@@ -58,11 +58,18 @@ const APPS={
   calendar:{name:'Calendar',bg:'#FFFFFF',fg:'#111614'},
   tips:{name:'Tips',bg:'#1F8A70',fg:'#fff'}
 };
-const glyph=id=>id==='calendar'?calGlyph():G_[id];
+const glyph=id=>id==='calendar'?calGlyph():(APPS[id].glyph||G_[id]);
 function iconHTML(id,label=true){const a=APPS[id];
   return `<div class="icon" data-app="${id}" role="button" tabindex="0" aria-label="${a.name}"><div class="glyph" style="background:${a.bg};color:${a.fg}">${glyph(id)}</div>${label?`<span>${a.name}</span>`:''}</div>`}
-$('#p1icons').innerHTML=['calendar','tips'].map(i=>iconHTML(i)).join('');
-$('#dock').innerHTML=['notes','calculator','clock','settings'].map(i=>iconHTML(i,false)).join('');
+let installed=store.get('installed',[]);
+function renderHome(newId){
+  installed=installed.filter(id=>APPS[id]);
+  const p1=['calendar','tips','clock','calculator','gallery'].filter(id=>APPS[id]);
+  $('#p1icons').innerHTML=p1.map(i=>iconHTML(i)).join('');
+  $('#dock').innerHTML=['notes','camera','store','settings'].filter(id=>APPS[id]).map(i=>iconHTML(i,false)).join('');
+  $('#p2icons').innerHTML=installed.map(i=>iconHTML(i)).join('');
+  if(newId){const n=$(`#p2icons [data-app="${newId}"]`);if(n)n.classList.add('new')}
+}
 
 /* ---------- Layer entities ---------- */
 const homeEl=$('#home'), pagesEl=$('#pages'), scrimEl=$('#scrim'), winsEl=$('#wins'), lockEl=$('#lock'), ccEl=$('#cc'), ccScrimEl=$('#ccScrim');
@@ -193,8 +200,9 @@ banEl.addEventListener('click',()=>{clearTimeout(banTimer);ban.y.to(-160,{resp:.
 /* ---------- Status painting ---------- */
 const sb=$('#statusbar'), hb=$('#homebar');
 function paint(){
-  const ink=!state.locked&&(state.cc||state.mode==='app'); sb.classList.toggle('ink',ink);
-  hb.classList.toggle('ink',!state.locked&&state.mode==='app'&&!state.cc);
+  const dk=!!(state.top&&APPS[state.top.id]&&APPS[state.top.id].darkUI);
+  const ink=!state.locked&&(state.cc||(state.mode==='app'&&!dk)); sb.classList.toggle('ink',ink);
+  hb.classList.toggle('ink',!state.locked&&state.mode==='app'&&!state.cc&&!dk);
 }
 
 /* ---------- Gesture manager ---------- */
@@ -283,7 +291,7 @@ HANDLERS.appBottom={
   end(g,v){const w=g.w; if(!w)return; clearTimeout(g.at);
     if(g.mode==='switch'){const n=g.n, d=w.x.v;
       if(d>W*.3||v.x>400){w.x.to(W+20,{resp:.42,damp:.92,vel:v.x});w.s.to(1);n.x.to(0,{resp:.42,damp:.92,vel:v.x});n.s.to(1);
-        w.onRest=()=>setVis(w,false); const st=state.stack; st.splice(st.indexOf(n),1); st.push(n); restack(); state.top=n}
+        w.onRest=()=>setVis(w,false); const st=state.stack; st.splice(st.indexOf(n),1); st.push(n); restack(); state.top=n; paint()}
       else{w.x.to(0,{vel:v.x});w.s.to(1);n.x.to(-W-20,{vel:v.x});n.onRest=()=>setVis(n,false)} return}
     const prog=clamp((1-w.s.v)/.9,0,1);
     if(v.y<-750||(!g.armed&&prog>.28)){goHome(w,v)}
@@ -323,6 +331,7 @@ const BUS=new Set();
 function syncCC(){
   $$('[data-cc]').forEach(b=>b.setAttribute('aria-pressed',!!prefs.cc[b.dataset.cc]));
   const d=isDark(); $('#ccDark').setAttribute('aria-pressed',d); $('#ccDark small').textContent=d?'On':'Off';
+  const tr=!!(window.OS&&OS.torch&&OS.torch.on); $('#ccTorch').setAttribute('aria-pressed',tr); $('#ccTorch small').textContent=tr?'On':'Off';
   const sl=prefs.speed<1; $('#ccSlow').setAttribute('aria-pressed',sl); $('#ccSlow small').textContent=sl?'0.4× speed':'Off';
   setSlider($('#slBright'),prefs.bright); setSlider($('#slVol'),prefs.vol);
 }
@@ -331,6 +340,8 @@ $('#ccDark').addEventListener('click',()=>{prefs.theme=isDark()?'light':'dark';s
 $('#ccSlow').addEventListener('click',()=>{prefs.speed=prefs.speed<1?1:.4;savePrefs();applyPrefs();vib(6)});
 $('#ccLock').addEventListener('click',()=>{closeCC();setTimeout(lockNow,120)});
 $('#ccSet').addEventListener('click',()=>{closeCC();openApp('settings')});
+$('#ccTorch').addEventListener('click',()=>{if(window.OS&&OS.torch){if(!OS.torch.on)closeCC();OS.torch.toggle()}vib(6)});
+$('#ccCam').addEventListener('click',()=>{closeCC();openApp('camera')});
 function setSlider(el,v){el.querySelector('.fill').style.transform=`scaleX(${v})`;el.querySelector('em').textContent=Math.round(v*100)+'%'}
 function bindSlider(el,key,min){
   let id=null;
@@ -526,7 +537,8 @@ BUILD.calendar=(el)=>{
 const TIPS=[['↑','Unlock','Swipe up anywhere on the lock screen.'],['↑','Go home','Swipe up from the bar at the bottom of any app.'],
   ['⏸','App switcher','Swipe up from the bottom bar and pause for a moment, then let go.'],['→','Previous app','Swipe right along the bottom bar to jump back to the last app.'],
   ['↓','Control Center','Pull down from the top edge, or anywhere on the home screen.'],['✕','Close an app','In the app switcher, flick a card up.'],
-  ['½','Watch it slowly','Turn on Slow motion in Control Center to see every spring.'],['+','Add to home screen','Use your browser menu to add this page to your home screen for a full-screen view.']];
+  ['½','Watch it slowly','Turn on Slow motion in Control Center to see every spring.'],['⬇','Get apps','Open the App Store to download games like Snake and Paper Glide. Remove them there too.'],
+  ['+','Add to home screen','Use your browser menu to add this page to your home screen for a full-screen view.']];
 BUILD.tips=(el)=>{
   el.innerHTML=`<div class="hdr"><h1>Tips</h1><p class="sub">Every gesture in Senritha OS</p></div><div class="scroll"><div class="group" style="margin-top:12px">${TIPS.map(t=>`<div class="tip"><i>${t[0]}</i><div><b>${t[1]}</b><span>${t[2]}</span></div></div>`).join('')}</div></div>`;
 };
@@ -544,6 +556,22 @@ function relayout(){
   cc.c.set(state.cc?1:0);
 }
 window.addEventListener('resize',relayout);
-measure(); applyPrefs(); clockTick(); noteWidget(); rotateTip(); relayout(); paint();
-ccEl.style.visibility='hidden';
+
+/* ---------- Public API for app modules (apps/*.js) ---------- */
+function kill(id){const w=wins[id];if(!w)return;const st=state.stack,i=st.indexOf(w);if(i>=0)st.splice(i,1);restack();
+  setVis(w,false);w.api.destroy&&w.api.destroy();w.el.remove();delete wins[id];if(state.top===w)state.top=null}
+window.OS={$,$$,clamp,vib,store,loop,esc,prefs,bus:BUS,now,glyph,isDark,
+  get W(){return W},get H(){return H},
+  apps:()=>APPS,
+  register(id,def){APPS[id]=def;if(def.build)BUILD[id]=def.build},
+  openApp:id=>openApp(id), notify:(a,t,b)=>notify(a,t,b), syncCC:()=>syncCC(),
+  isInstalled:id=>installed.includes(id),
+  install(id){if(!installed.includes(id)){installed.push(id);store.set('installed',installed);renderHome(id)}},
+  uninstall(id){kill(id);installed=installed.filter(x=>x!==id);store.set('installed',installed);renderHome()}
+};
+function boot(){
+  renderHome(); measure(); applyPrefs(); clockTick(); noteWidget(); rotateTip(); relayout(); paint();
+  ccEl.style.visibility='hidden';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot); else setTimeout(boot);
 })();
