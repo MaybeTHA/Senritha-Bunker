@@ -8,12 +8,12 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const ls={get(k,d){try{const v=localStorage.getItem('ws.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('ws.'+k,JSON.stringify(v))}catch(e){}}};
-const prefs=Object.assign({name:'Senritha',color:'#5B57E8',theme:'system',enterSend:true},ls.get('prefs',{}));
+const prefs=Object.assign({name:'Senritha',color:'#57524A',theme:'system',enterSend:true},ls.get('prefs',{}));
 const ui=Object.assign({active:null,open:{}},ls.get('ui',{}));
 const drafts=ls.get('drafts',{});
 const savePrefs=()=>ls.set('prefs',prefs), saveUi=()=>ls.set('ui',ui);
 let draftT=0; const saveDrafts=()=>{clearTimeout(draftT);draftT=setTimeout(()=>ls.set('drafts',drafts),300)};
-const COLORS=['#5B57E8','#E0603A','#1F8A70','#D6455D','#C08A1E','#3B82C4','#8A4FB8','#4B5563'];
+const COLORS=['#57524A','#B4532A','#3F7A5E','#8A560C','#3B6A8F','#7A4E7E','#A23E48','#2F2C28'];
 const QUICK=['👍','❤️','😂','🎉','🔥','👀','✅','🙏'];
 const EMOJI=['😀','😄','😁','😅','🤣','😊','😍','🥰','😎','🤩','🤔','😴','😮','😢','😭','😤','👍','👎','👏','🙌','🙏','💪','👀','🤝','❤️','🧡','💛','💚','💙','💜','🔥','✨','🎉','🎯','✅','❌','⚠️','💡','📌','📎','🚀','⭐','☕','🍜','🎵','🎮','📷','💯'];
 const I={
@@ -47,6 +47,7 @@ let channels=[]; const cache=new Map(), index=new Map(), urls=new Map();
 const ch=id=>channels.find(c=>c.id===id);
 const kids=pid=>channels.filter(c=>(c.parentId||null)===(pid||null)).sort((a,b)=>a.order-b.order);
 const pathOf=id=>{const p=[];let c=ch(id);while(c){p.unshift(c);c=ch(c.parentId)}return p};
+const pathStr=id=>pathOf(id).map(c=>c.name).join(' / ');
 const descendants=id=>{const out=[];(function walk(i){kids(i).forEach(k=>{out.push(k);walk(k.id)})})(id);return out};
 async function msgsOf(cid){if(!cache.has(cid)){const a=await DB.byIndex('messages','channelId',cid);a.sort((x,y)=>x.created-y.created);a.forEach(m=>index.set(m.id,m));cache.set(cid,a)}return cache.get(cid)}
 const repliesOf=m=>(cache.get(m.channelId)||[]).filter(r=>r.parentId===m.id);
@@ -143,7 +144,7 @@ scrim.onclick=()=>{closeModal();closeSheet()};
   addEventListener('pointermove',e=>{if(y0==null)return;dy=Math.max(0,e.clientY-y0);sheet.style.transform=`translateY(${dy}px)`});
   addEventListener('pointerup',()=>{if(y0==null)return;y0=null;sheet.style.transition='';if(dy>90)closeSheet();else sheet.style.transform=''})})();
 function renameChannel(c){
-  openModal(`<h3>Rename channel</h3><p>${esc(pathOf(c.id).map(x=>'#'+x.name).join(' › '))}</p><form id="rnForm"><label class="field"><span>Name</span><input type="text" id="rnName" maxlength="60" value="${esc(c.name)}"></label>
+  openModal(`<h3>Rename channel</h3><p class="path">${esc(pathStr(c.id))}</p><form id="rnForm"><label class="field"><span>Name</span><input type="text" id="rnName" maxlength="60" value="${esc(c.name)}"></label>
     <div class="row-btns"><button type="button" class="btn" data-cancel>Cancel</button><button class="btn primary">Save</button></div></form>`,m=>{
     m.querySelector('[data-cancel]').onclick=closeModal;
     m.querySelector('#rnForm').onsubmit=async e=>{e.preventDefault();const n=m.querySelector('#rnName').value.trim();if(!n)return;c.name=n.slice(0,60);await DB.put('channels',c);closeModal();renderTree();if(ui.active===c.id||pathOf(ui.active).includes(c))renderHead();toast('Renamed')}});
@@ -230,14 +231,15 @@ const sameGroup=(a,b)=>a&&b&&new Date(a.created).toDateString()===new Date(b.cre
 async function renderMsgs(){
   const c=ch(ui.active);if(!c)return;const list=(await msgsOf(c.id)).filter(m=>!m.parentId);
   const p=pathOf(c.id),subs=kids(c.id);
-  let h=`<div class="ch-intro"><div class="big">#</div><h2>${esc(c.name)}</h2><p>${p.length>1?`Sub-channel of ${esc(p.slice(0,-1).map(x=>'#'+x.name).join(' › '))}. `:''}${list.length?`${list.length} message${list.length===1?'':'s'} so far.`:'This is the start of the channel. Write the first message below.'}${subs.length?` Has ${subs.length} sub-channel${subs.length===1?'':'s'}.`:''}</p></div>`;
+  let h=`<div class="ch-intro">${p.length>1?`<div class="path">${esc(p.map(x=>x.name).join(' / '))}</div>`:''}<h2>${esc(c.name)}</h2><p>${p.length>1?`Inside ${esc(p[p.length-2].name)}. `:''}${list.length?`${list.length} message${list.length===1?'':'s'} so far.`:'This is the start of the channel. Write the first message below.'}${subs.length?` Has ${subs.length} sub-channel${subs.length===1?'':'s'}.`:''}</p></div>`;
   let prev=null;for(const m of list){if(!prev||new Date(prev.created).toDateString()!==new Date(m.created).toDateString())h+=`<div class="day">${dayLabel(m.created)}</div>`;h+=msgHTML(m,{cont:sameGroup(prev,m)});prev=m}
   msgList.innerHTML=h;msgList.classList.remove('list-swap');void msgList.offsetWidth;msgList.classList.add('list-swap');hydrate(msgList);
   msgsEl.scrollTop=msgsEl.scrollHeight;requestAnimationFrame(()=>msgsEl.scrollTop=msgsEl.scrollHeight);
 }
 function renderHead(){
   const c=ch(ui.active);if(!c)return;const p=pathOf(c.id);
-  $('#crumbs').innerHTML=p.slice(0,-1).map(x=>`<button data-go="${x.id}">#${esc(x.name)}</button><span class="sep">›</span>`).join('')+`<span class="cur"><i>#</i>${esc(c.name)}</span>`;
+  $('#crumbs').innerHTML=`<span class="path">${p.slice(0,-1).map(x=>`<button data-go="${x.id}">${esc(x.name)}</button> / `).join('')}</span><span class="cur">${esc(c.name)}</span>`;
+  $('#crumbs .path').hidden=p.length<2;
   const subs=kids(c.id);$('#subs').innerHTML=`<span class="lbl">Sub-channels</span>${subs.map(s=>`<button class="chip" data-go="${s.id}"><i>#</i>${esc(s.name)}</button>`).join('')}<button class="chip add" id="addSubChip">${I.plus}New sub-channel</button>`;
   updatePins();
 }
@@ -344,7 +346,7 @@ function tidyDays(){$$('.day',msgList).forEach(d=>{const n=d.nextElementSibling;
 
 /* ---------- Thread ---------- */
 function openThread(m,focus){
-  thread=m;const c=ch(m.channelId);$('#thWhere').textContent='#'+(c?c.name:'');
+  thread=m;$('#thWhere').textContent=pathStr(m.channelId);$('#thWhere').className='path';
   renderThread();app.classList.add('th-open');if(isPhone())setView('thread');thComposer.setKey('th:'+m.id,'Reply in thread');
   if(focus||!isPhone())setTimeout(()=>thComposer.focus(),300);
 }
@@ -358,7 +360,7 @@ $('#thClose').onclick=()=>closeThread();$('#thBack').onclick=()=>closeThread();
 /* ---------- Pins ---------- */
 function updatePins(){const all=(cache.get(ui.active)||[]).filter(m=>m.pinned);$('#pinCount').textContent=all.length;$('#pinsBtn').classList.toggle('has',!!all.length)}
 $('#pinsBtn').onclick=e=>{const all=(cache.get(ui.active)||[]).filter(m=>m.pinned).sort((a,b)=>b.created-a.created);
-  $('#pinsList').innerHTML=all.length?all.map(m=>`<button class="pin-item" data-id="${m.id}"><small>${dayLabel(m.created)} · ${fmtTime(m.created)}${m.parentId?' · in a thread':''}</small><div>${esc(m.text||'📷 Image')}</div></button>`).join(''):'<p class="noresult">No pinned messages. Use the pin button on a message to keep it here.</p>';
+  $('#pinsList').innerHTML=all.length?all.map(m=>`<button class="pin-item" data-id="${m.id}"><small>${dayLabel(m.created)} · ${fmtTime(m.created)}${m.parentId?' · in a thread':''}</small><div>${m.text?esc(m.text):`<span class="imgnote">${I.image}Image</span>`}</div></button>`).join(''):'<p class="noresult">No pinned messages. Use the pin button on a message to keep it here.</p>';
   $('#pinsList').onclick=ev=>{const b=ev.target.closest('[data-id]');if(b){closePops();jumpTo(index.get(b.dataset.id))}};openPop($('#pinsPop'),e.currentTarget)};
 async function jumpTo(m){if(!m)return;await openChannel(m.channelId,{focus:false});
   let el;if(m.parentId){openThread(index.get(m.parentId));el=$(`#thList .msg[data-id="${m.id}"]`)}else el=$(`#msgList .msg[data-id="${m.id}"]`);
@@ -379,9 +381,9 @@ async function search(v){
   const hl=new RegExp('('+terms.map(t=>reEsc(esc(t))).join('|')+')','gi');
   const groups=new Map();all.forEach(m=>{if(!ch(m.channelId))return;if(!groups.has(m.channelId))groups.set(m.channelId,[]);groups.get(m.channelId).push(m)});
   $('#searchTitle').textContent=`${all.length} result${all.length===1?'':'s'} for “${v.trim()}”`;
-  $('#results').innerHTML=all.length?[...groups].map(([cid,ms])=>`<div class="rgroup">${esc(pathOf(cid).map(c=>'#'+c.name).join(' › '))}</div>`+ms.map(m=>{
+  $('#results').innerHTML=all.length?[...groups].map(([cid,ms])=>`<div class="rgroup path">${esc(pathStr(cid))}</div>`+ms.map(m=>{
     const t=m.text.replace(/\*\*|~~|`/g,''),i=Math.max(0,t.toLowerCase().indexOf(terms[0])-50),snip=(i?'…':'')+t.slice(i,i+220);
-    return`<button class="res" data-id="${m.id}"><div class="rt"><span>${dayLabel(m.created)} · ${fmtTime(m.created)}</span>${m.parentId?'<span>in a thread</span>':''}${m.pinned?'<span>📌</span>':''}</div><div class="rx2">${esc(snip).replace(hl,'<mark>$1</mark>')}</div></button>`}).join('')).join('')
+    return`<button class="res" data-id="${m.id}"><div class="rt"><span>${dayLabel(m.created)} · ${fmtTime(m.created)}</span>${m.parentId?'<span>in a thread</span>':''}${m.pinned?'<span>pinned</span>':''}</div><div class="rx2">${esc(snip).replace(hl,'<mark>$1</mark>')}</div></button>`}).join('')).join('')
     :'<p class="noresult">No messages match. Try fewer or different words.</p>';
   app.classList.add('searching');
 }
@@ -469,7 +471,7 @@ async function seed(){
     x.fillStyle='#fff';x.font='700 44px system-ui';x.fillText('Beat engine v2',60,90);x.font='500 24px system-ui';x.fillStyle='#B9BAD6';x.fillText('Average timing error: 1–2 ms (example image)',60,130);
     const blob=await new Promise(r=>c.toBlob(r,'image/png'));if(blob){img={id:uid(),w:960,h:540};await DB.put('blobs',{id:img.id,blob})}}catch(e){}
   const msg=(c,text,t,o={})=>({id:uid(),channelId:c.id,parentId:o.parent||null,text,images:o.images||[],created:now-t,edited:0,pinned:!!o.pinned,reactions:o.reactions||[]});
-  const m1=msg(gen,'Welcome to Senritha\'s Work Space 👋\nThese channels and messages are **examples**. Rename or delete them anytime.',26*H,{pinned:true,reactions:['🎉']});
+  const m1=msg(gen,'This workspace starts with **example** channels and messages. Rename or delete them anytime.',26*H,{pinned:true,reactions:['🎉']});
   const m2=msg(gen,'Quick tips:\n• Press + next to a channel to make a sub-channel inside it (as deep as you like)\n• Paste, drop or attach images in the message box\n• Hover a message, or long-press on a phone, to react, reply, edit, pin or delete\n• Write **bold**, _italic_ and `code`',26*H-60e3);
   const r1=msg(rh,'Beat engine v2 is in. Timing is much tighter on the test songs.',3*H,{images:img?[img]:[],reactions:['🔥','🎉']});
   const r2=msg(rh,'Next: try it with real songs on the phone.',2.5*H,{parent:r1.id});
