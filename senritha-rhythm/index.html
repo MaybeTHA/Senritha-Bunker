@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Senritha's Rhythm</title>
-<meta name="description" content="Play songs from your phone and watch visuals that move with every beat.">
+<meta name="description" content="Play songs from your phone, watch visuals that move with every beat, and play them as a rhythm game.">
 <meta name="theme-color" content="#07070C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -31,10 +31,17 @@
     </div>
   </header>
 
+  <div class="hud" id="hud">
+    <div><span class="hl">Score</span><b id="hScore">0</b></div>
+    <div class="mid"><b id="hCombo"></b></div>
+    <div class="r"><span class="hl">Accuracy</span><b id="hAcc">—</b></div>
+    <button class="iconbtn" id="gPause" aria-label="Pause game"><svg viewBox="0 0 24 24" class="fill"><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z"/></svg></button>
+  </div>
+
   <section class="empty" id="empty">
-    <p class="eyebrow">Beat visualizer</p>
+    <p class="eyebrow">Beat visualizer and rhythm game</p>
     <h1>Your music, <em>on the beat.</em></h1>
-    <p class="lede">Pick songs from your phone. Senritha's Rhythm finds the tempo and maps every beat, then moves with it. Your songs never leave this device.</p>
+    <p class="lede">Pick songs from your phone. Senritha's Rhythm finds the tempo and maps every beat, then moves with it. Play any song as a 4-lane rhythm game. Your songs never leave this device.</p>
     <div class="actions">
       <label class="btn primary">Add songs<input type="file" id="addMain" accept="audio/*" multiple class="vh"></label>
       <button class="btn ghost" id="demo">Play the demo beat</button>
@@ -42,14 +49,21 @@
   </section>
 
   <footer class="player" id="player" hidden>
-    <div class="now"><div class="ttl" id="ttl">Pick a song</div><div class="meta" id="meta"></div></div>
+    <div class="nowrow">
+      <span class="art none" id="art" aria-hidden="true"></span>
+      <div class="now"><div class="ttl" id="ttl">Pick a song</div><div class="meta" id="meta"></div></div>
+      <button class="pill" id="gameBtn"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="11" rx="5"/><path d="M8 10.5v4M6 12.5h4M15.5 11.5h.01M17.5 13.5h.01"/></svg>Play</button>
+      <button class="rec" id="recBtn" aria-label="Record a 15 second clip"><span></span></button>
+    </div>
     <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Song position">
     <div class="times"><span id="cur">0:00</span><span id="dur">0:00</span></div>
     <div class="ctl">
       <button id="lib" aria-label="Library"><svg viewBox="0 0 24 24"><path d="M4 6h12M4 12h12M4 18h8M19 15v5"/><circle cx="17.5" cy="19.5" r="1.8"/></svg></button>
-      <button id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" class="fill"><path d="M18 6v12l-9-6zM6 6v12" /></svg></button>
+      <button id="shuffle" class="tog" aria-label="Shuffle" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 7h3.5c4.5 0 4.5 10 9 10H20M4 17h3.5c1.6 0 2.6-1.2 3.4-2.8M13.1 9.8C13.9 8.2 14.9 7 16.5 7H20M17.5 4.5 20 7l-2.5 2.5M17.5 14.5 20 17l-2.5 2.5"/></svg></button>
+      <button id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" class="fill"><path d="M18 6v12l-9-6zM6 6v12"/></svg></button>
       <button id="play" class="play" aria-label="Play"></button>
       <button id="next" aria-label="Next"><svg viewBox="0 0 24 24" class="fill"><path d="M6 6v12l9-6zM18 6v12"/></svg></button>
+      <button id="repeat" class="tog" aria-label="Repeat all" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 11V9a3 3 0 0 1 3-3h12l-3-3M20 13v2a3 3 0 0 1-3 3H5l3 3"/></svg><b>1</b></button>
       <button id="styleBtn" aria-label="Next visual style"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></button>
     </div>
   </footer>
@@ -59,7 +73,10 @@
   <section class="sheet" id="libSheet" aria-label="Library">
     <div class="grab" data-close></div>
     <div class="sheethead"><h2>Library</h2><label class="btn small primary">Add songs<input type="file" id="addLib" accept="audio/*" multiple class="vh"></label></div>
+    <div class="tabs" id="tabs"></div>
+    <form class="newpl" id="newPl" hidden><input id="plName" maxlength="40" placeholder="Playlist name" aria-label="Playlist name" autocomplete="off"><button class="btn small primary" type="submit">Make</button><button class="btn small" type="button" id="plCancel">Cancel</button></form>
     <ul id="songs"></ul>
+    <div class="pltools" id="plTools" hidden><button class="del" id="plDelete">Delete playlist</button></div>
     <p class="note">Songs are saved only on this device. Each song is analysed once to map its beats.</p>
   </section>
 
@@ -67,18 +84,49 @@
     <div class="grab" data-close></div>
     <div class="sheethead"><h2>Settings</h2><button class="btn small" data-close>Done</button></div>
     <div class="set">
-      <div class="row col"><span>Visual style</span><div class="seg" id="setStyle"><button data-v="orb">Orb</button><button data-v="bars">Bars</button><button data-v="tunnel">Tunnel</button></div></div>
+      <div class="row col"><span>Visual style</span><div class="seg wrap" id="setStyle"></div></div>
+      <div class="row"><span>Auto style<small class="sub">Changes style when the song gets calmer or more intense</small></span><button class="switch" role="switch" id="setAuto" aria-label="Auto style"></button></div>
       <div class="row"><span>Motion trails</span><button class="switch" role="switch" id="setTrails" aria-label="Motion trails"></button></div>
       <div class="row col"><span>Pulse strength <em id="strVal"></em></span><input type="range" id="setStrength" min="0.3" max="1.6" step="0.05"></div>
-      <div class="row col"><span>Beat sync <em id="offVal"></em></span><input type="range" id="setOffset" min="-200" max="200" step="10"><small>Move right if the visuals hit before the sound, left if they hit after. Bluetooth headphones usually need +100 to +200 ms.</small></div>
+      <div class="row col"><span>Beat sync <em id="offVal"></em></span><input type="range" id="setOffset" min="-200" max="200" step="10"><small>Move right if the visuals or notes hit before the sound, left if they hit after. Bluetooth headphones usually need +100 to +200 ms.</small></div>
       <div class="row col" id="installRow"><span>Install</span><button class="btn primary" id="installBtn" hidden>Install Senritha's Rhythm</button><small id="installHint">Open this page from GitHub Pages, then use your browser menu: Add to Home Screen.</small></div>
     </div>
   </section>
 
+  <section class="sheet" id="gameSheet" aria-label="Rhythm game">
+    <div class="grab" data-close></div>
+    <div class="sheethead"><h2>Rhythm game</h2><span class="note" id="gCount"></span></div>
+    <p class="note big">Notes fall down 4 lanes in time with the song. Tap a lane when its note crosses the line. On a keyboard, use D F J K.</p>
+    <div class="seg" id="gDiff"><button data-v="easy">Easy</button><button data-v="normal">Normal</button><button data-v="hard">Hard</button></div>
+    <p class="note" id="gBest"></p>
+    <button class="btn primary wide" id="gStart">Start</button>
+  </section>
+
+  <section class="sheet" id="pauseSheet" aria-label="Paused">
+    <div class="sheethead"><h2>Paused</h2></div>
+    <div class="stack"><button class="btn primary wide" id="pResume">Resume</button><button class="btn wide" id="pRestart">Restart song</button><button class="btn ghost wide" id="pQuit">Quit game</button></div>
+  </section>
+
+  <section class="sheet" id="resultSheet" aria-label="Results">
+    <div class="result"><div class="grade" id="rGrade">A</div><div><div class="rsong" id="rSong"></div><div class="rscore" id="rScore"></div></div></div>
+    <div class="rstats" id="rStats"></div>
+    <div class="stack"><button class="btn primary wide" id="rAgain">Play again</button><button class="btn ghost wide" id="rDone">Back to visuals</button></div>
+  </section>
+
+  <section class="sheet" id="clipSheet" aria-label="Your clip">
+    <div class="grab" data-close></div>
+    <div class="sheethead"><h2>Your clip</h2><span class="note" id="clipInfo"></span></div>
+    <video id="clipVideo" playsinline controls loop></video>
+    <div class="stack row2"><button class="btn primary" id="clipShare">Share</button><button class="btn" id="clipSave">Save video</button></div>
+  </section>
+
   <div class="toast" id="toast" role="status"></div>
 </div>
+<script src="tags.js"></script>
 <script src="analysis.js"></script>
 <script src="visuals.js"></script>
 <script src="app.js"></script>
+<script src="game.js"></script>
+<script src="clip.js"></script>
 </body>
 </html>
