@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#143A32">
+</head>
+<body>
+<title>Senritha OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+
+<div id="device">
+  <div class="wall wp0" id="wall"></div>
+
+  <div id="home">
+    <div id="pages">
+      <div class="page">
+        <div class="grid">
+          <div class="widget" data-open="calendar" role="button" tabindex="0" aria-label="Open Calendar">
+            <div class="wlabel" id="wtDay">Monday</div>
+            <div class="wt-date" id="wtDate">9</div>
+            <div class="wt-sub" id="wtSub">November</div>
+          </div>
+          <div class="widget" data-open="notes" role="button" tabindex="0" aria-label="Open Notes">
+            <div class="wlabel">Latest note</div>
+            <div class="wn-title" id="wnTitle"></div>
+            <div class="wn-body" id="wnBody"></div>
+          </div>
+          <div id="p1icons" style="display:contents"></div>
+        </div>
+      </div>
+      <div class="page">
+        <div class="grid">
+          <div class="widget wide" data-open="settings" role="button" tabindex="0" aria-label="Open Settings">
+            <div class="wlabel">This display</div>
+            <div class="stats">
+              <div><b id="stHz">60</b><small>Hz refresh</small></div>
+              <div><b id="stRes">0</b><small>points wide</small></div>
+              <div><b id="stApps">0</b><small>apps open</small></div>
+            </div>
+          </div>
+          <div class="widget wide" data-open="tips" role="button" tabindex="0" aria-label="Open Tips">
+            <div class="wlabel">Gesture tip</div>
+            <div class="wtip" id="wTip"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="dots"><i class="on"></i><i></i></div>
+    <div id="dock"></div>
+  </div>
+
+  <div id="scrim"></div>
+  <div id="wins"></div>
+
+  <div id="lock">
+    <div class="wall wp0" id="lockWall"></div>
+    <div class="lockin">
+      <div class="ldate" id="lDate">Monday, 9 November</div>
+      <div class="ltime" id="lTime">9:41</div>
+      <div class="lnote">
+        <div class="glyph" style="background:#1F8A70;color:#fff"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></div>
+        <div><b>Welcome to Senritha OS</b><span>Swipe up to unlock. Open Tips for every gesture.</span></div>
+      </div>
+      <div class="lhint">Swipe up to unlock</div>
+    </div>
+  </div>
+
+  <div id="ccScrim"></div>
+  <div id="cc">
+    <div class="cc4">
+      <button data-cc="wifi"><span class="o"><svg viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0M12 19.5h.01"/></svg></span>Wi‑Fi</button>
+      <button data-cc="bt"><span class="o"><svg viewBox="0 0 24 24"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></svg></span>Bluetooth</button>
+      <button data-cc="air"><span class="o"><svg viewBox="0 0 24 24"><path d="M10.5 21l1.5-1 1.5 1v-2.5L12 17V13l8 3v-2l-8-5V4.5a1 1 0 0 0-2 0V9l-8 5v2l8-3v4l-1.5 1.5z" transform="translate(1 0)"/></svg></span>Airplane</button>
+      <button data-cc="dnd"><span class="o"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span>Focus</button>
+    </div>
+    <div class="cctiles">
+      <button class="tile" id="ccDark">Dark mode<small>Off</small></button>
+      <button class="tile" id="ccSlow">Slow motion<small>Off</small></button>
+    </div>
+    <div class="slider" id="slBright" data-nogesture><div class="fill"></div><span>Brightness</span><em></em></div>
+    <div class="slider" id="slVol" data-nogesture><div class="fill"></div><span>Volume</span><em></em></div>
+    <div class="cctiles"><button class="tile" id="ccLock">Lock phone<small>Back to lock screen</small></button><button class="tile" id="ccSet">Settings<small>All options</small></button></div>
+    <div class="grab"></div>
+  </div>
+
+  <div id="banner" data-nogesture><div class="glyph"></div><div><b></b><span></span></div></div>
+
+  <div id="statusbar"><span id="sbTime">9:41</span><span class="sbr"><svg viewBox="0 0 18 12" id="sbSig"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 16 12" id="sbWifi"><path d="M8 12l2.4-3a3.8 3.8 0 0 0-4.8 0zM8 0a12.5 12.5 0 0 0-8 2.9L1.6 5a10 10 0 0 1 12.8 0L16 2.9A12.5 12.5 0 0 0 8 0zm0 4.3a8.3 8.3 0 0 0-5.3 1.9l1.6 2a5.8 5.8 0 0 1 7.4 0l1.6-2A8.3 8.3 0 0 0 8 4.3z"/></svg><span class="batt"><i id="sbBatt" style="width:82%"></i></span></span></div>
+  <div id="topzone"></div>
+  <div id="botzone"></div>
+  <div id="homebar"></div>
+  <div id="dim"></div>
+  <div id="fps" hidden>60 fps</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
