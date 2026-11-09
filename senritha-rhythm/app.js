@@ -8,6 +8,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const ls={get(k,d){try{const v=localStorage.getItem('rhythm.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('rhythm.'+k,JSON.stringify(v))}catch(e){}}};
 const prefs=Object.assign({style:'orb',trails:true,offset:0,strength:1,auto:false,shuffle:false,repeat:'all',difficulty:'normal'},ls.get('prefs',{}));
 const savePrefs=()=>ls.set('prefs',prefs);
+if(prefs.syncV!==2){prefs.offset=-(prefs.offset||0);prefs.syncV=2;savePrefs()}   // v1 stored the opposite sign
 const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 
 /* ---------- Song library (IndexedDB, with an in-memory fallback) ---------- */
@@ -43,7 +44,7 @@ function buildOrder(){const list=viewSongs().slice();
   if(prefs.shuffle){for(let i=list.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[list[i],list[j]]=[list[j],list[i]]}
     if(cur){const k=list.indexOf(cur);if(k>0){list.splice(k,1);list.unshift(cur)}}}
   order=list}
-async function refresh(){songs=await lib.all();buildOrder();renderList();$('#empty').hidden=!!songs.length;$('#player').hidden=!songs.length}
+async function refresh(){songs=await lib.all();songs.forEach(s=>{if(s.analysis&&(s.analysis.v||1)<Analysis.VERSION)s.analysis=null});buildOrder();renderList();$('#empty').hidden=!!songs.length;$('#player').hidden=!songs.length}
 
 async function addFiles(files){
   const list=[...files].filter(f=>f.type.startsWith('audio/')||/\.(mp3|m4a|aac|wav|ogg|flac|opus|webm)$/i.test(f.name));
@@ -102,7 +103,22 @@ let W=0,H=0;
 function resize(){const d=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cv.style.width=W+'px';cv.style.height=H+'px';ctx.setTransform(d,0,0,d,0,0);ctx.fillStyle='#07070C';ctx.fillRect(0,0,W,H)}
 addEventListener('resize',resize);
 const PAL=Visuals.PAL;
-const songTime=()=>{const lat=ac?(ac.outputLatency||ac.baseLatency||0):0;return audio.currentTime-lat+prefs.offset/1000};
+/* Smooth song clock. audio.currentTime only updates every few frames on many phones, so we keep an
+   anchor (song time, performance time) and run it forward with performance.now(), gently pulled toward
+   each fresh currentTime reading. This gives a new, precise time on every frame and for every tap. */
+const clock={m:0,p:0,last:-1,
+  reset(){this.m=audio.currentTime;this.p=performance.now();this.last=audio.currentTime},
+  at(perf){
+    if(audio.paused||audio.seeking)return audio.currentTime;
+    const ct=audio.currentTime,rate=audio.playbackRate||1;
+    if(ct!==this.last){const now=performance.now(),pred=this.m+(now-this.p)/1000*rate,err=ct-pred;
+      if(Math.abs(err)>.12){this.m=ct;this.p=now}else{this.m=pred+err*.15;this.p=now}this.last=ct}
+    return this.m+(perf-this.p)/1000*rate}};
+['play','playing','seeked','pause','ratechange','loadedmetadata'].forEach(ev=>audio.addEventListener(ev,()=>clock.reset()));
+const outLat=()=>ac?(ac.outputLatency||ac.baseLatency||0):0;
+/* song time heard at a performance timestamp: playback position minus output latency minus the user's sync delay */
+const songTimeAt=perf=>clock.at(perf)-outLat()-prefs.offset/1000;
+const songTime=()=>songTimeAt(performance.now());
 function state(now){
   const playing=!!cur&&!audio.paused, A=cur&&cur.analysis;
   let t; if(cur){t=songTime();if(playing&&!A)live.feed(audio.currentTime)}else t=now/1000;
@@ -279,7 +295,7 @@ try{if('serviceWorker'in navigator&&location.protocol==='https:')navigator.servi
 const listeners={}; function emit(n,a){(listeners[n]||[]).forEach(f=>f(a))}
 const endHooks=[]; function hooksEnd(){return endHooks.some(f=>f())}
 const Game={active:false,blocking:()=>false};   // replaced by game.js
-window.Rhythm={audio,prefs,savePrefs,toast,sheet,vib,esc,fmt,title,artUrl,songTime,ensureGraph,
+window.Rhythm={audio,prefs,savePrefs,toast,sheet,vib,esc,fmt,title,artUrl,songTime,songTimeAt,outLat,syncSettings:()=>syncSettings(),ensureGraph,
   get ac(){return ac},get cur(){return cur},get recDest(){return recDest},canvas:cv,size:()=>({W,H}),
   frameHooks,endHooks,on(n,f){(listeners[n]=listeners[n]||[]).push(f)},
   setGame(g){Object.assign(Game,g)},Game,immersive,play,ui};

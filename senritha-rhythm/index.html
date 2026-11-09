@@ -88,9 +88,17 @@
       <div class="row"><span>Auto style<small class="sub">Changes style when the song gets calmer or more intense</small></span><button class="switch" role="switch" id="setAuto" aria-label="Auto style"></button></div>
       <div class="row"><span>Motion trails</span><button class="switch" role="switch" id="setTrails" aria-label="Motion trails"></button></div>
       <div class="row col"><span>Pulse strength <em id="strVal"></em></span><input type="range" id="setStrength" min="0.3" max="1.6" step="0.05"></div>
-      <div class="row col"><span>Beat sync <em id="offVal"></em></span><input type="range" id="setOffset" min="-200" max="200" step="10"><small>Move right if the visuals or notes hit before the sound, left if they hit after. Bluetooth headphones usually need +100 to +200 ms.</small></div>
+      <div class="row col"><span>Beat sync <em id="offVal"></em></span><input type="range" id="setOffset" min="-150" max="400" step="5"><small>How late the sound reaches your ears. Move right if visuals or notes come before the sound, left if after. Bluetooth headphones usually need +100 to +250 ms.</small><button class="btn wide" id="calOpen">Calibrate by tapping</button></div>
       <div class="row col" id="installRow"><span>Install</span><button class="btn primary" id="installBtn" hidden>Install Senritha's Rhythm</button><small id="installHint">Open this page from GitHub Pages, then use your browser menu: Add to Home Screen.</small></div>
     </div>
+  </section>
+
+  <section class="sheet" id="calSheet" aria-label="Calibrate beat sync">
+    <div class="grab" data-close></div>
+    <div class="sheethead"><h2>Calibrate</h2><span class="note" id="calCount"></span></div>
+    <p class="note big" id="calText">Use the headphones or speaker you normally use. Press Start, then tap the pad each time you hear a click. Tap to the sound, not a light.</p>
+    <button class="calpad" id="calPad" aria-label="Tap here on each click"><span>Tap on each click</span></button>
+    <div class="stack row2"><button class="btn primary" id="calStart">Start</button><button class="btn" id="calApply" hidden>Use this setting</button></div>
   </section>
 
   <section class="sheet" id="gameSheet" aria-label="Rhythm game">
@@ -128,5 +136,6 @@
 <script src="app.js"></script>
 <script src="game.js"></script>
 <script src="clip.js"></script>
+<script src="calibrate.js"></script>
 </body>
 </html>

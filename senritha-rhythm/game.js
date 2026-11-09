@@ -74,9 +74,9 @@ function finish(){
 }
 
 /* ---------- Judging ---------- */
-function hit(lane){
+function hit(lane,ts){
   if(!G.active||paused||performance.now()<startAt)return;
-  flashes[lane]=performance.now(); const t=R.songTime(), w=DIFF[diff].win;
+  flashes[lane]=performance.now(); const t=R.songTimeAt(ts||performance.now()), w=DIFF[diff].win;   // judged at the moment of the touch, not when the code runs
   let cand=null;for(let i=st.next;i<notes.length;i++){const n=notes[i];if(n.t-t>w[2])break;if(!n.hit&&n.lane===lane&&Math.abs(n.t-t)<=w[2]){cand=n;break}}
   if(!cand)return;
   const d=Math.abs(cand.t-t), j=d<=w[0]?'perfect':d<=w[1]?'great':'good';
@@ -95,9 +95,9 @@ function hud(){const k=`${st.score}|${st.combo}`;if(k===hudKey)return;hudKey=k;$
 
 /* ---------- Input ---------- */
 const geo=()=>{const {W,H}=R.size(),lw=Math.min(W-24,520)/LANES,x0=(W-lw*LANES)/2;return{W,H,lw,x0,hy:H-Math.max(130,H*.17)}};
-R.canvas.addEventListener('pointerdown',e=>{if(!G.active)return;const g=geo(),l=Math.floor((e.clientX-g.x0)/g.lw);if(l<0||l>=LANES)return;pressed[l]=e.pointerId;hit(l)});
+R.canvas.addEventListener('pointerdown',e=>{if(!G.active)return;const g=geo(),l=Math.floor((e.clientX-g.x0)/g.lw);if(l<0||l>=LANES)return;pressed[l]=e.pointerId;hit(l,e.timeStamp)});
 const up=e=>{pressed=pressed.map(p=>p===e.pointerId?0:p)}; addEventListener('pointerup',up); addEventListener('pointercancel',up);
-document.addEventListener('keydown',e=>{if(!G.active||e.repeat)return;const l=KEYS[e.key.toLowerCase()];if(l!=null){e.preventDefault();pressed[l]=-1;hit(l)}else if(e.key==='Escape'||e.code==='Space'){e.preventDefault();paused?null:pause()}});
+document.addEventListener('keydown',e=>{if(!G.active||e.repeat)return;const l=KEYS[e.key.toLowerCase()];if(l!=null){e.preventDefault();pressed[l]=-1;hit(l,e.timeStamp)}else if(e.key==='Escape'||e.code==='Space'){e.preventDefault();paused?null:pause()}});
 document.addEventListener('keyup',e=>{const l=KEYS[e.key.toLowerCase()];if(l!=null)pressed[l]=0});
 
 /* ---------- Drawing (runs after the visual style each frame) ---------- */
