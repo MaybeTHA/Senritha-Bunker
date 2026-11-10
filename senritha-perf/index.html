@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Senritha's Test performance</title>
+<meta name="description" content="2D graphics benchmark: seven WebGL2 stress tests with measured FPS, 1% and 0.1% lows, frame-time graphs, scores, history and export.">
+<meta name="theme-color" content="#06080C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 24h5l4-12 5 16 4-10 3 6h5" /></svg>
+      <div><b>Senritha's Test performance</b><small>2D graphics benchmark · WebGL2</small></div>
+    </div>
+    <div class="status" id="status" role="status"><i></i><span>Ready</span></div>
+    <div class="ctrls">
+      <button class="btn primary" id="btnStart">Start benchmark</button>
+      <button class="btn" id="btnPause" disabled>Pause</button>
+      <button class="btn" id="btnStop" disabled>Stop</button>
+      <button class="btn ghost" id="btnHistory">History <span id="histCount" class="count"></span></button>
+    </div>
+  </header>
+
+  <aside class="left">
+    <section class="panel">
+      <h2>Benchmark mode</h2>
+      <div class="modes" id="modes" role="radiogroup" aria-label="Benchmark mode"></div>
+    </section>
+    <section class="panel" id="modeOptsPanel">
+      <h2>Mode settings</h2>
+      <div id="modeOpts" class="fields"></div>
+    </section>
+    <section class="panel">
+      <h2>Configuration</h2>
+      <div class="fields">
+        <label class="field"><span>Render resolution</span><select id="cfgRes"><option>1280x720</option><option>1920x1080</option><option>2560x1440</option><option>3840x2160</option></select></label>
+        <label class="field"><span>Target FPS</span><select id="cfgTarget"><option>Unlimited</option><option>30</option><option>60</option><option>120</option><option>144</option><option>165</option><option>240</option></select></label>
+        <label class="field"><span>Duration</span><select id="cfgDuration"><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="180">3 minutes</option><option value="300">5 minutes</option></select></label>
+        <label class="field"><span>Object density</span><select id="cfgDensity"><option>Low</option><option>Medium</option><option>High</option><option>Extreme</option></select></label>
+        <label class="field"><span>V-Sync</span><select id="cfgVsync"><option value="on">On</option><option value="off">Off</option></select></label>
+        <label class="field"><span>Quality preset</span><select id="cfgQuality"><option>Low</option><option>Medium</option><option>High</option><option>Ultra</option></select></label>
+      </div>
+      <p class="note" id="cfgNote"></p>
+    </section>
+  </aside>
+
+  <main class="center">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Benchmark render output"></canvas>
+      <div class="hud" id="hud" hidden>
+        <div class="hud-fps"><b id="hudFps">0</b><span>FPS</span></div>
+        <div class="hud-meta"><span id="hudFt">0.00 ms</span><span id="hudObj">0 objects</span><span id="hudStage"></span></div>
+      </div>
+      <div class="stage-msg" id="stageMsg"><b>Pick a mode and press Start</b><span>A 3-second warm-up runs first and is not counted.</span></div>
+    </div>
+    <div class="progress"><div class="track"><div class="bar" id="bar"></div></div><span id="progText">00:00 / 01:00</span></div>
+    <div class="graphs">
+      <section class="graph"><header><b>FPS</b><span>8-frame rolling average, last 300 frames</span></header><canvas id="gFps"></canvas></section>
+      <section class="graph"><header><b>Frame time</b><span>every frame, last 300 frames</span></header><canvas id="gFt"></canvas></section>
+    </div>
+  </main>
+
+  <aside class="right">
+    <section class="panel">
+      <h2>Performance <span class="tag t-meas">Measured</span></h2>
+      <dl class="metrics" id="metrics"></dl>
+    </section>
+    <section class="panel">
+      <h2>System load</h2>
+      <dl class="rows" id="load"></dl>
+    </section>
+    <section class="panel">
+      <h2>Hardware</h2>
+      <dl class="rows" id="hw"></dl>
+    </section>
+    <section class="panel">
+      <h2>Sensors</h2>
+      <dl class="rows" id="sensors"></dl>
+      <p class="note">Browsers do not expose temperatures, GPU utilization or system CPU usage. These values are never estimated or invented here.</p>
+    </section>
+  </aside>
+</div>
+
+<div class="overlay" id="results" role="dialog" aria-modal="true" aria-labelledby="rTitle"><div class="sheet" id="resultsBody"></div></div>
+<div class="overlay" id="history" role="dialog" aria-modal="true" aria-labelledby="hTitle"><div class="sheet" id="historyBody"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="stats.js"></script>
+<script src="gl.js"></script>
+<script src="scenes.js"></script>
+<script src="hw.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
