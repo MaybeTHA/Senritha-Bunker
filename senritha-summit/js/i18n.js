@@ -24,6 +24,7 @@ export const STR = {
 		shortcuts: 'Shortcuts: 1 2 3 time · G wind · V view · C camp · T summit · R reset · F full screen',
 		menu: 'Menu', interact: 'Use', run: 'Run', jump: 'Jump',
 		calm: 'calm', breezy: 'breezy', gale: 'gale',
+		soundCredits: 'Sounds', texCredits: 'Textures',
 	},
 	th: {
 		title: 'ยอดเขาสุดท้ายของเซนริธา', tagline: 'โลกแห่งหิมะ ลม และแสงบนเทือกเขาสูง',
@@ -49,5 +50,6 @@ export const STR = {
 		shortcuts: 'ปุ่มลัด: 1 2 3 เวลา · G ลม · V มุมมอง · C แคมป์ · T ยอดเขา · R รีเซ็ต · F เต็มจอ',
 		menu: 'เมนู', interact: 'ใช้', run: 'วิ่ง', jump: 'โดด',
 		calm: 'สงบ', breezy: 'พัดเบา', gale: 'พายุ',
+		soundCredits: 'เสียง', texCredits: 'พื้นผิว',
 	},
 };

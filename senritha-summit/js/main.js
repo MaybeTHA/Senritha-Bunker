@@ -196,6 +196,7 @@ async function boot() {
 	document.body.classList.add('ready');
 	$('enter').hidden = false;
 	$('enter').focus();
+	window.__audio = audio;
 	window.__app = { composer, renderer, scene, camera, terrain, sky, hf, U, cabin, summit, walker, free, wind, setTime, setWind, setView, goTo, interact, THREE, renderFrames: (n) => { for (let i = 0; i < n; i++) { frames = 0; frame(); } }, viewpoint };
 	renderer.setAnimationLoop(frame);
 }
@@ -448,12 +449,12 @@ function interact() {
 	if (S.view !== 'walk' || !focus) return;
 	const id = focus.id;
 	if (id === 'getup') { walker.look = null; return; }
-	if (id === 'door') { const o = cabin.toggleDoor(); audio.door(o); }
+	if (id === 'door') { const o = cabin.toggleDoor(); audio.door(o, focus.pos); }
 	else if (id === 'fire') { cabin.fireBoost = 1; audio.stoke(); toast(t('fireToast')); }
 	else if (id === 'coffee') { toast(t('coffeeToast')); audio.click(); }
-	else if (id === 'bed') { walker.look = { pos: cabin.bedView.pos, target: cabin.bedView.look }; toast(t('restToast')); }
-	else if (id === 'sofa') walker.look = { pos: cabin.sofaView.pos, target: cabin.sofaView.look };
-	else if (id === 'chair') walker.look = { pos: cabin.chairView.pos, target: cabin.chairView.look };
+	else if (id === 'bed') { walker.look = { pos: cabin.bedView.pos, target: cabin.bedView.look }; toast(t('restToast')); audio.creak(focus.pos); }
+	else if (id === 'sofa') { walker.look = { pos: cabin.sofaView.pos, target: cabin.sofaView.look }; audio.creak(focus.pos); }
+	else if (id === 'chair') { walker.look = { pos: cabin.chairView.pos, target: cabin.chairView.look }; audio.creak(focus.pos); }
 	else if (id === 'flag') {
 		const s = hf.summit, w = U.uWindDir.value;
 		const side = new THREE.Vector3(-w.y, 0, w.x);
@@ -524,6 +525,7 @@ let frames = 0, perfT = 0, perfN = 0;
 const still = +params.get('still') || 0;
 const _v = new THREE.Vector3();
 const _c = new THREE.Color();
+const _lf = new THREE.Vector3(), _lu = new THREE.Vector3();
 function frame() {
 	frames++;
 	if (still && frames > still) { renderer.setAnimationLoop(null); document.body.classList.add('still'); return; }
@@ -614,7 +616,8 @@ function frame() {
 	if (audio?.ctx) {
 		audio.update(dt, {
 			wind: wind.s, gust: wind.gust, inside: cabin.inside(camP),
-			fireDist: camP.distanceTo(cabin.firePos), fire: 0.7 + cabin.fireBoost * 0.6,
+			fireDist: camP.distanceTo(cabin.firePos), firePos: cabin.firePos, fire: 0.7 + cabin.fireBoost * 0.6,
+			listener: { pos: camP, fwd: camera.getWorldDirection(_lf), up: _lu.set(0, 1, 0).applyQuaternion(camera.quaternion) },
 			flagDist: camP.distanceTo(summit.top), flagEnergy: summit.flapEnergy,
 			alt01: THREE.MathUtils.clamp((camP.y - hf.camp.y) / 450, 0, 1), night: S.time === 'night',
 		});

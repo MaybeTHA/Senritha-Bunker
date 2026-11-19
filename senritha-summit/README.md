@@ -44,10 +44,24 @@ Time of day (sunrise, clear afternoon, aurora night), light or strong wind, free
 | `js/flora.js` | Pines, boulders, icicles |
 | `js/controls.js` | Free camera, first-person walker with collisions, footprints |
 | `js/effects.js` | Fire, steam and smoke |
-| `js/audio.js` | Generated wind, fire, footsteps, flag and music |
+| `js/audio.js` | Sound: recorded footsteps, fireplace, door and creaks placed in 3D; generated wind, flag and music |
+| `js/sounds.js`, `sounds/`, `tools/make_sounds.py` | Sound sprites, their offsets, and the script that builds them |
 | `js/shading.js` | Shared uniforms, fog and material patches, texture loading |
 | `js/i18n.js` | English and Thai text |
 
 ## Credits
 
-Textures in `textures/` are from [Poly Haven](https://polyhaven.com/) and are CC0: snow_02, marble_cliff_03, dark_wooden_planks, coated_pine, old_wood_floor, castle_wall_slates, pine_bark, wool_boucle, knitted_fleece, rough_linen, curly_teddy_natural. They were resized and converted to WebP. All sounds are generated in the browser.
+Textures in `textures/` are from [Poly Haven](https://polyhaven.com/) and are CC0: snow_02, marble_cliff_03, dark_wooden_planks, coated_pine, old_wood_floor, castle_wall_slates, pine_bark, wool_boucle, knitted_fleece, rough_linen, curly_teddy_natural. They were resized and converted to WebP.
+
+Recorded sounds in `sounds/` come from Wikimedia Commons. They were cut into single takes, filtered, level-matched and packed into MP3 sprites by `tools/make_sounds.py`; the wooden-floor steps are built from the boot attack of the gravel recording played through a modelled floorboard.
+
+| Sound | Source | Author | License |
+| --- | --- | --- | --- |
+| Footsteps on snow | [Walking through snow](https://commons.wikimedia.org/wiki/File:Walking_through_snow.mp3) | Lukas Beck | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Footsteps on rock, wooden floor | [Footstep on Gravel (Gravity Sound)](https://commons.wikimedia.org/wiki/File:Footstep_on_Gravel_(Gravity_Sound).mp3) | Gravity Sound | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Fireplace and crackles | [Dry grass burning in open fireplace](https://commons.wikimedia.org/wiki/File:Dry_grass_burning_in_open_fireplace.ogg) | ezwa | Public domain |
+| Door opening | [Door handle creaking](https://commons.wikimedia.org/wiki/File:Door_handle_creaking.ogg) | stephan | Public domain |
+| Door closing | [Closing an old door](https://commons.wikimedia.org/wiki/File:Closing_an_old_door.ogg) | ezwa | Public domain |
+| Cabin and furniture creaks | [Creaky wooden swivel chair](https://commons.wikimedia.org/wiki/File:Creaky_wooden_swivel_chair.ogg) | chocoholic | Public domain |
+
+Wind, the flag, icy tinkles and the music are generated in the browser. If the recordings cannot load, generated versions play instead.
