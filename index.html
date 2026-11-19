@@ -4,120 +4,91 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Inside Bunker</title>
-<meta name="description" content="Every Senritha-Bunker project in one menu. Pick one to open it.">
-<meta name="theme-color" content="#EFEDE8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#12110F" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Senritha's personal operating system: every Senritha-Bunker app in one place.">
+<meta name="theme-color" content="#080B12">
+<meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Inside Bunker">
+<link rel="icon" href="inside-bunker/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
-<style>
-:root{
-  /* Same notebook world as Work Space: paper, graphite, one amber highlighter. The project path in mono is the signature. */
-  --bg:#F6F5F2; --surface:#FFFFFE; --fg:#1D1B18; --fg-2:#57524A; --muted:#78726A; --line:rgba(29,27,24,.09); --hover:rgba(29,27,24,.04);
-  --accent:#E3A13B; --accent-text:#8A560C; --accent-soft:rgba(227,161,59,.16);
-  --shadow-sm:0 1px 2px rgba(29,27,24,.06);
-  --sans:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
-  --ease:cubic-bezier(.22,1,.36,1);
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#161513; --surface:#1C1A18; --fg:#EFE9DE; --fg-2:#AAA398; --muted:#8A847A; --line:rgba(239,233,222,.08); --hover:rgba(239,233,222,.04);
-  --accent:#E8AA48; --accent-text:#F0BC66; --accent-soft:rgba(232,170,72,.16); --shadow-sm:none; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#161513; --surface:#1C1A18; --fg:#EFE9DE; --fg-2:#AAA398; --muted:#8A847A; --line:rgba(239,233,222,.08); --hover:rgba(239,233,222,.04);
-  --accent:#E8AA48; --accent-text:#F0BC66; --accent-soft:rgba(232,170,72,.16); --shadow-sm:none; color-scheme:dark}
-
-*{box-sizing:border-box}
-html{background:var(--bg)}
-body{margin:0;min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
-svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
-
-.wrap{max-width:640px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 32px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 32px) max(16px,env(safe-area-inset-left,0px))}
-.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:24px}
-h1{margin:0;font-size:24px;line-height:32px;font-weight:600;letter-spacing:-.01em}
-.path{font:400 12px/16px var(--mono);color:var(--muted)}
-.top .path{margin:4px 0 0}
-.icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--muted);transition:background-color .15s var(--ease),color .15s var(--ease)}
-.icon:hover{background:var(--hover);color:var(--fg)}
-
-.list{display:flex;flex-direction:column;gap:8px}
-.app{display:flex;align-items:center;gap:16px;padding:16px;border-radius:14px;background:var(--surface);color:inherit;text-decoration:none;box-shadow:inset 0 0 0 1px var(--line),var(--shadow-sm);transition:box-shadow .15s var(--ease),transform .12s var(--ease)}
-.app:hover{box-shadow:inset 0 0 0 1px var(--accent),var(--shadow-sm)}
-.app:active{transform:scale(.99)}
-.mark{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text);flex:none}
-.mark svg{width:22px;height:22px}
-.txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.txt b{font-weight:500;font-size:16px;line-height:22px}
-.desc{color:var(--fg-2);font-size:14px;line-height:20px}
-.txt .path{margin-top:4px}
-.go{color:var(--muted);transition:transform .15s var(--ease),color .15s var(--ease)}
-.app:hover .go{color:var(--accent-text);transform:translateX(2px)}
-
-.foot{margin:24px 0 0;color:var(--muted);font-size:13px}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="inside-bunker/style.css">
 </head>
 <body>
-<!-- Each app opens as its own page (not inside a frame), so it gets the whole GPU, full screen and its own permissions. -->
-<main class="wrap">
-  <header class="top">
-    <div>
-      <h1>Inside Bunker</h1>
-      <p class="path">senritha-bunker /</p>
+<!-- Inside Bunker: Senritha's personal OS. Apps open as their own pages (not frames) so each runs at full speed. -->
+<div class="os" id="os">
+
+  <header class="bar">
+    <button class="ib side-toggle" id="sideToggle" aria-label="Toggle sidebar" data-tip="Sidebar"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M9.5 4.5v15"/></svg></button>
+    <a class="brand" href="#" aria-label="Inside Bunker home">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5"/><path d="M6.5 10v8.5h11V10"/><path class="a" d="M10 18.5v-4h4v4"/></svg></span>
+      <span class="brand-name">Inside Bunker</span>
+    </a>
+    <button class="search-trigger" id="searchOpen" aria-label="Search apps">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+      <span>Search apps</span><kbd id="kbdHint">⌘K</kbd>
+    </button>
+    <div class="bar-right">
+      <div class="status" id="status" data-tip="Connection"><i></i><span>Online</span></div>
+      <time class="clock" id="clock" data-tip="Today"><span id="clockDate"></span><b id="clockTime"></b></time>
+      <button class="ib mobile-search" id="searchOpen2" aria-label="Search apps"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg></button>
+      <div class="pop-wrap">
+        <button class="ib" id="notifBtn" aria-label="Notifications" aria-expanded="false" data-tip="Notifications"><svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></button>
+        <div class="pop" id="notifPop" role="dialog" aria-label="Notifications" hidden>
+          <header><b>Notifications</b></header>
+          <div class="empty sm"><svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg><b>You're all caught up</b><p>Bunker apps don't send notifications yet. When one does, it will show here.</p></div>
+        </div>
+      </div>
+      <a class="ib settings-link" href="#settings" aria-label="Settings" data-tip="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.8"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M6 18l1.4-1.4M16.6 7.4 18 6"/></svg></a>
+      <a class="avatar" id="avatar" href="#settings" aria-label="Profile and settings" data-tip="Profile"></a>
     </div>
-    <button class="icon" id="theme" aria-label="Switch theme" title="Switch theme"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
   </header>
 
-  <nav class="list" id="list" aria-label="Apps"></nav>
+  <nav class="side" id="side" aria-label="Main">
+    <div class="side-scroll">
+      <a class="nav" href="#" data-route="home" data-tip="Home"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5"/><path d="M6.5 10v9h11v-9"/></svg><span>Home</span></a>
+      <a class="nav" href="#apps" data-route="apps" data-tip="All applications"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/></svg><span>All applications</span><em id="navCount"></em></a>
+      <a class="nav" href="#recent" data-route="recent" data-tip="Recent apps"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Recent apps</span></a>
+      <a class="nav" href="#favorites" data-route="favorites" data-tip="Favorites"><svg viewBox="0 0 24 24"><path d="m12 4.5 2.3 4.7 5.2.8-3.8 3.6.9 5.2L12 16.4l-4.6 2.4.9-5.2-3.8-3.6 5.2-.8z"/></svg><span>Favorites</span><em id="navFav"></em></a>
+      <a class="nav" href="#categories" data-route="categories" data-tip="Categories"><svg viewBox="0 0 24 24"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6H10l2 2h6.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/></svg><span>Categories</span></a>
+      <div class="cats" id="sideCats"></div>
+    </div>
+    <div class="side-foot">
+      <a class="nav" href="#settings" data-route="settings" data-tip="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.8"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M6 18l1.4-1.4M16.6 7.4 18 6"/></svg><span>Settings</span></a>
+    </div>
+  </nav>
+  <div class="side-scrim" id="sideScrim"></div>
 
-  <p class="foot">Each app opens on its own page and runs at full speed. Use back to return here.</p>
-</main>
-<script>
-/* Inside Bunker: one list of every Senritha project. Links open each app as its own page. */
-const APPS=[
-  {href:'senritha-workspace/',path:'senritha-workspace',name:"Senritha's Work Space",desc:'Channels, sub-channels, messages and images. Saved on this device.',
-   icon:'<path d="M4 6.5A1.5 1.5 0 0 1 5.5 5H10l2 2h6.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path d="M8 12h8M8 15h5"/>'},
-  {href:'senritha-os/',path:'senritha-os',name:'Senritha OS',desc:'Phone OS-style web app: lock screen, home screen, app switcher and an App Store.',
-   icon:'<rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/>'},
-  {href:'senritha-rhythm/',path:'senritha-rhythm',name:"Senritha's Rhythm",desc:'Beat visualizer and 4-lane rhythm game for the songs on your phone.',
-   icon:'<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>'},
-  {href:'senritha-solaris/',path:'senritha-solaris',name:"Senritha's Solaris X3D",desc:'Real-time interactive 3D explorer of the Solar System.',
-   icon:'<circle cx="12" cy="12" r="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-20 12 12)"/>'},
-  {href:'senritha-motorhome/',path:'senritha-motorhome',name:"Senritha's Motorhome 3D",desc:'Walk through a luxury motorhome parked in a snowy forest at blue hour.',
-   icon:'<path d="M3 16V8a2 2 0 0 1 2-2h10l4 4h1a1 1 0 0 1 1 1v5h-2"/><path d="M9 16h6"/><circle cx="7" cy="16.5" r="1.8"/><circle cx="17" cy="16.5" r="1.8"/><path d="M6 10h4"/>'},
-  {href:'senritha-perf/',path:'senritha-perf',name:"Senritha's Test performance",desc:'WebGL2 2D graphics benchmark: GPU, CPU and frame pacing, measured.',
-   icon:'<path d="M4 18a8 8 0 1 1 16 0"/><path d="m12 18 4-6"/>'},
-];
+  <main class="main" id="main" tabindex="-1">
+    <div class="view" id="view"></div>
+  </main>
 
-const list=document.getElementById('list');
-list.innerHTML=APPS.map(a=>`<a class="app" href="${a.href}">
-  <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24">${a.icon}</svg></span>
-  <span class="txt"><b>${a.name}</b><span class="desc">${a.desc}</span><span class="path">${a.path} /</span></span>
-  <svg class="go" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
-</a>`).join('');
+  <nav class="dock" aria-label="Main">
+    <a href="#" data-route="home"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5"/><path d="M6.5 10v9h11v-9"/></svg><span>Home</span></a>
+    <a href="#apps" data-route="apps"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.8"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.8"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.8"/></svg><span>Apps</span></a>
+    <a href="#recent" data-route="recent"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Recent</span></a>
+    <a href="#favorites" data-route="favorites"><svg viewBox="0 0 24 24"><path d="m12 4.5 2.3 4.7 5.2.8-3.8 3.6.9 5.2L12 16.4l-4.6 2.4.9-5.2-3.8-3.6 5.2-.8z"/></svg><span>Favorites</span></a>
+    <a href="#settings" data-route="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.8"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M6 18l1.4-1.4M16.6 7.4 18 6"/></svg><span>Settings</span></a>
+  </nav>
 
-/* Fetch an app's page as soon as a finger or pointer lands on it, so the tap opens faster. Costs nothing until then. */
-const warmed=new Set();
-list.addEventListener('pointerdown',warm,{passive:true});
-list.addEventListener('pointerover',warm,{passive:true});
-function warm(e){const a=e.target.closest('a.app');if(!a||warmed.has(a.href))return;warmed.add(a.href);
-  const l=document.createElement('link');l.rel='prefetch';l.href=a.href;document.head.appendChild(l)}
+  <div class="palette" id="palette" hidden>
+    <div class="palette-scrim" data-close></div>
+    <div class="palette-box" role="dialog" aria-modal="true" aria-label="Search apps">
+      <label class="palette-input"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+        <input id="q" type="text" placeholder="Search by name or description" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="results" aria-autocomplete="list">
+        <kbd>Esc</kbd></label>
+      <div class="chips" id="qCats" role="group" aria-label="Filter by category"></div>
+      <div class="results" id="results" role="listbox" aria-label="Apps"></div>
+      <footer class="palette-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>↵</kbd> open</span><span><kbd>Esc</kbd> close</span></footer>
+    </div>
+  </div>
 
-/* Theme: shared with Work Space (same saved setting). */
-const KEY='ws.prefs';
-function read(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
-function apply(){const t=read().theme;if(!t||t==='system')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t}
-apply();
-document.getElementById('theme').addEventListener('click',()=>{
-  const dark=document.documentElement.dataset.theme?document.documentElement.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
-  const p=read();p.theme=dark?'light':'dark';try{localStorage.setItem(KEY,JSON.stringify(p))}catch(e){}apply();
-});
-window.addEventListener('pageshow',apply);
-
-</script>
+  <div class="launch" id="launch" aria-live="polite" hidden><div class="launch-card"><span class="launch-icon" id="launchIcon"></span><b id="launchName"></b><span class="launch-bar"><i></i></span></div></div>
+  <div class="toast" id="toast" role="status"></div>
+</div>
+<script src="inside-bunker/app.js"></script>
 </body>
 </html>
