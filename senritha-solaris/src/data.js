@@ -162,9 +162,9 @@ export const PLANETS = [
     orbitColor: [0.95, 0.80, 0.62], dot: ['#e7c8a0', '#8a5a3a'],
     atmo: { color: [0.95, 0.85, 0.70], sunset: [0.9, 0.6, 0.4], scale: 1.025, density: 0.55, intensity: 0.7 },
     flow: { amp: 0.009, jets: 22, period: 6, turb: 0.0045, refLat: -20.9, limb: 0.45, haze: [0.95, 0.88, 0.78], hazeAmt: 0.35, bump: 0.010, wrap: 0.12,
-      storm: { lat: -20.9, lon: 47.2, a: 0.15, b: 0.095, spin: 0.10 } },
+      storm: { lat: -20.9, lon: -47.1, a: 0.15, b: 0.095, spin: 0.10 } },
     hd: {
-      render: 'gaseq', bump: 0.012, storm: { lat: -20.9, lon: 47.2, a: 0.15, b: 0.095, spin: 0.10 },
+      render: 'gaseq', bump: 0.012, storm: { lat: -20.9, lon: -47.1, a: 0.15, b: 0.095, spin: 0.10 },
       layers: [{ r: 1.005, speed: 0.006, scale: 3.0, stretch: 9, opacity: 0.16, lo: 0.6, hi: 0.9, tint: [1.0, 0.98, 0.94], shear: 0.8, seed: 2 }],
     },
     rings: { kind: 'jupiter' },

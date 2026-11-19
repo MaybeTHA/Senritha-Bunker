@@ -7,6 +7,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { World, Baker } from './world.js';
 import { TextureManager } from './textures.js';
+import { geoDir } from './hd.js';
 import { UI } from './ui.js';
 import { PLANETS, SPEEDS, DEFAULT_SPEED, STRINGS } from './data.js';
 import { POST_VERT, POST_FRAG } from './shaders.js';
@@ -269,12 +270,14 @@ class App {
         const n = pl.axis.clone(); const s = Math.sign(n.dot(toSun)) || 1;
         dir.normalize().addScaledVector(n, 0.75 * s);
       }
-      if (pl && pl.data.flow && pl.data.flow.storm) dir.y -= 0.32;
+      const storm = pl && ((pl.data.hd && pl.data.hd.storm) || (pl.data.flow && pl.data.flow.storm));
+      if (storm) dir.y -= 0.32;
       dir.normalize();
-      if (pl && pl.data.flow && pl.data.flow.storm) {
+      if (storm) {
         // turn the planet so its great storm faces the camera when we arrive
         const local = dir.clone().applyQuaternion(pl.tilt.quaternion.clone().invert());
-        const want = Math.atan2(-local.z, local.x) - 0.3;
+        const sd = geoDir(storm.lat, storm.lon);
+        const want = Math.atan2(-local.z, local.x) - 0.3 + Math.atan2(sd.z, sd.x);
         const dur = this.flightDuration(b, dir, dist);
         const cur = pl.spinOffset || 0;
         let target = want - pl.spinRate * (this.vt + dur);
@@ -392,7 +395,13 @@ class App {
   }
 
   // ---------------------------------------------------------------- time
-  finishFlight() { if (this.flight) { this.flight.t = 0.9999; if (this.spinAlign) { this.spinAlign.pl.spinOffset = this.spinAlign.to; this.spinAlign = null; } } }
+  finishFlight() {
+    const f = this.flight; if (!f) return;
+    const sa = this.spinAlign;
+    // arriving early: rotate the planet as if the remaining flight time had passed
+    if (sa) { sa.pl.spinOffset = sa.to + sa.pl.spinRate * f.dur * (1 - f.t); this.spinAlign = null; }
+    f.t = 0.9999;
+  }
   togglePause() { this.paused = !this.paused; this.ui.updateSpeed(); }
   setSpeed(i) { this.speedIdx = THREE.MathUtils.clamp(i, 0, SPEEDS.length - 1); this.paused = false; this.ui.updateSpeed(); }
   resetDate() { this.simDays = (Date.now() - J2000) / 86400000; }
@@ -552,11 +561,15 @@ class App {
     this.slow = ms > 24 ? (this.slow || 0) + 1 : 0;
     this.fast = ms < 12 ? (this.fast || 0) + 1 : 0;
     const now = performance.now();
+    // calibrate during the opening seconds, then hold steady unless the device is badly overloaded
+    this.adaptStart ||= now;
+    const calibrating = now - this.adaptStart < 25000;
+    if (!calibrating && this.slow < 6) return;
     if (this.lastAdapt && now - this.lastAdapt < 4000) return;
     let pr = this.pr;
     const maxPr = Math.min(window.devicePixelRatio || 1, Q.prMax);
     if (this.slow >= 3 && pr > Q.prMin) pr = Math.max(Q.prMin, Math.round(pr * 0.85 * 20) / 20);
-    else if (this.fast >= 4 && pr < maxPr) pr = Math.min(maxPr, Math.round(pr * 1.12 * 20) / 20);
+    else if (calibrating && this.fast >= 4 && pr < maxPr) pr = Math.min(maxPr, Math.round(pr * 1.12 * 20) / 20);
     if (pr !== this.pr) { this.lastAdapt = now; this.slow = 0; this.fast = 0; }
     if (Math.abs(pr - this.pr) > 0.01) {
       this.pr = pr;
