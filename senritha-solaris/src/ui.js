@@ -1,4 +1,5 @@
 import { STRINGS, SPEEDS, PLANETS, SUN } from './data.js';
+import { MAPS } from './textures.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -15,6 +16,9 @@ export class UI {
     this.labels = new Map();
     this.current = null;
     this.sheetOpen = false;
+    this.res = {};
+    this.venusRadar = false;
+    this.venusFalse = false;
     this.bind();
     this.applyLang();
   }
@@ -222,6 +226,8 @@ export class UI {
       <p class="eyebrow">${esc(eyebrow)}</p>
       <h2 class="pname">${esc(this.name(d))}</h2>
       <p class="psub">${esc(sub)}</p>
+      ${this.texIdOf(body) ? '<p class="reschip" id="resChip"></p>' : ''}
+      ${body.id === 'venus' ? this.venusControls() : ''}
       <dl class="stats">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>
       ${moons}
       <h3 class="sect">${esc(t.facts)}</h3>
@@ -229,6 +235,12 @@ export class UI {
       <p class="note">${esc(t.scaleNote)}</p>
       <p class="note credit">${esc(t.credits)}</p>`;
     $('#panelBody').querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => this.app.selectById(b.dataset.go)));
+    const vr = document.getElementById('venusRadar');
+    if (vr) {
+      vr.addEventListener('click', () => { this.venusRadar = !this.venusRadar; if (!this.venusRadar) this.venusFalse = false; this.app.setVenusMode(this.venusRadar, this.venusFalse); this.renderPanel(this.current); });
+      document.getElementById('venusFalse').addEventListener('click', () => { this.venusFalse = !this.venusFalse; this.app.setVenusMode(this.venusRadar, this.venusFalse); this.renderPanel(this.current); });
+    }
+    this.paintRes();
     $('#panelBody').scrollTop = 0;
     $('#sheetName').textContent = this.name(d);
   }
@@ -238,6 +250,29 @@ export class UI {
     const items = list.map((m) => `<button class="mchip${cur && cur.id === m.id ? ' on' : ''}" data-go="${m.id}">${esc(this.name(m.data))}</button>`);
     if (parent) items.unshift(`<button class="mchip back" data-go="${parent.id}">← ${esc(this.t.backTo)} ${esc(this.name(parent.data))}</button>`);
     return `<h3 class="sect">${esc(title)}</h3><div class="mchips">${items.join('')}</div>`;
+  }
+
+  texIdOf(body) { return !body ? null : body.id === 'moon' ? 'moon' : body.kind === 'moon' ? null : (MAPS[body.id] ? body.id : null); }
+
+  setRes(id, level, state) {
+    this.res[id] = { level, state };
+    if (this.texIdOf(this.current) === id) this.paintRes();
+  }
+  paintRes() {
+    const el = document.getElementById('resChip');
+    if (!el) return;
+    const id = this.texIdOf(this.current);
+    const r = this.res[id] || { level: '2k', state: 'ready' };
+    el.classList.toggle('busy', r.state === 'loading');
+    el.innerHTML = `<i></i>${esc(this.t.surface)} <b>${r.level.toUpperCase()}</b>${r.state === 'loading' ? ` <span>${esc(this.t.loadingRes)}…</span>` : ''}`;
+  }
+
+  venusControls() {
+    const t = this.t;
+    return `<div class="modes">
+      <button class="mode${this.venusRadar ? ' on' : ''}" id="venusRadar" aria-pressed="${this.venusRadar}"><b>${esc(t.radar)}</b><small>${esc(t.radarSub)}</small></button>
+      <button class="mode slim${this.venusFalse ? ' on' : ''}" id="venusFalse" aria-pressed="${this.venusFalse}"${this.venusRadar ? '' : ' disabled'}>${esc(t.falseColor)}</button>
+    </div>`;
   }
 
   // ---------------------------------------------------------------- labels

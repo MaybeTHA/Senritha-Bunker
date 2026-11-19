@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as S from './shaders.js';
 import { PLANETS, SUN, SUN_RADIUS, BELTS, auToScene, artRadius } from './data.js';
+import { buildHD, terrainMaterial, makeScatter, updateScatter, buildRings, updateRings, geoDir } from './hd.js';
 
 const DEG = Math.PI / 180;
 const TAU = Math.PI * 2;
@@ -144,7 +145,10 @@ function ringTexture(kind) {
 
 // ------------------------------------------------------------------ world
 export class World {
-  constructor({ renderer, scene, quality, baked, textures }) {
+  constructor({ renderer, scene, quality, baked, textures, tm }) {
+    this.tm = tm;
+    this.textures = textures;
+    this.prU = { value: 1 };
     this.renderer = renderer;
     this.scene = scene;
     this.q = quality;
@@ -161,6 +165,7 @@ export class World {
       hi: new THREE.SphereGeometry(1, 192, 128),
       mid: new THREE.SphereGeometry(1, 96, 64),
       lo: new THREE.SphereGeometry(1, 40, 28),
+      tiny: new THREE.SphereGeometry(1, 20, 14),
       moon: new THREE.SphereGeometry(1, 96, 64),
       moonLo: new THREE.SphereGeometry(1, 32, 20),
     };
@@ -226,12 +231,12 @@ export class World {
     const spin = new THREE.Group();
     root.add(spin);
     spin.quaternion.setFromUnitVectors(UP, eqToScene(286.13, 63.87));
-    const sunU = { uTime: { value: 0 }, uIntensity: { value: 1.5 } };
+    const sunU = { uTime: { value: 0 }, uIntensity: { value: 1.5 }, uFlare: { value: new THREE.Vector4() } };
     const sphere = new THREE.Mesh(this.geo.hi, new THREE.ShaderMaterial({ vertexShader: S.SUN_VERT, fragmentShader: S.SUN_FRAG, uniforms: sunU }));
     sphere.scale.setScalar(R);
     spin.add(sphere);
 
-    const coronaU = { uTime: { value: 0 }, uScale: { value: 5.5 }, uIntensity: { value: 1.0 } };
+    const coronaU = { uTime: { value: 0 }, uScale: { value: 5.5 }, uIntensity: { value: 1.0 }, uGlow: { value: 0 }, uCME: { value: new THREE.Vector4() } };
     const corona = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
       vertexShader: S.BILLBOARD_VERT, fragmentShader: S.CORONA_FRAG, uniforms: coronaU,
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
@@ -286,6 +291,7 @@ export class World {
     lod.addLevel(new THREE.Mesh(this.geo.hi, material), 0);
     lod.addLevel(new THREE.Mesh(this.geo.mid, material), R * 14);
     lod.addLevel(new THREE.Mesh(this.geo.lo, material), R * 70);
+    lod.addLevel(new THREE.Mesh(this.geo.tiny, material), R * 250);
     return lod;
   }
 
@@ -307,10 +313,14 @@ export class World {
     tilt.quaternion.setFromUnitVectors(UP, axis);
     const spin = new THREE.Group(); tilt.add(spin);
     const L = this.lightUniforms(sy);
-    let material, uniforms, clouds = null, cloudsU = null;
+    let material, uniforms, clouds = null, cloudsU = null, hd = null;
     const texel = (size) => 1.5 * (Math.PI / 2) / size;
 
-    if (p.kind === 'earth') {
+    if (p.hd) {
+      hd = buildHD(this, p, { R, L, tilt, spin, sy });
+      material = hd.material; uniforms = hd.uniforms;
+      clouds = hd.clouds || null; cloudsU = hd.cloudsU || null;
+    } else if (p.kind === 'earth') {
       uniforms = { ...L, uDay: { value: this.tex.day }, uNight: { value: this.tex.night }, uData: { value: this.tex.data }, uCloudShift: { value: 0 }, uTexW: { value: this.tex.data.image.width }, uDetail: { value: 0 } };
       material = new THREE.ShaderMaterial({ vertexShader: S.BODY_VERT, fragmentShader: S.EARTH_FRAG, uniforms });
       cloudsU = { ...this.lightUniforms(1), uData: { value: this.tex.data }, uTexW: { value: this.tex.data.image.width } };
@@ -340,6 +350,15 @@ export class World {
         const e = new THREE.Vector3().crossVectors(UP, c).normalize();
         uniforms.uStormC.value.copy(c); uniforms.uStormE.value.copy(e); uniforms.uStormN.value.crossVectors(c, e);
       }
+      if (p.storms) {
+        uniforms.uSpots = { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] };
+        uniforms.uSpotsB = { value: [new THREE.Vector4(0.17, 0.10, 0, 0), new THREE.Vector4(0.12, 0.07, 0, 0), new THREE.Vector4(0.08, 0.05, 0, 0)] };
+        uniforms.uSpotN = { value: 3 };
+      } else {
+        uniforms.uSpots = { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] };
+        uniforms.uSpotsB = { value: [new THREE.Vector4(1, 1, 0, 0), new THREE.Vector4(1, 1, 0, 0), new THREE.Vector4(1, 1, 0, 0)] };
+        uniforms.uSpotN = { value: 0 };
+      }
       material = new THREE.ShaderMaterial({ vertexShader: S.BODY_VERT, fragmentShader: S.GAS_FRAG, uniforms });
     } else {
       const map = this.baked[p.id];
@@ -352,15 +371,16 @@ export class World {
       material = new THREE.ShaderMaterial({ vertexShader: S.BODY_VERT, fragmentShader: S.ROCKY_FRAG, uniforms });
     }
 
-    const lod = this.makeLOD(material, R);
+    const lod = hd && hd.lod ? hd.lod : this.makeLOD(material, R);
     lod.scale.set(R, R * sy, R);
     spin.add(lod);
 
-    let atmo = null, atmoU = null;
-    if (p.atmo) ({ mesh: atmo, u: atmoU } = this.makeAtmosphere(p.atmo, R, tilt, sy));
+    let atmo = null, atmoU = null, scatter = null;
+    if (p.scatter) { scatter = makeScatter(this, p.scatter, R, tilt, sy); if (hd) hd.scatter = scatter; }
+    else if (p.atmo) ({ mesh: atmo, u: atmoU } = this.makeAtmosphere(p.atmo, R, tilt, sy));
 
-    let ring = null, ringU = null;
-    if (p.rings) {
+    let ring = null, ringU = null, ringParts = null;
+    if (p.rings && (p.rings.kind !== 'saturn' || !p.hd) && p.rings.kind !== 'uranus' && p.rings.kind !== 'neptune' && p.rings.kind !== 'jupiter') {
       const { tex, range } = ringTexture(p.rings.kind);
       ringU = {
         uRingTex: { value: tex }, uRange: { value: new THREE.Vector2(...range) }, uCenter: { value: new THREE.Vector3() }, uN: { value: new THREE.Vector3() },
@@ -379,6 +399,8 @@ export class World {
       }
     }
 
+    if (p.rings && !ring) ringParts = buildRings(this, p, { R, L, tilt }, uniforms);
+
     // orbit ribbon
     const orbit = this.makeOrbit(p);
 
@@ -388,13 +410,66 @@ export class World {
 
     const body = {
       id: p.id, kind: 'planet', data: p, R, root, scaleG, tilt, spin, lod, material, uniforms, clouds, cloudsU, atmo, atmoU, ring, ringU, orbit,
-      moonFrame, moons: [], scale: 1, world: new THREE.Vector3(), phase: 0, minDist: R * 1.18 * (p.rings ? 1 : 1),
+      hd, scatter, ringParts, storms: p.storms ? this.makeStorms(p.id) : null,
+      moonFrame, moons: [], scale: 1, world: new THREE.Vector3(), phase: 0, minDist: R * (p.hd && p.hd.render === 'terrain' ? 1.05 : 1.1),
       axis, spinRate: this.spinRate(p.cloudRotHours || p.rotHours), sy,
     };
     this.scene.add(root);
     this.bodies.push(body);
     this.planets.push(body);
     (p.moons || []).forEach((m, i) => this.buildMoon(m, body, i));
+  }
+
+  ringTexture(kind) { return ringTexture(kind); }
+
+  // Occasional solar flares, some launching a coronal mass ejection.
+  updateEruptions(vt, camera) {
+    const sun = this.sun;
+    const f = sun.erupt ||= { r: rng(123), next: 14, t0: -1, dir: new THREE.Vector3(), cme: false };
+    let flare = 0, cmeI = 0, cmeR = 1;
+    if (f.t0 < 0 && vt > f.next) {
+      f.t0 = vt;
+      const lat = (f.r() < 0.5 ? -1 : 1) * (10 + f.r() * 22), lon = f.r() * 360;
+      f.dir.set(Math.cos(lat * DEG) * Math.cos(lon * DEG), Math.sin(lat * DEG), Math.cos(lat * DEG) * Math.sin(lon * DEG));
+      f.cme = f.r() < 0.6;
+    }
+    if (f.t0 >= 0) {
+      const t = vt - f.t0;
+      flare = smooth(0, 0.5, t) * (1 - smooth(1.2, 5, t));
+      if (f.cme) { cmeR = 1.05 + t * 0.38; cmeI = smooth(0.3, 1.5, t) * (1 - smooth(6, 14, t)); }
+      if (t > 15) { f.t0 = -1; f.next = vt + 22 + f.r() * 28; }
+    }
+    sun.sunU.uFlare.value.set(f.dir.x, f.dir.y, f.dir.z, flare);
+    const dW = f.dir.clone().applyQuaternion(sun.sphere.getWorldQuaternion(new THREE.Quaternion()));
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion), up = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion);
+    sun.coronaU.uCME.value.set(Math.atan2(dW.dot(up), dW.dot(right)), cmeR, cmeI * Math.min(1, 1.2 - Math.abs(dW.dot(new THREE.Vector3().subVectors(camera.position, sun.root.position).normalize()))), 0.35);
+    sun.coronaU.uGlow.value = flare * 0.25;
+  }
+
+  // Neptune's dark storms come and go: each lives a few minutes, drifts, fades and reappears elsewhere.
+  makeStorms(seed) {
+    const r = rng(seed.length * 97);
+    return [0, 1, 2].map((i) => ({ r, life: 150 + r() * 120, t0: -r() * 150, lat: -15 - r() * 30, lon: r() * 360, drift: (r() - 0.5) * 3, seed: i }));
+  }
+  updateStorms(pl, vt) {
+    const sp = pl.uniforms.uSpots.value;
+    pl.storms.forEach((st, i) => {
+      let t = (vt - st.t0) / st.life;
+      if (t >= 1) { st.t0 = vt; st.life = 150 + st.r() * 120; st.lat = -12 - st.r() * 35; st.lon = st.r() * 360; st.drift = (st.r() - 0.5) * 3; t = 0; }
+      const k = smooth(0, 0.18, t) * (1 - smooth(0.75, 1, t)) * (i === 0 ? 1 : 0.75);
+      const d = geoDir(st.lat + 4 * Math.sin(t * 3.0), st.lon + st.drift * (vt - st.t0));
+      sp[i].set(d.x, d.y, d.z, k);
+    });
+  }
+  setVenusMode(radar, falseColor) {
+    const v = this.planets.find((p) => p.id === 'venus');
+    if (!v || !v.hd || !v.hd.radar) return;
+    v.hd.radar.lod.visible = radar;
+    v.lod.visible = !radar;
+    v.hd.layers.forEach((l) => { l.mesh.visible = !radar; });
+    if (v.scatter) v.scatter.mesh.visible = !radar;
+    v.hd.radar.uniforms.uFalse.value = falseColor ? 1 : 0;
+    this.venusRadar = radar;
   }
 
   spinRate(hours) {
@@ -464,8 +539,14 @@ export class World {
     (m.inEcliptic ? planet.root : planet.moonFrame).add(frame);
 
     const L = this.lightUniforms(1);
-    let uniforms, material, geo = this.geo.moon;
-    if (m.equirect) {
+    let uniforms, material, geo = this.geo.moon, hdLod = null;
+    if (m.hd) {
+      ({ material, uniforms } = terrainMaterial(this, m.id, m.hd, L));
+      hdLod = new THREE.LOD();
+      hdLod.addLevel(new THREE.Mesh(new THREE.SphereGeometry(1, this.q.mobile ? 192 : 320, this.q.mobile ? 96 : 160), material), 0);
+      hdLod.addLevel(new THREE.Mesh(new THREE.SphereGeometry(1, 96, 48), material), R * 10);
+      hdLod.addLevel(new THREE.Mesh(this.geo.moonLo, material), R * 50);
+    } else if (m.equirect) {
       const t = this.tex.moon;
       uniforms = {
         ...L, uMap: { value: null }, uEqMap: { value: t }, uEqSize: { value: new THREE.Vector2(t.image.width, t.image.height) },
@@ -484,16 +565,21 @@ export class World {
       material = new THREE.ShaderMaterial({ vertexShader: S.BODY_VERT, fragmentShader: S.ROCKY_FRAG, uniforms });
       if (m.shape) geo = this.irregular(m.id.length * 13 + index, m.shape);
     }
-    const lod = new THREE.LOD();
-    lod.addLevel(new THREE.Mesh(geo, material), 0);
-    lod.addLevel(new THREE.Mesh(m.shape ? geo : this.geo.moonLo, material), R * 40);
+    const lod = hdLod || new THREE.LOD();
+    if (!hdLod) {
+      lod.addLevel(new THREE.Mesh(geo, material), 0);
+      lod.addLevel(new THREE.Mesh(m.shape ? geo : this.geo.moonLo, material), R * 40);
+    }
     lod.position.set(m.dist * planet.R, 0, 0);
     lod.rotation.y = Math.PI;
     lod.scale.setScalar(R);
     pivot.add(lod);
 
-    let atmo = null, atmoU = null;
-    if (m.atmo) {
+    let atmo = null, atmoU = null, scatter = null;
+    if (m.scatter) {
+      scatter = makeScatter(this, m.scatter, R, lod);
+      scatter.mesh.scale.setScalar(m.scatter.shell);
+    } else if (m.atmo) {
       ({ mesh: atmo, u: atmoU } = this.makeAtmosphere(m.atmo, R, lod));
       atmo.scale.setScalar(m.atmo.scale);
     }
@@ -505,8 +591,8 @@ export class World {
     frame.add(ring);
 
     const body = {
-      id: m.id, kind: 'moon', data: m, R, parent: planet, frame, pivot, lod, material, uniforms, atmo, atmoU, orbitLine: ring,
-      root: lod, scale: 1, world: new THREE.Vector3(), minDist: R * 1.3,
+      id: m.id, kind: 'moon', data: m, R, parent: planet, frame, pivot, lod, material, uniforms, atmo, atmoU, scatter, orbitLine: ring,
+      root: lod, scale: 1, world: new THREE.Vector3(), minDist: R * (m.hd ? 1.06 : 1.3),
       rate: TAU / (Math.sqrt(Math.abs(m.periodDays)) * 16),
     };
     planet.moons.push(body);
@@ -611,6 +697,7 @@ export class World {
         p.u.uFade.value = 0.55 + 0.45 * Math.sin(c * TAU + 1.0);
       }
     }
+    this.updateEruptions(vt, camera);
     this.starUniforms.uTime.value = vt;
     this.stars.position.copy(camera.position);
     this.sky.position.copy(camera.position);
@@ -629,6 +716,13 @@ export class World {
       }
       if (pl.uniforms.uTime) pl.uniforms.uTime.value = vt;
       if (pl.ringU) pl.ringU.uTime.value = vt;
+      if (pl.hd) {
+        for (const l of pl.hd.layers) l.u.uTime.value = vt;
+        if (pl.cloudsU && pl.cloudsU.uTime) pl.cloudsU.uTime.value = vt;
+        if (pl.hd.radar) pl.hd.radar.uniforms.uTime.value = vt;
+        for (const f of pl.hd.updates) f({ vt, pl });
+      }
+      if (pl.storms) this.updateStorms(pl, vt);
       for (const m of pl.moons) {
         m.pivot.rotation.y = vt * m.rate;
         m.uniforms.uTime.value = vt;
@@ -648,6 +742,12 @@ export class World {
       if (pl.uniforms.uCenter) pl.uniforms.uCenter.value.copy(pl.world);
       if (pl.uniforms.uRingN) { pl.uniforms.uRingN.value.copy(pl.axis); pl.uniforms.uRadiusW.value = Rw; }
       if (pl.ringU) { pl.ringU.uCenter.value.copy(pl.world); pl.ringU.uN.value.copy(pl.axis); pl.ringU.uR.value = Rw; }
+      if (pl.hd) {
+        for (const l of pl.hd.layers) { l.u.uSunI = l.u.uSunI || pl.uniforms.uSunI; }
+        if (pl.hd.radar) { pl.hd.radar.uniforms.uSunI.value = sunI; }
+      }
+      if (pl.scatter) updateScatter(pl.scatter, pl.world, Rw, pl.axis, sunI / (pl.scale * pl.scale), camera.position);
+      if (pl.ringParts) updateRings(pl.ringParts, pl.world, pl.axis, Rw, vt, camera);
       if (pl.atmoU) { pl.atmoU.uAxis.value.copy(pl.axis); pl.atmoU.uCenter.value.copy(pl.world); pl.atmoU.uR.value = Rw; pl.atmoU.uShell.value = Rw * pl.data.atmo.scale; pl.atmoU.uSunI.value = sunI / (pl.scale * pl.scale); }
       // moons cast shadows on their planet; the planet shadows its moons
       const occ = pl.uniforms.uOcc.value; let n = 0;
@@ -658,6 +758,7 @@ export class World {
         m.uniforms.uSunI.value = sunI;
         m.uniforms.uOcc.value[0].set(pl.world.x, pl.world.y, pl.world.z, Rw);
         m.uniforms.uOccN.value = 1;
+        if (m.scatter) updateScatter(m.scatter, m.world, m.R, null, sunI, camera.position);
         if (m.atmoU) { m.atmoU.uCenter.value.copy(m.world); m.atmoU.uR.value = m.R; m.atmoU.uShell.value = m.R * m.data.atmo.scale; m.atmoU.uSunI.value = sunI; }
       }
     }
@@ -678,7 +779,6 @@ export class World {
       pl.scaleG.scale.setScalar(target);
       const show = target < 1.25;
       for (const m of pl.moons) m.lod.visible = show;
-      if (pl.clouds) pl.uniforms.uDetail.value = 0;
     }
   }
 }

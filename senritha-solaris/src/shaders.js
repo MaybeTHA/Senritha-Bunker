@@ -419,29 +419,6 @@ vec4 bakeNeptune(vec3 d){
   col = mix(col, vec3(0.34, 0.52, 0.88), smoothstep(65.0, 85.0, abs(latW))*0.5);
   col *= 0.94 + 0.12*fbm(vec3(d.x*3.0, d.y*45.0, d.z*3.0) + t1, 4, 2.0, 0.5);
   float hgt = 0.5;
-  // Great Dark Spot with bright companion clouds
-  vec3 gc = dirLL(-20.0, 0.0); vec3 gE = eastOf(gc); vec3 gN = cross(gc, gE);
-  vec2 q = vec2(dot(d, gE)/0.17, dot(d, gN)/0.10);
-  if (dot(d, gc) > 0.8){
-    float sw = fbm(vec3(q*2.5, 3.0), 4, 2.0, 0.5);
-    float rr = length(q);
-    float m = smoothstep(1.0, 0.65, rr + sw*0.12);
-    col = mix(col, vec3(0.09, 0.15, 0.40), m*0.88);
-    col = mix(col, vec3(0.20, 0.32, 0.66), gauss(rr - 1.05, 0.12)*0.5);
-    vec2 qc = q - vec2(0.25, -1.15);
-    float comp = smoothstep(0.6, 0.05, length(qc*vec2(0.55, 1.5)) + sw*0.18);
-    col = mix(col, vec3(0.93, 0.96, 1.0), comp*0.9);
-    hgt += comp*0.3 - m*0.1;
-  }
-  { vec3 c = dirLL(-42.0, 120.0); vec3 E = eastOf(c); vec3 N = cross(c, E);
-    vec2 s = vec2(dot(d, E)/0.06, dot(d, N)/0.035);
-    float m = smoothstep(1.0, 0.25, length(s) + t2*0.25) * step(0.9, dot(d, c));
-    col = mix(col, vec3(0.90, 0.94, 1.0), m*0.8); hgt += m*0.2; }
-  { vec3 c = dirLL(-55.0, -100.0); vec3 E = eastOf(c); vec3 N = cross(c, E);
-    vec2 s = vec2(dot(d, E)/0.07, dot(d, N)/0.045); float r = length(s);
-    float k = step(0.9, dot(d, c));
-    col = mix(col, vec3(0.10, 0.17, 0.42), smoothstep(1.0, 0.6, r)*0.8*k);
-    col = mix(col, vec3(0.85, 0.90, 1.0), smoothstep(0.35, 0.0, r)*0.8*k); }
   float ci = smoothstep(0.52, 0.85, fbm(vec3(d.x*5.0, d.y*28.0, d.z*5.0) + 13.0, 4, 2.0, 0.5)) * (gauss(latD - 28.0, 6.0) + gauss(latD + 30.0, 6.0)*0.7);
   col = mix(col, vec3(0.88, 0.93, 1.0), ci*0.8);
   hgt += ci*0.3;
@@ -776,6 +753,9 @@ varying vec3 vObj; varying vec3 vWorld; varying vec2 vUv;
 uniform samplerCube uMap;
 uniform float uTime, uFlowAmp, uJets, uPeriod, uTurb, uRefLat;
 uniform float uHasStorm, uStormSpin;
+uniform vec4 uSpots[3];
+uniform vec4 uSpotsB[3];
+uniform int uSpotN;
 uniform vec3 uStormC, uStormE, uStormN;
 uniform vec2 uStormAB;
 uniform float uLimb, uHaze, uBump, uWrap;
@@ -854,6 +834,22 @@ void main(){
         }
       }
     }
+  }
+  for (int i = 0; i < 3; i++){
+    if (i >= uSpotN) break;
+    float k = uSpots[i].w;
+    if (k <= 0.001) continue;
+    vec3 sc = uSpots[i].xyz;
+    if (dot(n, sc) < 0.85) continue;
+    vec3 sE = eastOf(sc); vec3 sN = cross(sc, sE);
+    vec2 q = vec2(dot(n, sE)/uSpotsB[i].x, dot(n, sN)/uSpotsB[i].y);
+    float rr = length(q);
+    float sw = snoise(vec3(q*2.5, uTime*0.04 + float(i)*3.7));
+    float m = smoothstep(1.0, 0.6, rr + sw*0.12) * k;
+    alb = mix(alb, pow(vec3(0.08, 0.14, 0.38), vec3(2.2)), m*0.9);
+    alb = mix(alb, pow(vec3(0.20, 0.32, 0.66), vec3(2.2)), gauss(rr - 1.05, 0.12)*0.4*k);
+    float comp = smoothstep(0.6, 0.05, length((q - vec2(0.2, -1.2))*vec2(0.55, 1.5)) + sw*0.2) * k;
+    alb = mix(alb, pow(vec3(0.93, 0.96, 1.0), vec3(2.2)), comp*0.85);
   }
   vec3 col = alb * (uSunColor * uSunI * diff * limb * shadow + uAmbient);
   float fres = pow(1.0 - NdV, 2.6);
@@ -1053,6 +1049,7 @@ export const SUN_FRAG = /* glsl */`
 precision highp float;
 varying vec3 vObj; varying vec3 vWorld; varying vec3 vNormalW;
 uniform float uTime, uIntensity;
+uniform vec4 uFlare;
 ${NOISE}
 vec2 vorAnim(vec3 p, float t){
   vec3 ip = floor(p), fp = fract(p); float f1 = 8.0, f2 = 8.0;
@@ -1088,9 +1085,12 @@ void main(){
   I *= 1.0 - pen*(0.45 + 0.15*fil) - umbra*0.45;
   I += fac*0.35;
   float limb = 1.0 - 0.66*(1.0 - pow(mu, 0.55));
-  vec3 hot = vec3(1.0, 0.76, 0.42), warm = vec3(1.0, 0.47, 0.12), deep = vec3(0.78, 0.20, 0.03);
+  vec3 hot = vec3(1.0, 0.72, 0.36), warm = vec3(1.0, 0.44, 0.10), deep = vec3(0.78, 0.18, 0.02);
   vec3 col = mix(warm, hot, sat(limb*I*1.2 - 0.25));
   col = mix(deep, col, smoothstep(0.08, 0.55, limb*I));
+  float fl = uFlare.w > 0.0 ? exp(-pow(angDist(n, uFlare.xyz)/0.05, 2.0)) * uFlare.w : 0.0;
+  I += fl*1.6;
+  col = mix(col, vec3(1.0, 0.95, 0.86), clamp(fl, 0.0, 1.0)*0.65);
   float plasma = smoothstep(0.2, 0.7, flow*0.5 + 0.5);
   col *= 1.0 + 0.10*plasma;
   gl_FragColor = vec4(col * I * limb * uIntensity, 1.0);
@@ -1105,7 +1105,8 @@ void main(){ vUv = uv*2.0 - 1.0; gl_Position = projectionMatrix * modelViewMatri
 export const CORONA_FRAG = /* glsl */`
 precision highp float;
 varying vec2 vUv;
-uniform float uTime, uScale, uIntensity;
+uniform float uTime, uScale, uIntensity, uGlow;
+uniform vec4 uCME;
 ${NOISE}
 void main(){
   vec2 p = vUv * uScale;
@@ -1119,7 +1120,18 @@ void main(){
   float streamers = pow(st, 2.4)*exp(-x*1.0)*0.55 + pow(st2, 3.0)*exp(-x*2.2)*0.35;
   float spic = snoise(vec3(cos(a)*80.0, sin(a)*80.0, uTime*0.3))*0.5 + 0.5;
   float chrom = exp(-pow(x/0.018, 2.0)) * (0.6 + 0.6*spic);
+  float threads = pow(snoise(vec3(cos(a)*46.0, sin(a)*46.0, x*0.25 - uTime*0.012))*0.5 + 0.5, 5.0) * exp(-x*1.3) * 0.35;
+  float cme = 0.0;
+  if (uCME.z > 0.0){
+    float da = abs(mod(a - uCME.x + 3.14159265, 6.2831853) - 3.14159265);
+    float shell = exp(-pow((r - uCME.y)/(0.16*uCME.y), 2.0));
+    float cone = smoothstep(uCME.w, uCME.w*0.35, da);
+    float inner = smoothstep(uCME.w*1.1, 0.0, da) * smoothstep(uCME.y, 1.0, r) * 0.22;
+    cme = (shell*cone + inner) * (0.5 + 0.5*fbm(vec3(cos(a)*8.0, sin(a)*8.0, r*1.5 - uTime*0.1), 3, 2.0, 0.5)) * uCME.z;
+  }
   vec3 col = vec3(1.0, 0.76, 0.48)*glow + vec3(1.0, 0.86, 0.68)*streamers*0.55 + vec3(1.0, 0.35, 0.18)*chrom*0.9;
+  col += vec3(1.0, 0.86, 0.70)*threads*0.45 + vec3(1.0, 0.82, 0.62)*cme*0.55;
+  col *= 1.0 + uGlow;
   col *= smoothstep(0.985, 1.005, r) * (1.0 - smoothstep(uScale*0.6, uScale, r));
   gl_FragColor = vec4(col * uIntensity, 1.0);
 }
@@ -1147,7 +1159,7 @@ void main(){
   float n = fbm(vec3(along*9.0 - uTime*0.12 + uSeed, vUv.y*2.5, uTime*0.05 + uSeed), 4, 2.0, 0.5)*0.5 + 0.5;
   float fil = smoothstep(0.32, 0.82, n);
   float ends = smoothstep(0.0, 0.06, along) * smoothstep(1.0, 0.94, along);
-  vec3 col = mix(vec3(1.0, 0.30, 0.10), vec3(1.0, 0.72, 0.42), fil) * (0.25 + 1.6*fil) * core * ends * uFade * (1.0 - 0.88*disk);
+  vec3 col = mix(vec3(1.0, 0.22, 0.06), vec3(1.0, 0.52, 0.26), fil) * (0.18 + 1.15*fil) * core * ends * uFade * (1.0 - 0.9*disk);
   gl_FragColor = vec4(col * uIntensity, 1.0);
 }
 `;
@@ -1297,7 +1309,8 @@ void main(){
 export const POST_FRAG = /* glsl */`
 precision highp float;
 uniform sampler2D tDiffuse;
-uniform float uTime, uVignette, uWarp;
+uniform float uTime, uVignette, uWarp, uSunVis, uAspect;
+uniform vec2 uSun;
 uniform vec2 uRes;
 varying vec2 vUv;
 float hash12(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
@@ -1309,6 +1322,23 @@ void main(){
   col.r = texture2D(tDiffuse, uv - off).r;
   col.g = texture2D(tDiffuse, uv).g;
   col.b = texture2D(tDiffuse, uv + off).b;
+  if (uSunVis > 0.002){
+    vec2 asp = vec2(uAspect, 1.0);
+    vec2 dir = vec2(0.5) - uSun;
+    float fp[5] = float[5](0.35, 0.62, 0.9, 1.25, 1.55);
+    float fs[5] = float[5](0.035, 0.06, 0.02, 0.09, 0.045);
+    vec3 fc[5] = vec3[5](vec3(0.6, 0.8, 1.0), vec3(1.0, 0.75, 0.5), vec3(0.7, 1.0, 0.8), vec3(0.6, 0.65, 1.0), vec3(1.0, 0.6, 0.7));
+    vec3 fl = vec3(0.0);
+    for (int i = 0; i < 5; i++){
+      vec2 p = uSun + dir*fp[i]*2.0;
+      float d = length((uv - p)*asp);
+      fl += fc[i] * (smoothstep(fs[i], fs[i]*0.7, d)*0.6 + exp(-d*d/(fs[i]*fs[i]))*0.4);
+    }
+    float dh = length((uv - uSun)*asp);
+    fl += vec3(0.7, 0.85, 1.0) * exp(-pow((dh - 0.28)/0.012, 2.0)) * 0.5;
+    float streak = exp(-abs(uv.y - uSun.y)*260.0) * exp(-abs(uv.x - uSun.x)*2.5);
+    col += (fl*0.018 + vec3(1.0, 0.88, 0.75)*streak*0.09) * uSunVis;
+  }
   col *= 1.0 - uVignette * smoothstep(0.1, 0.75, r2*1.6);
   float g = hash12(uv*uRes + fract(uTime*7.13)*317.0) - 0.5;
   col += g * 0.010 * (col + 0.015);

@@ -6,6 +6,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { World, Baker } from './world.js';
+import { TextureManager } from './textures.js';
 import { UI } from './ui.js';
 import { PLANETS, SPEEDS, DEFAULT_SPEED, STRINGS } from './data.js';
 import { POST_VERT, POST_FRAG } from './shaders.js';
@@ -16,9 +17,9 @@ const params = new URLSearchParams(location.search);
 const coarse = matchMedia('(pointer: coarse)').matches;
 const small = Math.min(screen.width, screen.height) < 700;
 const QUALITY = {
-  high: { bake: 1024, moon: 512, sky: 2048, prMax: 2, prMin: 0.8, earth: '4k', stars: 16000, belt: 1, dust: 1400, samples: 4, minPx: 4.5 },
-  mid: { bake: 512, moon: 256, sky: 1024, prMax: 1.6, prMin: 0.7, earth: '2k', stars: 10000, belt: 0.7, dust: 900, samples: 2, minPx: 4.5 },
-  low: { bake: 256, moon: 128, sky: 512, prMax: 1, prMin: 0.6, earth: '2k', stars: 6000, belt: 0.45, dust: 500, samples: 0, minPx: 4 },
+  high: { bake: 1024, moon: 512, sky: 2048, prMax: 2, prMin: 0.8, maxTex: '8k', stars: 16000, belt: 1, dust: 1400, samples: 4, minPx: 4.5, mobile: false },
+  mid: { bake: 512, moon: 256, sky: 1024, prMax: 1.6, prMin: 0.7, maxTex: '4k', stars: 10000, belt: 0.7, dust: 900, samples: 2, minPx: 4.5, mobile: true },
+  low: { bake: 256, moon: 128, sky: 512, prMax: 1, prMin: 0.6, maxTex: '2k', stars: 6000, belt: 0.45, dust: 500, samples: 0, minPx: 4, mobile: true },
 };
 const qName = QUALITY[params.get('q')] ? params.get('q') : (coarse || small ? 'mid' : 'high');
 const Q = QUALITY[qName];
@@ -62,18 +63,19 @@ class App {
     const tl = () => STRINGS[this.ui.lang];
     this.ui.progress(0.03, tl().textures);
 
-    // textures
-    const loader = new THREE.TextureLoader();
-    const tex = async (f, srgb = false) => {
-      const tx = await loader.loadAsync('textures/' + f);
-      tx.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-      tx.colorSpace = THREE.NoColorSpace;
-      tx.wrapS = THREE.RepeatWrapping;
-      return tx;
-    };
-    const ek = Q.earth;
-    const [day, night, data, moon] = await Promise.all([tex(`earth_day_${ek}.jpg`), tex(`earth_night_${ek}.jpg`), tex(`earth_data_${ek}.jpg`), tex('moon_1k.jpg')]);
-    this.ui.progress(0.12, tl().sky);
+    // real planet maps: 2K for every body first; sharper levels stream in for the body in focus
+    const RK = { '2k': 0, '4k': 1, '8k': 2 };
+    let maxTex = window.SOLARIS_MAX_TEX && RK[window.SOLARIS_MAX_TEX] < RK[Q.maxTex] ? window.SOLARIS_MAX_TEX : Q.maxTex;
+    const mem = navigator.deviceMemory || 8;
+    if (maxTex === '8k' && (renderer.capabilities.maxTextureSize < 8192 || mem < 4)) maxTex = '4k';
+    this.tm = new TextureManager(renderer, maxTex);
+    this.tm.on((id, level, state) => this.ui.setRes(id, level, state));
+    let done = 0;
+    const [ringProfile] = await Promise.all([
+      this.tm.load('textures/saturn/rings.png').then((t) => { t.wrapS = THREE.ClampToEdgeWrapping; t.generateMipmaps = true; return t; }),
+      this.tm.loadBase(() => { done++; this.ui.progress(0.03 + 0.12 * (done / 24), tl().textures); }),
+    ]);
+    this.ui.progress(0.16, tl().sky);
     await nextFrame();
 
     // bake procedural surfaces on the GPU, one body per frame
@@ -82,10 +84,9 @@ class App {
     baked.sky = baker.bakeSky(Q.sky);
     const jobs = [];
     for (const p of PLANETS) {
-      if (p.bake) jobs.push({ id: p.id, name: p.name, size: Q.bake, opt: { kind: p.bake, seed: 3 } });
+      if (p.bake && !p.hd) jobs.push({ id: p.id, name: p.name, size: Q.bake, opt: { kind: p.bake, seed: 3 } });
       for (const m of p.moons || []) {
-        if (!m.bake && m.bake !== 0) continue;
-        if (m.equirect) continue;
+        if (m.hd || m.equirect || (!m.bake && m.bake !== 0)) continue;
         const opt = { kind: m.bake, seed: m.id.length * 7.3, colA: m.colors?.[0], colB: m.colors?.[1], p: [m.craters ?? 1, m.brightCraters ?? 0.5, m.grooves ?? 0, 0] };
         if (!opt.colA) delete opt.colA; if (!opt.colB) delete opt.colB;
         jobs.push({ id: m.id, name: m.name, size: Q.moon, opt });
@@ -102,7 +103,7 @@ class App {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x000000);
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 30000);
-    this.world = new World({ renderer, scene: this.scene, quality: Q, baked, textures: { day, night, data, moon } });
+    this.world = new World({ renderer, scene: this.scene, quality: Q, baked, textures: { saturnRings: ringProfile }, tm: this.tm });
     this.ui.ensureLabels(this.world.bodies);
 
     // post-processing
@@ -111,9 +112,12 @@ class App {
     this.composer = new EffectComposer(renderer, rt);
     this.composer.setPixelRatio(this.pr);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
+    // drop any invalid pixel (NaN/Inf) before bloom so it can never smear across the frame
+    this.composer.addPass(new ShaderPass({ uniforms: { tDiffuse: { value: null } }, vertexShader: POST_VERT,
+      fragmentShader: 'precision highp float; uniform sampler2D tDiffuse; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); bool bad = any(isnan(c)) || any(isinf(c)); gl_FragColor = bad ? vec4(0.0, 0.0, 0.0, 1.0) : vec4(min(c.rgb, vec3(48.0)), 1.0); }' }));
     this.bloom = new UnrealBloomPass(size, 0.42, 0.4, 0.95);
     this.composer.addPass(this.bloom);
-    this.post = new ShaderPass({ uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uVignette: { value: 0.38 }, uWarp: { value: 0 }, uRes: { value: new THREE.Vector2() } }, vertexShader: POST_VERT, fragmentShader: POST_FRAG });
+    this.post = new ShaderPass({ uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uVignette: { value: 0.38 }, uWarp: { value: 0 }, uRes: { value: new THREE.Vector2() }, uSun: { value: new THREE.Vector2() }, uSunVis: { value: 0 }, uAspect: { value: 1 } }, vertexShader: POST_VERT, fragmentShader: POST_FRAG });
     this.composer.addPass(this.post);
     this.composer.addPass(new OutputPass());
 
@@ -225,14 +229,18 @@ class App {
   selectById(id) { const b = this.world.bodies.find((x) => x.id === id); if (b) this.select(b); }
   select(b) {
     if (!b) return;
-    if (b.kind === 'moon' && !b.lod.visible && this.focus !== b.parent) { /* fly via parent framing */ }
     this.focus = null;
     this.ui.setCurrent(b);
+    // stream sharper maps for this body (or the planet behind a moon) and free the previous ones
+    const texId = b.id === 'moon' ? 'moon' : b.kind === 'moon' ? b.parent.id : b.id;
+    this.tm.focus(texId);
     this.flyTo(b);
     this.layoutChanged();
   }
+  setVenusMode(radar, falseColor) { this.world.setVenusMode(radar, falseColor); }
   goOverview() {
     this.focus = null;
+    this.tm.focus(null);
     this.ui.setCurrent(null);
     this.layoutChanged();
     this.flyOverview(3.6);
@@ -412,7 +420,7 @@ class App {
     // keep the camera outside every body
     for (const b of this.world.bodies) {
       if (b.kind === 'moon' && !b.lod.visible) continue;
-      const minD = b.R * (b.scale || 1) * (b.kind === 'sun' ? 1.25 : 1.1);
+      const minD = (b.minDist || b.R * 1.1) * (b.scale || 1) * 0.96;
       const off = cam.position.clone().sub(b.world);
       const d = off.length();
       if (d < minD) cam.position.copy(b.world).addScaledVector(off.normalize(), minD);
@@ -477,6 +485,25 @@ class App {
     w.sun.sunU.uIntensity.value = THREE.MathUtils.lerp(1.5, 0.95, calm);
     w.sun.coronaU.uIntensity.value = THREE.MathUtils.lerp(1.0, 0.7, calm);
     this.post.uniforms.uTime.value = this.vt;
+    // lens flare when looking toward an unobstructed Sun
+    const sv = new THREE.Vector3(0, 0, 0).project(cam);
+    let vis = sv.z < 1 && Math.abs(sv.x) < 1.15 && Math.abs(sv.y) < 1.15 ? 1 : 0;
+    if (vis) {
+      const ray = new THREE.Ray(cam.position.clone(), cam.position.clone().negate().normalize());
+      const sph = new THREE.Sphere();
+      for (const b of w.bodies) {
+        if (b.kind === 'sun' || (b.kind === 'moon' && !b.lod.visible)) continue;
+        if (b.world.length() > sunD) continue;
+        sph.set(b.world, b.R * (b.scale || 1));
+        if (ray.intersectsSphere(sph)) { vis = 0; break; }
+      }
+      vis *= (1 - calm) * THREE.MathUtils.clamp(1.15 - Math.max(Math.abs(sv.x), Math.abs(sv.y)), 0, 1) * (this.flight ? 0.5 : 1);
+    }
+    const pu = this.post.uniforms;
+    pu.uSunVis.value += (vis - pu.uSunVis.value) * Math.min(1, dt * 6);
+    pu.uSun.value.set(sv.x * 0.5 + 0.5, sv.y * 0.5 + 0.5);
+    pu.uAspect.value = W / H;
+    w.prU.value = this.pr;
 
     // hover
     if (this.mouse && !this.flight) {
@@ -518,13 +545,19 @@ class App {
 
   adapt(dt) {
     this.fpsT += dt; this.fpsN++;
-    if (this.fpsT < 1.5) return;
+    if (this.fpsT < 1.0) return;
     const ms = (this.fpsT / this.fpsN) * 1000;
     this.fpsT = 0; this.fpsN = 0;
+    // only react to sustained slowness or headroom, and not too often (resizing reallocates buffers)
+    this.slow = ms > 24 ? (this.slow || 0) + 1 : 0;
+    this.fast = ms < 12 ? (this.fast || 0) + 1 : 0;
+    const now = performance.now();
+    if (this.lastAdapt && now - this.lastAdapt < 4000) return;
     let pr = this.pr;
     const maxPr = Math.min(window.devicePixelRatio || 1, Q.prMax);
-    if (ms > 24 && pr > Q.prMin) pr = Math.max(Q.prMin, pr * 0.85);
-    else if (ms < 13 && pr < maxPr) pr = Math.min(maxPr, pr * 1.1);
+    if (this.slow >= 3 && pr > Q.prMin) pr = Math.max(Q.prMin, Math.round(pr * 0.85 * 20) / 20);
+    else if (this.fast >= 4 && pr < maxPr) pr = Math.min(maxPr, Math.round(pr * 1.12 * 20) / 20);
+    if (pr !== this.pr) { this.lastAdapt = now; this.slow = 0; this.fast = 0; }
     if (Math.abs(pr - this.pr) > 0.01) {
       this.pr = pr;
       this.renderer.setPixelRatio(pr);
