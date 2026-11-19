@@ -491,6 +491,6 @@ async function seed(){
   const start=ch(ui.active)?ui.active:(first||(kids(null)[0]||{}).id);
   if(start)await openChannel(start,{push:false,focus:false,force:true});else showEmpty();
   if(!isPhone()&&start)setView('channel');
-  try{if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(()=>{})}catch(e){}
+  try{if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 })();
 })();

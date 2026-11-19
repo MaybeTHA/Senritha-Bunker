@@ -1,7 +1,7 @@
 {
   "name": "Senritha's Work Space",
   "short_name": "Work Space",
-  "description": "Every Senritha project in one menu, plus Channels for notes and images.",
+  "description": "Channels, sub-channels, messages and images, saved on this device.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
