@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Senritha's Motorhome 3D</title>
+<meta name="description" content="Explore a cozy luxury motorhome parked in a snowy spruce forest, in real-time 3D.">
+<meta name="theme-color" content="#0b1019">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+		"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+	}
+}
+</script>
+</head>
+<body>
+<div id="stage" aria-label="3D view of the motorhome. Drag to look around, scroll or pinch to zoom, double-click to inspect."></div>
+<div id="fade" aria-hidden="true"></div>
+
+<header class="brand">
+	<h1>Senritha's Motorhome <span>3D</span></h1>
+	<p class="meta"><span>Pine Hollow</span><span>−8 °C outside</span><span>21 °C inside</span><span id="clock">--:--</span></p>
+</header>
+
+<div class="tools" role="toolbar" aria-label="View tools">
+	<button class="tool" id="btn-sound" type="button" aria-pressed="true" title="Sound on">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path class="on" d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z M15.5 9a4 4 0 0 1 0 6 M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="off" d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z M16 9.5l5 5 M21 9.5l-5 5"/></svg>
+		<span class="sr">Sound</span>
+	</button>
+	<button class="tool" id="btn-reset" type="button" title="Reset camera (R)">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3 M4.5 4.5v4h4"/></svg>
+		<span class="sr">Reset camera</span>
+	</button>
+	<button class="tool" id="btn-settings" type="button" aria-expanded="false" aria-controls="settings" title="Settings">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10 M18 7h2 M4 17h4 M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+		<span class="sr">Settings</span>
+	</button>
+	<button class="tool" id="btn-help" type="button" aria-expanded="false" aria-controls="help" title="Controls">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.6a2.4 2.4 0 1 1 3.4 2.2c-.7.3-1.1.9-1.1 1.7v.3 M12 16.6v.1"/></svg>
+		<span class="sr">Controls</span>
+	</button>
+</div>
+
+<section class="panel" id="settings" hidden aria-label="Settings">
+	<h2>Settings</h2>
+	<label class="row" for="speed"><span>Camera speed</span><output id="speed-out">1.0×</output></label>
+	<input type="range" id="speed" min="0.3" max="2" step="0.05" value="1">
+	<label class="row" for="snowfall"><span>Snowfall</span><output id="snow-out">Steady</output></label>
+	<input type="range" id="snowfall" min="0.15" max="1" step="0.05" value="0.8">
+	<label class="row" for="quality"><span>Render quality</span></label>
+	<select id="quality">
+		<option value="auto">Auto</option>
+		<option value="high">High</option>
+		<option value="balanced">Balanced</option>
+		<option value="low">Battery saver</option>
+	</select>
+	<p class="note" id="quality-note">Adjusts itself to keep the motion smooth.</p>
+</section>
+
+<section class="panel" id="help" hidden aria-label="Controls">
+	<h2>Controls</h2>
+	<div class="cols">
+		<dl>
+			<dt>Mouse &amp; keys</dt>
+			<dd><b>Drag</b> rotate</dd>
+			<dd><b>Right-drag</b> or <b>Shift-drag</b> pan</dd>
+			<dd><b>Scroll</b> zoom</dd>
+			<dd><b>Double-click</b> inspect an object</dd>
+			<dd><b>W A S D</b> move · <b>Q E</b> down/up</dd>
+			<dd><b>F</b> walk mode · <b>R</b> reset · <b>T</b> tour</dd>
+		</dl>
+		<dl>
+			<dt>Touch</dt>
+			<dd><b>One finger</b> rotate</dd>
+			<dd><b>Pinch</b> zoom</dd>
+			<dd><b>Two fingers</b> pan</dd>
+			<dd><b>Double-tap</b> inspect an object</dd>
+			<dd><b>Joystick</b> walk (in Walk view)</dd>
+		</dl>
+	</div>
+</section>
+
+<div class="toast" id="toast" hidden role="status" aria-live="polite">
+	<p class="toast-name" id="toast-name"></p>
+	<p class="toast-desc" id="toast-desc"></p>
+</div>
+
+<p class="hint" id="hint">Drag to look around · Scroll or pinch to zoom · Double-click anything to inspect it</p>
+
+<nav class="views" id="views" aria-label="Camera views">
+	<div class="views-track">
+		<span class="group-label">Inside</span>
+		<button type="button" data-shot="overview">Overview</button>
+		<button type="button" data-shot="walk">Walk</button>
+		<button type="button" data-shot="fire">Wood stove</button>
+		<button type="button" data-shot="coffee">Coffee</button>
+		<button type="button" data-shot="kitchen">Kitchen</button>
+		<button type="button" data-shot="bedroom">Bedroom</button>
+		<button type="button" data-shot="window">Window seat</button>
+		<span class="group-label">Outside</span>
+		<button type="button" data-shot="outside">Exterior</button>
+		<button type="button" data-shot="porch">Porch</button>
+		<button type="button" data-shot="forest">Forest</button>
+		<span class="divider" aria-hidden="true"></span>
+		<button type="button" data-shot="tour" class="tour">Cinematic tour</button>
+	</div>
+</nav>
+
+<div id="joystick" hidden aria-label="Walk joystick"><div class="knob"></div></div>
+
+<div id="loader" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Loading">
+	<div class="loader-inner">
+		<p class="loader-kicker">Pine Hollow · winter</p>
+		<h2>Senritha's Motorhome <span>3D</span></h2>
+		<div class="bar"><i id="bar"></i></div>
+		<p class="loader-step" id="step">Preparing</p>
+		<p class="loader-error" id="loader-error" hidden></p>
+	</div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
