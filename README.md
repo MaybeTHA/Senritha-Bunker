@@ -10,5 +10,5 @@ Each project lives in its own folder. Keep a project's files inside its folder.
 | [`senritha-rhythm/`](senritha-rhythm/) | Senritha's Rhythm: beat visualizer app for your music |
 | [`senritha-solaris/`](senritha-solaris/) | Senritha's Solaris X3D: interactive 3D Solar System explorer |
 | [`senritha-motorhome/`](senritha-motorhome/) | Senritha's Motorhome 3D: explorable winter motorhome in three.js |
-| [`senritha-workspace/`](senritha-workspace/) | Senritha's Work Space: channels, sub-channels, messages and images |
+| [`senritha-workspace/`](senritha-workspace/) | Senritha's Work Space: menu for every project, plus Channels for notes and images |
 | [`senritha-perf/`](senritha-perf/) | Senritha's Test performance: WebGL2 graphics benchmark |

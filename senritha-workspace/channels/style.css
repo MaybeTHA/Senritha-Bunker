@@ -39,9 +39,7 @@ svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke
 /* ---------- Sidebar ---------- */
 .side{background:var(--side);color:var(--side-fg);display:flex;flex-direction:column;min-width:0;padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);border-right:1px solid var(--side-line)}
 .side .icon{color:var(--side-muted)}.side .icon:hover{background:var(--side-hover);color:var(--side-fg)}
-.ws{display:flex;align-items:center;gap:12px;padding:16px 12px 12px 16px}
-.ws-mark{width:28px;height:28px;display:grid;place-items:center;color:var(--side-fg);flex:none}
-.ws-mark svg{width:24px;height:24px}
+.ws{display:flex;align-items:center;gap:8px;padding:16px 12px 12px 8px}
 .ws-name{flex:1;min-width:0;line-height:1.25}
 .ws-name b{display:block;font-weight:500;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ws-name small{color:var(--side-muted);font-size:12px}
