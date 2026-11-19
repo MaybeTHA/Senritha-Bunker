@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Senritha's Solaris X3D</title>
+<meta name="description" content="Explore the real Solar System in real-time 3D: fly to every planet, its rings, storms and major moons.">
+<meta name="theme-color" content="#03050a">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="scene" aria-label="3D Solar System"></canvas>
+  <div id="labels" aria-hidden="true"></div>
+  <div id="reticle" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M2 22V2h20M78 2h20v20M98 78v20H78M22 98H2V78"/></svg></div>
+
+  <header class="top">
+    <div class="brand">
+      <span class="by">Senritha's</span>
+      <span class="word">SOLARIS <b>X3D</b></span>
+      <span class="date" id="date" aria-live="polite"></span>
+    </div>
+    <div class="tools">
+      <button class="tool" id="btnLabels" data-i18n-label="labels" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10l4 5-4 5H4z"/></svg><span class="lbl" data-i18n="labels"></span>
+      </button>
+      <button class="tool" id="btnInfo" data-i18n-label="info" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="lbl" data-i18n="info"></span>
+      </button>
+      <button class="tool" id="btnLang" aria-label="Language / ภาษา">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.5 2.6 14.5 0 17M12 3.5c-2.6 2.5-2.6 14.5 0 17"/></svg><span class="lbl">EN</span>
+      </button>
+      <button class="tool" id="btnHelp" data-i18n-label="help">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.4M12 16.6v.4"/></svg><span class="lbl" data-i18n="help"></span>
+      </button>
+      <button class="tool icon-only" id="btnFull" data-i18n-label="fullscreen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <aside id="panel" class="panel" hidden aria-live="polite">
+    <button class="grip" id="panelGrip" aria-label="Expand"><span></span><b id="sheetName"></b></button>
+    <button class="pclose" id="panelClose" data-i18n-label="hidePanel">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="pbody" id="panelBody"></div>
+  </aside>
+  <button id="reopen" class="reopen" hidden data-i18n-label="showPanel">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="lbl"></span>
+  </button>
+
+  <footer class="bottom">
+    <div class="time" role="group" data-i18n-label="time">
+      <button class="tbtn" id="btnSlower" data-i18n-label="slower"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 7l-5 5 5 5M18 7l-5 5 5 5"/></svg></button>
+      <button class="tbtn play" id="btnPlay"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg></button>
+      <button class="tbtn" id="btnFaster" data-i18n-label="faster"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7l5 5-5 5M13 7l5 5-5 5"/></svg></button>
+      <span class="speed" id="speedLbl"></span>
+      <button class="tbtn today" id="btnToday" data-i18n-label="today"><span data-i18n="today"></span></button>
+    </div>
+    <nav class="dock" id="dock" aria-label="Solar System"></nav>
+  </footer>
+
+  <div id="help" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="card">
+      <div class="card-h"><h2 id="helpTitle" data-i18n="helpTitle"></h2>
+        <button class="pclose" id="helpClose" data-i18n-label="close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="help-body" id="helpBody"></div>
+    </div>
+  </div>
+
+  <div id="toast" role="status"></div>
+
+  <div id="loader">
+    <div class="ld">
+      <div class="orrery" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
+      <p class="by">Senritha's</p>
+      <h1>SOLARIS <b>X3D</b></h1>
+      <p class="tag" data-i18n="tagline"></p>
+      <div class="bar"><span id="loadBar"></span></div>
+      <p class="msg" id="loadMsg" data-i18n="loading"></p>
+    </div>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
