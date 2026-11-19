@@ -4,6 +4,8 @@ Code stuff and random things
 ## Projects
 Each project lives in its own folder. Keep a project's files inside its folder.
 
+**Inside Bunker** (`index.html` at the repo root) is the menu that links to every project. When you add a project, add it to `APPS` in that file too. With GitHub Pages on, it opens at `https://maybetha.github.io/Senritha-Bunker/`.
+
 | Folder | Project |
 | --- | --- |
 | [`senritha-os/`](senritha-os/) | Phone OS-style web app |
