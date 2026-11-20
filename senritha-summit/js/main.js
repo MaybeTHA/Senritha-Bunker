@@ -128,10 +128,19 @@ async function boot() {
 	scene.add(route.group);
 	forest = new Forest(hf, Q, hf.camp);
 	scene.add(forest.group);
-	rocks = new Rocks(hf, Q, hf.camp);
+	const nearCabin = (x, z, r) => {
+		const l = new THREE.Vector3(x, 0, z).applyMatrix4(cabin.inv);
+		return Math.abs(l.x) < 4.6 + 4.2 + r && l.z > -3.3 - 2.5 - r && l.z < 3.3 + 4.0 + r;
+	};
+	rocks = new Rocks(hf, Q, hf.camp, { keepOut: nearCabin });
 	scene.add(rocks.group);
 	const iceSpots = cabin.icicleWorld();
-	for (const r of rocks.icicleSpots.slice(0, 40)) for (let k = 0; k < 5; k++) iceSpots.push({ x: r.x + (k - 2) * 0.15 * r.s, y: r.y, z: r.z + r.s * 0.7, len: 0.15 + Math.random() * 0.45 });
+	// icicles under the bulge of a few boulders, only where they hang clear of the snow
+	for (const r of rocks.icicleSpots.slice(0, 60)) for (let k = 0; k < 5; k++) {
+		const a = r.r + (k - 2) * 0.12;
+		const x = r.x + Math.sin(a) * r.s * 0.7, z = r.z + Math.cos(a) * r.s * 0.7, len = 0.15 + Math.random() * 0.45;
+		if (r.y - len > hf.height(x, z) + 0.15) iceSpots.push({ x, y: r.y, z, len });
+	}
 	scene.add(icicles(iceSpots));
 
 	world.colliders = cabin.colliders;

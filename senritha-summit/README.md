@@ -9,8 +9,8 @@ Open `index.html` through any static web server (for example `npx serve .` or Gi
 - **Mountains:** one height function for the whole range: a horn-shaped summit with five arêtes, radial couloirs, broken rock, and a ring of lower ranges with glacier floors out to about 30 km. Heights live in three nested grids (1.75 m around the route, 4 m over the massif, 64 m for the world) generated in Web Workers at load.
 - **Terrain rendering:** CDLOD quadtree with vertex morphing (no cracks between levels), terrain self-shadowing ray-marched toward the sun or moon, snow/rock/ice shading by slope, curvature and altitude, wind ripples, blue snow in hollows, glints, glacier crevasses and a trampled route.
 - **Rest camp:** a timber cabin with a glass gable that faces the summit, a deck with lanterns, a stone fireplace with live flames, a bed with a thick duvet and pillows, sofa, lounge chair, rug, bookshelf, coats, boots, backpack, skis, a steaming coffee, frosted windows and icicles.
-- **Summit:** jagged crown rocks, a wind-carved cornice, a steel pole with guy wires and a cairn, and a deep red flag simulated as cloth (Verlet, 442 particles) that follows the wind.
-- **Route:** about 1.2 km and 450 m of climbing along the south-east ridge with switchbacks, marker poles, cairns and a fixed rope near the top.
+- **Summit:** jagged crown rocks, wind-packed drifts on the lee side, a steel pole with guy wires and a cairn, and a deep red flag simulated as cloth (Verlet, 442 particles) that follows the wind.
+- **Route:** about 1.35 km and 430 m of climbing from the cabin's porch steps along the south-east ridge, with switchbacks, marker poles, cairns and a fixed rope near the top. The trail is never steeper than about 32°; open faces steeper than about 45° cannot be climbed on foot.
 
 ## Controls
 

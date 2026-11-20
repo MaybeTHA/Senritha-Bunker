@@ -124,6 +124,14 @@ export const CAMP = (() => {
 	return { x, z, th, yaw: Math.atan2(Math.cos(th), -Math.sin(th)) };
 })();
 
+// cabin-local (x right, z toward the summit) to world, matching cabin.js
+export const CAMP_YAW = Math.atan2(SUMMIT_XZ.x - CAMP.x, SUMMIT_XZ.z - CAMP.z);
+export function campLocal(lx, lz) {
+	const c = Math.cos(CAMP_YAW), s = Math.sin(CAMP_YAW);
+	return [CAMP.x + lx * c + lz * s, CAMP.z - lx * s + lz * c];
+}
+const CABIN_EXIT = [[8.0, -1.35], [8.6, 4.5], [6.5, 10.5], [0, 15], [-9, 17.5]];
+
 export function buildRoute(heightFn = rawHeight) {
 	// crest line from the camp out to the summit
 	const raw = [];
@@ -131,8 +139,9 @@ export function buildRoute(heightFn = rawHeight) {
 	// smooth the crest azimuth
 	for (let pass = 0; pass < 4; pass++) for (let i = 1; i < raw.length - 1; i++) raw[i].th = (raw[i - 1].th + 2 * raw[i].th + raw[i + 1].th) / 4;
 	const ctrl = [];
-	// leave the camp shelf and join the crest
-	ctrl.push([CAMP.x + Math.cos(CAMP.th) * 6, CAMP.z + Math.sin(CAMP.th) * 6]);
+	// start at the foot of the cabin's porch steps, pass the corner of the deck, then swing
+	// out in front of the glass gable toward the summit and join the crest
+	for (const [lx, lz] of CABIN_EXIT) ctrl.push(campLocal(lx, lz));
 	for (const p of raw) {
 		// switchbacks where the ridge steepens and on the summit horn
 		let lat = 0;
@@ -179,16 +188,19 @@ export function buildRoute(heightFn = rawHeight) {
 		y = out;
 	}
 	y[0] = y0; y[n - 1] = y1;
-	const MAXG = 0.7, MING = 0.02;
+	for (let i = 0; i < n; i++) if (Math.hypot(pts[i].x - CAMP.x, pts[i].z - CAMP.z) < 30) y[i] = y0 + 0.015 * pts[i].s;
+	const L = pts[n - 1].s;
+	const MING = 0.02;
+	const maxG = (i) => (pts[i].s > L - 45 ? 0.5 : 0.62);
 	for (let it = 0; it < 4; it++) {
 		for (let i = 1; i < n; i++) {
 			const ds = pts[i].s - pts[i - 1].s;
-			y[i] = clamp(y[i], y[i - 1] + MING * ds, y[i - 1] + MAXG * ds);
+			y[i] = clamp(y[i], y[i - 1] + MING * ds, y[i - 1] + maxG(i) * ds);
 		}
 		y[n - 1] = y1;
 		for (let i = n - 2; i >= 0; i--) {
 			const ds = pts[i + 1].s - pts[i].s;
-			y[i] = clamp(y[i], y[i + 1] - MAXG * ds, y[i + 1] - MING * ds);
+			y[i] = clamp(y[i], y[i + 1] - maxG(i + 1) * ds, y[i + 1] - MING * ds);
 		}
 		y[0] = y0;
 	}
@@ -222,13 +234,33 @@ export function fillHeights(region, res, r0, r1, out, rowOffset = 0) {
 // Returns a Float32Array path mask (0..1) of the same size.
 export function carve(h, res, region, route, campY) {
 	const step = region.size / (res - 1);
+	// 0) the camp shelf, first, so the path bench can cut its own level way out of it
+	const cR = 34, cF = 30;
+	for (let j = 0; j < res; j++) {
+		const z = region.z0 + j * step;
+		if (Math.abs(z - CAMP.z) > cR + cF) continue;
+		for (let i = 0; i < res; i++) {
+			const x = region.x0 + i * step;
+			const d = Math.hypot(x - CAMP.x, z - CAMP.z);
+			if (d > cR + cF) continue;
+			const idx = j * res + i;
+			const w = 1 - smoothstep(cR, cR + cF, d);
+			const shelf = campY + 0.35 * N.fbm(x / 9, z / 9, 2) * smoothstep(8, 26, d);
+			h[idx] = lerp(h[idx], shelf, w);
+		}
+	}
+	const sampleH = (x, z) => {
+		const fx = clamp((x - region.x0) / step, 0, res - 1.001), fz = clamp((z - region.z0) / step, 0, res - 1.001);
+		const i = fx | 0, j = fz | 0, tx = fx - i, tz = fz - j, o = j * res + i;
+		return lerp(lerp(h[o], h[o + 1], tx), lerp(h[o + res], h[o + res + 1], tx), tz);
+	};
 	// 1) reshape the whole ridge in a wide band so its crest follows the route's steady grade
 	{
 		const n = route.length;
 		const gs = new Float32Array(n);
 		for (let i = 0; i < n; i++) {
 			let acc = 0, c = 0;
-			for (let k = -30; k <= 30; k++) { const j = clamp(i + k, 0, n - 1); acc += route[j].g; c++; }
+			for (let k = -30; k <= 30; k++) { const j = clamp(i + k, 0, n - 1); acc += sampleH(route[j].x, route[j].z); c++; }
 			gs[i] = acc / c;
 		}
 		const pts = [];
@@ -260,7 +292,7 @@ export function carve(h, res, region, route, campY) {
 	const mask = new Float32Array(res * res);
 	const best = new Float32Array(res * res).fill(1e9);
 	const target = new Float32Array(res * res);
-	const HALF = 1.9, SHOULDER = 5.5;
+	const HALF = 2.3, SHOULDER = 6.0;
 	const R = HALF + SHOULDER;
 	for (let k = 0; k < route.length - 1; k++) {
 		const a = route[k], b = route[k + 1];
@@ -285,24 +317,9 @@ export function carve(h, res, region, route, campY) {
 		h[idx] = lerp(h[idx], target[idx] - 0.12, w);
 		mask[idx] = 1 - smoothstep(HALF - 0.6, HALF + 1.2, dist);
 	}
-	// camp shelf
-	const cR = 34, cF = 30;
-	for (let j = 0; j < res; j++) {
-		const z = region.z0 + j * step;
-		if (Math.abs(z - CAMP.z) > cR + cF) continue;
-		for (let i = 0; i < res; i++) {
-			const x = region.x0 + i * step;
-			const d = Math.hypot(x - CAMP.x, z - CAMP.z);
-			if (d > cR + cF) continue;
-			const idx = j * res + i;
-			const w = 1 - smoothstep(cR, cR + cF, d);
-			const shelf = campY + 0.35 * N.fbm(x / 9, z / 9, 2) * smoothstep(8, 26, d);
-			h[idx] = lerp(h[idx], shelf, w);
-		}
-	}
 	// summit platform: a small rounded top, highest point at the flag
 	const top = route[route.length - 1];
-	const topY = top.y + 1.2;
+	const topY = top.y + 0.1;
 	for (let j = 0; j < res; j++) {
 		const z = region.z0 + j * step;
 		if (Math.abs(z - SUMMIT_XZ.z) > 40) continue;
@@ -311,12 +328,12 @@ export function carve(h, res, region, route, campY) {
 			const d = Math.hypot(x - SUMMIT_XZ.x, z - SUMMIT_XZ.z);
 			if (d > 40) continue;
 			const idx = j * res + i;
-			const dome = topY - 0.09 * d * d;
-			h[idx] = d < 4 ? lerp(dome, h[idx], smoothstep(2.5, 4, d)) : Math.min(h[idx], topY - 0.4 - (d - 2) * 0.45);
+			const dome = topY - 0.05 * d * d;
+			h[idx] = d < 4 ? Math.min(h[idx], dome) : Math.min(h[idx], topY - 0.8 - (d - 4) * 0.45);
 		}
 	}
 	return mask;
 }
 
-export const ROUTE_HALF = 1.9;
+export const ROUTE_HALF = 2.3;
 export { N as noise };

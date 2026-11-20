@@ -172,7 +172,7 @@ export class Walker {
 			const wx = nx * cs + nz * sn, wz = -nx * sn + nz * cs;
 			p.x += wx * (r - d); p.z += wz * (r - d);
 		}
-		for (const c of this.world.circles) {
+		for (const c of this.nearCircles(p.x, p.z)) {
 			if (c.top !== undefined && c.top < feet) continue;
 			const dx = p.x - c.x, dz = p.z - c.z, rr = c.r + r;
 			const d2 = dx * dx + dz * dz;
@@ -184,6 +184,31 @@ export class Walker {
 		const m = 140;
 		p.x = THREE.MathUtils.clamp(p.x, FINE.x0 + m, FINE.x0 + FINE.size - m);
 		p.z = THREE.MathUtils.clamp(p.z, FINE.z0 + m, FINE.z0 + FINE.size - m);
+	}
+	// rocks and tree trunks indexed on an 8 m grid so thousands of them cost almost nothing
+	nearCircles(x, z) {
+		const list = this.world.circles;
+		if (this._grid?.n !== list.length) {
+			const g = new Map();
+			for (const c of list) {
+				const r = c.r + 0.5;
+				for (let gx = Math.floor((c.x - r) / 8); gx <= Math.floor((c.x + r) / 8); gx++)
+					for (let gz = Math.floor((c.z - r) / 8); gz <= Math.floor((c.z + r) / 8); gz++) {
+						const k = gx * 100003 + gz;
+						if (!g.has(k)) g.set(k, []);
+						g.get(k).push(c);
+					}
+			}
+			this._grid = { n: list.length, g };
+		}
+		return this._grid.g.get(Math.floor(x / 8) * 100003 + Math.floor(z / 8)) || [];
+	}
+	// angle of the ground ahead in the direction (dx, dz), positive when climbing
+	climbAngle(dx, dz) {
+		const l = Math.hypot(dx, dz) || 1, ux = dx / l, uz = dz / l, p = this.pos;
+		// over a stride-length baseline so small ripples in the snow do not stop a climber
+		const h0 = this.hf.height(p.x - ux * 0.9, p.z - uz * 0.9), h1 = this.hf.height(p.x + ux * 1.3, p.z + uz * 1.3);
+		return Math.atan((h1 - h0) / 2.2);
 	}
 	update(dt) {
 		if (!this.enabled) return;
@@ -200,14 +225,14 @@ export class Walker {
 		const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
 		const want = new THREE.Vector3().addScaledVector(fwd, fx).addScaledVector(right, sx);
 		if (want.lengthSq() > 0) want.normalize().multiplyScalar(speed);
-		// slopes: slow down climbing, refuse walls of snow and rock
-		const n = this.hf.normal(this.pos.x, this.pos.z, this._n);
+		// slopes: measured along the direction of travel (a level path across a steep face stays
+		// walkable); climbing slows down, faces steeper than about 45 degrees cannot be climbed
 		if (this.surface !== 'wood' && want.lengthSq() > 0) {
-			const up = -(n.x * want.x + n.z * want.z) / (want.length() || 1);
-			const slope = Math.acos(Math.min(1, n.y));
-			if (up > 0) {
-				const steep = THREE.MathUtils.smoothstep(slope, 0.62, 0.74);
-				want.multiplyScalar(1 - Math.min(0.55, up * 0.6) - steep * 0.95);
+			const ang = this.climbAngle(want.x, want.z);
+			if (ang > 0) {
+				// the trodden trail grips better than open powder
+				const steep = this.surface === 'path' ? THREE.MathUtils.smoothstep(ang, 0.74, 0.86) : THREE.MathUtils.smoothstep(ang, 0.66, 0.8);
+				want.multiplyScalar(Math.max(0, 1 - Math.min(0.5, Math.sin(ang) * 0.75) - steep));
 			}
 		}
 		const acc = this.onGround ? 12 : 2.5;
@@ -226,8 +251,8 @@ export class Walker {
 			const g = this.groundAt(this.pos.x, this.pos.z, this.pos.y);
 			if (this.pos.y <= g + 0.02 || (this.onGround && this.pos.y - g < this.step && this.vel.y <= 0)) {
 				// on very steep terrain slide back down instead of standing
-				const nn = this.hf.normal(this.pos.x, this.pos.z, this._n);
-				if (this.surface !== 'wood' && nn.y < 0.62 && g > this.pos.y + 0.05) { this.pos.x = ox; this.pos.z = oz; }
+				const mx = this.pos.x - ox, mz = this.pos.z - oz, ml = Math.hypot(mx, mz);
+				if (this.surface !== 'wood' && ml > 1e-4 && g > this.pos.y + 0.05 && (g - this.pos.y) / ml > 1.25) { this.pos.x = ox; this.pos.z = oz; }
 				this.pos.y = Math.max(g, Math.min(this.pos.y, g));
 				this.pos.y = this.groundAt(this.pos.x, this.pos.z, this.pos.y + 0.1);
 				if (this.vel.y < 0) this.vel.y = 0;

@@ -1,4 +1,4 @@
-// The summit: crown rocks, a wind-carved cornice, the steel flagpole and the red flag (a
+// The summit: crown rocks, wind-packed drifts, the steel flagpole and the red flag (a
 // Verlet cloth driven by the wind), plus the route furniture: marker poles, cairns, the fixed
 // rope on the summit zig-zags and the trailhead sign.
 import * as THREE from 'three';
@@ -144,18 +144,22 @@ export class Summit {
 		slab(-2.0, -5.6, 2.8, 4.4, 1.9, 0.9, -0.15);
 		slab(5.8, 2.6, 1.3, 2.6, 1.1, 2.1, 0.1);
 
-		// cornice: wind-carved overhang on the lee (east) side
-		const cg = new THREE.CylinderGeometry(1.4, 1.8, 9, 24, 6, true, -Math.PI * 0.1, Math.PI * 0.55);
-		cg.rotateX(Math.PI / 2);
-		const cp = cg.attributes.position;
-		for (let i = 0; i < cp.count; i++) cp.setY(i, cp.getY(i) * 0.6 + Math.sin(cp.getZ(i) * 0.6) * 0.3);
-		cg.computeVertexNormals();
-		const snowMat = patch(new THREE.MeshStandardMaterial({ color: 0xf2f6fc, roughness: 0.78, normalMap: tex('snow_nor', 2), normalScale: new THREE.Vector2(0.6, 0.6), side: THREE.DoubleSide }), {});
-		const cornice = new THREE.Mesh(cg, snowMat);
-		cornice.position.set(s.x + 6, hf.height(s.x + 6, s.z - 1) + 0.6, s.z - 1);
-		cornice.rotation.y = 0.15;
-		cornice.receiveShadow = true;
-		this.group.add(cornice);
+		// wind-packed snow drifts on the lee (downwind, east) side of the top, sunk into the slope
+		const snowMat = patch(new THREE.MeshStandardMaterial({ color: 0xf2f6fc, roughness: 0.78, normalMap: tex('snow_nor', 2), normalScale: new THREE.Vector2(0.6, 0.6) }), {});
+		for (const [dx, dz, sx, sy, sz, ry] of [[3.8, -2.9, 3.0, 0.85, 1.5, 0.25], [6.6, -0.9, 2.4, 0.7, 1.2, -0.3], [-1.2, -4.8, 2.0, 0.55, 1.1, 0.6]]) {
+			const g = new THREE.SphereGeometry(1, 28, 14);
+			const p = g.attributes.position;
+			// sharp windward crest, rounded lee
+			for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i); p.setY(i, y > 0 ? y * (1 - 0.35 * Math.max(0, -x)) : y); }
+			g.computeVertexNormals();
+			const m = new THREE.Mesh(g, snowMat);
+			const gx = s.x + dx, gz = s.z + dz;
+			m.position.set(gx, hf.height(gx, gz) - sy * 0.45, gz);
+			m.scale.set(sx, sy, sz);
+			m.rotation.y = ry;
+			m.receiveShadow = true;
+			this.group.add(m);
+		}
 
 		// flagpole with cairn base and guy wires
 		const poleH = 6.6;
@@ -285,8 +289,8 @@ export class RouteFurniture {
 			const a = R[i], b = R[i + 1];
 			const tx = b.x - a.x, tz = b.z - a.z, l = Math.hypot(tx, tz) || 1;
 			side = -side;
-			const x = a.x - (tz / l) * 2.5 * side, z = a.z + (tx / l) * 2.5 * side;
-			spots.push([x, hf.height(x, z) - 0.25, z, (rnd() - 0.5) * 0.12]);
+			const x = a.x - (tz / l) * 2.9 * side, z = a.z + (tx / l) * 2.9 * side;
+			spots.push([x, Math.min(hf.height(x, z), hf.height(x + 0.2, z), hf.height(x - 0.2, z), hf.height(x, z + 0.2), hf.height(x, z - 0.2)) - 0.3, z, (rnd() - 0.5) * 0.12]);
 		}
 		const im = new THREE.InstancedMesh(pg, poleMat, spots.length);
 		const m = new THREE.Matrix4(), e = new THREE.Euler(), q = new THREE.Quaternion(), s = new THREE.Vector3(1, 1, 1), p = new THREE.Vector3();
@@ -327,7 +331,7 @@ export class RouteFurniture {
 			if (R[i].s < startS) continue;
 			const a = R[i], b = R[i + 1];
 			const tx = b.x - a.x, tz = b.z - a.z, l = Math.hypot(tx, tz) || 1;
-			const x = a.x + (tz / l) * 1.9 * sideR, z = a.z - (tx / l) * 1.9 * sideR;
+			const x = a.x + (tz / l) * 2.4 * sideR, z = a.z - (tx / l) * 2.4 * sideR;
 			posts.push(new THREE.Vector3(x, hf.height(x, z) + 1.0, z));
 		}
 		void sideR;

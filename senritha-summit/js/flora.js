@@ -83,7 +83,11 @@ export class Forest {
 			const key = Math.floor(x / CELL) + ',' + Math.floor(z / CELL);
 			if (!cells.has(key)) cells.set(key, [[], [], []]);
 			const v = (rnd() * 3) | 0;
-			cells.get(key)[v].push([x, y - 0.4 * s * 0.05, z, s, rnd() * Math.PI * 2]);
+			let low = y;
+			const tr = s * 0.04;
+			for (let k = 0; k < 6; k++) { const a = (k / 6) * Math.PI * 2; low = Math.min(low, hf.height(x + Math.cos(a) * tr, z + Math.sin(a) * tr)); }
+			cells.get(key)[v].push([x, low - 0.15, z, s, rnd() * Math.PI * 2]);
+			this.colliders.push({ x, z, r: 0.2 + s * 0.018 });
 		};
 		let count = 0;
 		const spacing = q.treeSpacing;
@@ -117,7 +121,6 @@ export class Forest {
 			if (n.y < 0.78 || hf.nearestRoute(x, z).d < 6) continue;
 			const s = 4 + rnd() * 6;
 			push(x, z, s, y);
-			this.colliders.push({ x, z, r: 0.35 + s * 0.012 });
 		}
 		this.count = count;
 		const m = new THREE.Matrix4(), qn = new THREE.Quaternion(), sc = new THREE.Vector3(), ps = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
@@ -176,7 +179,8 @@ function boulderGeometry(seed) {
 }
 
 export class Rocks {
-	constructor(hf, q, camp, extra = []) {
+	constructor(hf, q, camp, opts = {}) {
+		const extra = opts.extra || [];
 		this.group = new THREE.Group();
 		this.colliders = [];
 		const mat = patch(new THREE.MeshStandardMaterial({
@@ -187,12 +191,21 @@ export class Rocks {
 		const lists = [[], [], [], []];
 		const rnd = mulberry32(31337);
 		const n = { x: 0, y: 1, z: 0 };
-		const add = (x, z, s, sink = 0.35, collide = false) => {
+		const keepOut = opts.keepOut || (() => false);
+		const add = (x, z, s, sink = 0.35) => {
+			if (keepOut(x, z, s * 1.2) || Math.hypot(x - hf.summit.x, z - hf.summit.z) < 14) return;
+			if (x > bx0 - 12 && x < bx1 + 12 && z > bz0 - 12 && z < bz1 + 12 && hf.nearestRoute(x, z).d < 2.3 + s * 1.15 + 0.6) return;
 			const y = hf.height(x, z);
+			// the lowest ground under the rock: on a slope it must not hang over the downhill side
+			let low = y;
+			for (let k = 0; k < 8; k++) { const a = (k / 8) * Math.PI * 2; low = Math.min(low, hf.height(x + Math.cos(a) * s * 1.25, z + Math.sin(a) * s * 1.25)); }
 			const v = (rnd() * 4) | 0;
-			lists[v].push([x, y - s * sink, z, s, rnd() * 6.28, rnd() * 0.4]);
-			if (collide && s > 0.5) this.colliders.push({ x, z, r: s * 0.85, top: y + s * 0.6 });
+			const cy = Math.min(y - s * sink, low + s * 0.22);
+			lists[v].push([x, cy, z, s, rnd() * 6.28, rnd() * 0.4]);
+			if (s > 0.45) this.colliders.push({ x, z, r: s * 0.8, top: cy + s * 0.75 });
 		};
+		let bx0 = 1e9, bx1 = -1e9, bz0 = 1e9, bz1 = -1e9;
+		for (const p of hf.route) { bx0 = Math.min(bx0, p.x); bx1 = Math.max(bx1, p.x); bz0 = Math.min(bz0, p.z); bz1 = Math.max(bz1, p.z); }
 		const R = hf.route;
 		// boulders along the route
 		for (let i = 8; i < R.length; i += 7) {
@@ -200,18 +213,19 @@ export class Rocks {
 			const a = R[Math.min(R.length - 1, i + 1)], b = R[i];
 			const tx = a.x - b.x, tz = a.z - b.z, l = Math.hypot(tx, tz) || 1;
 			const side = rnd() < 0.5 ? -1 : 1;
-			const off = 3.4 + rnd() * 5;
-			add(b.x - (tz / l) * off * side, b.z + (tx / l) * off * side, 0.35 + rnd() * rnd() * 2.2, 0.35, true);
+			const sz = 0.35 + rnd() * rnd() * 2.2;
+			const off = 2.3 + sz * 1.15 + 0.8 + rnd() * 4;
+			add(b.x - (tz / l) * off * side, b.z + (tx / l) * off * side, sz, 0.35);
 		}
 		// scattered over the massif
 		let k = 0;
 		while (k < q.rocks) {
 			const x = -1500 + rnd() * 3000, z = -1500 + rnd() * 3000;
 			hf.normal(x, z, n);
-			if (n.y < 0.6 || n.y > 0.97) continue;
+			if (n.y < 0.72 || n.y > 0.97) continue;
 			if (hf.pathMask(x, z) > 0.01 || Math.hypot(x - camp.x, z - camp.z) < 40) continue;
 			const s = 0.8 + rnd() * rnd() * 7;
-			add(x, z, s, 0.4, hf.nearestRoute(x, z).d < 30);
+			add(x, z, s, 0.4);
 			k++;
 		}
 		// around the camp
@@ -219,9 +233,9 @@ export class Rocks {
 			const a = rnd() * Math.PI * 2, d = 30 + rnd() * 22;
 			const x = camp.x + Math.cos(a) * d, z = camp.z + Math.sin(a) * d;
 			if (hf.nearestRoute(x, z).d < 4) continue;
-			add(x, z, 0.5 + rnd() * 2.2, 0.35, true);
+			add(x, z, 0.5 + rnd() * 2.2, 0.35);
 		}
-		for (const e of extra) add(e.x, e.z, e.s, e.sink ?? 0.35, true);
+		for (const e of extra) add(e.x, e.z, e.s, e.sink ?? 0.35);
 		const m = new THREE.Matrix4(), qn = new THREE.Quaternion(), e = new THREE.Euler(), sc = new THREE.Vector3(), ps = new THREE.Vector3();
 		this.icicleSpots = [];
 		lists.forEach((list, v) => {
@@ -232,7 +246,7 @@ export class Rocks {
 				sc.set(s * (1 + (i % 3) * 0.15), s * (0.7 + (i % 4) * 0.12), s);
 				ps.set(x, y, z);
 				im.setMatrixAt(i, m.compose(ps, qn, sc));
-				if (s > 1.6 && s < 4 && i % 3 === 0) this.icicleSpots.push({ x, y: y + s * 0.15, z, s });
+				if (s > 1.6 && s < 4 && i % 3 === 0) this.icicleSpots.push({ x, y: y + s * 0.15, z, s, r });
 			});
 			im.instanceMatrix.needsUpdate = true;
 			im.computeBoundingSphere();

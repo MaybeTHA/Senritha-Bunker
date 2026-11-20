@@ -311,15 +311,17 @@ export class Cabin {
 			}
 			this.box(0.14, rise - 0.25, 0.14, M.beam, 0, EAVE + (rise - 0.25) / 2 + 0.12, z, 1);
 		}
-		// chimney through the left slope
-		this.box(0.9, 2.6, 0.9, M.stoneOut, -2.85, EAVE + rise * 0.6 + 0.6, 0.8, 1).userData.cast = true;
-		this.box(1.05, 0.12, 1.05, M.trim, -2.85, EAVE + rise * 0.6 + 1.95, 0.8, 1);
+		// chimney rising straight from the fireplace breast, through the left eave
+		const cx = -W / 2 + 0.45, cz = 0.8;
+		this.box(0.95, 2.7, 1.62, M.stoneOut, cx, 2.7 + 1.35, cz, 1).userData.cast = true;
+		this.box(1.1, 0.12, 1.78, M.trim, cx, 5.46, cz, 1);
 		this.smoke = new Puffs({ count: 34, origin: new THREE.Vector3(0, 0, 0), life: 9, rise: 1.0, spread: 0.5, size0: 0.6, size1: 4.0, color: 0xb9bcc4, opacity: 0.13, windK: 1.2 });
-		this.smoke.mesh.position.copy(this.toWorld(-2.85, EAVE + rise * 0.6 + 2.1, 0.8));
+		this.smoke.mesh.position.copy(this.toWorld(cx, 5.6, cz));
 		// icicles hanging from both eaves
 		this.icicleSpots = [];
 		for (const sgn of [-1, 1]) {
 			for (let z = -len / 2 + 0.2; z < len / 2 - 0.1; z += 0.18 + this.rnd() * 0.25) {
+				if (sgn > 0 && z > -1.75 - 1.1 && z < -1.75 + 1.9) continue;
 				const ex = sgn * (hw + over - 0.05);
 				const ey = EAVE + rise + 0.12 - (hw + over) * CABIN.PITCH - 0.12;
 				this.icicleSpots.push({ local: new THREE.Vector3(ex, ey, z), len: 0.12 + Math.pow(this.rnd(), 2) * 0.75 });
@@ -381,7 +383,7 @@ export class Cabin {
 	fireplace() {
 		const M = this.M;
 		const x = -CABIN.W / 2 + 0.45, z = 0.8;
-		const H = CABIN.EAVE + CABIN.W / 2 * CABIN.PITCH * 0.55;
+		const H = 3.3; // the chimney above takes over at the roof
 		// chimney breast with a dark firebox opening
 		this.box(0.7, 0.85, 1.7, M.stone, x, 0.425, z, 1);
 		this.box(0.7, H - 1.65, 1.5, M.stone, x, 1.65 + (H - 1.65) / 2, z, 1);
@@ -587,7 +589,7 @@ export class Cabin {
 		this.inner.add(this.pendant);
 		// a tall plant by the glass
 		this.plant(3.85, 2.6, 1.0);
-		this.plant(2.35, -2.9 + 0.12, 0.45, 1.36);
+		this.plant(1.5, -CABIN.D / 2 + 0.27, 0.3, 2.04);
 	}
 
 	plant(x, z, s, y = 0) {
@@ -649,6 +651,7 @@ export class Cabin {
 		const knob2 = knob.clone(); knob2.position.x = 0.07; this.doorPivot.add(knob2);
 		this.doorAngle = 0; this.doorTarget = 0;
 		this.doorCollider = this.solid(hw, dz, 0.06, this.door.w / 2, 0, 2.1, { door: true });
+		this.doorOpenCollider = this.solid(hw, dz, 0.05, this.door.w / 2, 0, 2.1, { disabled: true });
 		this.interact.push({ id: 'door', pos: this.toWorld(hw, 1.0, dz), r: 1.8, label: 'door' });
 		// door mat, boots
 		this.rbox(0.9, 0.02, 0.6, 0.01, M.leather, hw - 0.55, 0.01, dz, 2);
@@ -704,7 +707,7 @@ export class Cabin {
 		}
 		// an ice axe on the wall
 		const axe = new THREE.Group();
-		axe.position.set(hw - 0.09, 1.45, -0.55); axe.rotation.set(0, -Math.PI / 2, 0.15);
+		axe.position.set(hw - 0.14, 1.45, -0.55); axe.rotation.set(0, -Math.PI / 2, 0.15);
 		this.inner.add(axe);
 		const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.016, 0.62, 8), M.jacketB); axe.add(shaft);
 		const head = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.035, 0.02), M.iron); head.position.y = 0.31; axe.add(head);
@@ -737,8 +740,8 @@ export class Cabin {
 		// exterior lanterns: two on the deck posts and one by the door, plus warm light spilling out
 		const M = this.M;
 		const hw = CABIN.W / 2, hd = CABIN.D / 2;
-		this.lantern(-hw - 0.5, 1.12, hd + 2.7, 0.9);
-		this.lantern(hw + 0.5, 1.12, hd + 2.7, 0.9);
+		this.lantern(-hw - 0.5, 1.16, hd + 2.74, 0.9);
+		this.lantern(hw + 0.5, 1.16, hd + 2.74, 0.9);
 		const dl = this.lantern(hw + 0.12, 2.0, this.door.c + 0.75, 0.8);
 		dl.rotation.y = Math.PI / 2;
 		this.porchLight = new THREE.PointLight(0xffa860, 0, 11, 2);
@@ -775,8 +778,15 @@ export class Cabin {
 		this.add(new THREE.CylinderGeometry(0.27, 0.27, 0.06, 14), M.snow, hw + 2.4, -CABIN.LIFT + 0.53, this.door.c - 1.5);
 		this.solid(hw + 2.4, this.door.c - 1.5, 0.3, 0.3, -CABIN.LIFT, 0.1);
 		for (const k of [0, 1]) {
-			const sh = this.add(new THREE.TorusGeometry(0.22, 0.02, 6, 20), M.trim, hw + 1.95 + k * 0.08, 0.2 - CABIN.LIFT + 0.25, this.door.c - 0.95 + k * 0.05);
-			sh.scale.set(0.55, 1.3, 1); sh.rotation.y = Math.PI / 2 - 0.2; sh.rotation.z = 0.25;
+			const g = new THREE.Group();
+			g.position.set(hw + 0.16 + k * 0.05, 0.31, this.door.c + 1.3 + k * 0.16);
+			g.rotation.set(0, Math.PI / 2, 0);
+			const ring = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.02, 6, 20), M.trim);
+			ring.scale.set(0.55, 1.3, 1); ring.rotation.x = -0.18;
+			const web = new THREE.Mesh(new THREE.CircleGeometry(0.2, 16), M.leather);
+			web.scale.set(0.55, 1.3, 1); web.rotation.x = -0.18;
+			g.add(ring, web);
+			this.inner.add(g);
 		}
 	}
 
@@ -792,6 +802,14 @@ export class Cabin {
 		this.doorAngle += (this.doorTarget - this.doorAngle) * Math.min(1, dt * 3.2);
 		this.doorPivot.rotation.y = this.doorAngle * 1.75;
 		this.doorCollider.disabled = this.doorAngle > 0.35;
+		{
+			const th = this.doorPivot.rotation.y, half = this.door.w / 2;
+			const p = this.doorPivot.position;
+			const w = this.toWorld(p.x + Math.sin(th) * half, 0, p.z + Math.cos(th) * half);
+			const oc = this.doorOpenCollider;
+			oc.x = w.x; oc.z = w.z; oc.rot = this.yaw + th;
+			oc.disabled = this.doorAngle < 0.35;
+		}
 		this.fireBoost = Math.max(0, this.fireBoost - dt * 0.12);
 		const flick = 0.82 + Math.sin(time * 11.3) * 0.06 + Math.sin(time * 23.7 + 1.3) * 0.05 + Math.sin(time * 5.1) * 0.07;
 		const fp = 1 + this.fireBoost * 0.9;
