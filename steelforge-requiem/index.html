@@ -203,12 +203,87 @@ input[type=range]::-moz-range-thumb{background:#ff9a3a;border-color:#ffdca6}
 #bmc{border-color:#c07a3a;background:#0b0c0e}
 .wv{font-family:"Teko","Kanit",sans-serif;letter-spacing:3px;color:#ffc46a;text-shadow:0 0 26px #000,0 0 14px rgba(255,122,42,.8)}
 #prev,#mTank{border:1px solid #3f464d!important;border-radius:9px;background:#0d0f11!important;box-shadow:inset 0 0 0 1px #000,0 8px 24px rgba(0,0,0,.55)}
+/* ═══════════ PHONE: แนวนอน · ปุ่มตามนิ้วโป้ง · ไม่ทับกัน ═══════════ */
+#rot{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+ background:radial-gradient(circle at 50% 40%,#1c2024,#0b0c0e 70%);color:#f2d9a6;text-align:center;font-family:Kanit,sans-serif;padding:24px}
+#rot .ph{width:52px;height:88px;border:4px solid #ffb347;border-radius:11px;position:relative;animation:rotPh 2.2s ease-in-out infinite;box-shadow:0 0 22px rgba(255,122,42,.35)}
+#rot .ph:after{content:'';position:absolute;left:50%;bottom:5px;width:10px;height:3px;margin-left:-5px;background:#ffb347;border-radius:2px}
+#rot b{font-size:20px}#rot span{font-size:13px;color:#a6acb1}
+@keyframes rotPh{0%,25%{transform:rotate(0)}55%,100%{transform:rotate(90deg)}}
+body.mbl.inb.portrait #rot{display:flex}
+body.mbl #hud{font-size:10px}
+body.mbl .hb{padding:4px 6px;border-radius:7px}
+body.mbl #hLeft{top:calc(4px + env(safe-area-inset-top));left:calc(4px + env(safe-area-inset-left));min-width:0;width:136px}
+body.mbl #hLeft .row{margin:2px 0!important}body.mbl #hLeft .bar{height:6px}
+body.mbl #lbRL,body.mbl #lbAim,body.mbl #tDef:empty{display:none}
+body.mbl #tSpot,body.mbl #tMod{font-size:9.5px!important;line-height:1.35!important}
+body.mbl #dmgC{width:124px!important;height:60px!important}
+body.mbl #hTop{top:calc(4px + env(safe-area-inset-top));min-width:0;padding:3px 10px;font-size:10px}
+body.mbl #hScore{top:calc(40px + env(safe-area-inset-top));min-width:0;padding:3px 8px}
+body.mbl #hScore .fz{width:20px;height:11px;line-height:10px}
+body.mbl #hRight{top:calc(4px + env(safe-area-inset-top));right:calc(4px + env(safe-area-inset-right));padding:3px}
+body.mbl #mini{width:86px;height:86px;display:block}
+body.mbl #hEsc{top:calc(4px + env(safe-area-inset-top));right:calc(104px + env(safe-area-inset-right));min-height:40px;min-width:52px;
+ display:flex;align-items:center;justify-content:center;font-size:12px}
+body.mbl #hScan{top:calc(102px + env(safe-area-inset-top));right:calc(4px + env(safe-area-inset-right));width:150px;max-height:32vh}
+body.mbl #hLog{top:calc(76px + env(safe-area-inset-top));bottom:auto;left:50%;transform:translateX(-50%);max-width:44%;text-align:center}
+body.mbl #hLog .lg{font-size:9.5px;padding:2px 6px}body.mbl #hLog .lg:nth-child(n+3){display:none}
+body.mbl #hAmmo{bottom:calc(6px + env(safe-area-inset-bottom));gap:4px;max-width:46vw}
+body.mbl .ab{min-width:50px;min-height:42px;padding:5px 6px;font-size:10.5px;display:flex;flex-direction:column;justify-content:center}
+body.mbl #hUse{bottom:calc(60px + env(safe-area-inset-bottom));padding:10px 18px;font-size:13px;min-height:44px}
+body.mbl .stick{width:126px;height:126px;bottom:calc(12px + env(safe-area-inset-bottom))}
+body.mbl .stick i{width:58px;height:58px;margin:-29px 0 0 -29px}
+body.mbl #stL{left:calc(12px + env(safe-area-inset-left))}body.mbl #stR{right:calc(12px + env(safe-area-inset-right))}
+body.mbl .fbtn{font-size:10.5px;border-width:2px;box-shadow:0 3px 10px rgba(0,0,0,.45);-webkit-user-select:none;user-select:none}
+body.mbl .fbtn.dn{transform:scale(.92);filter:brightness(1.3)}
+body.mbl #bMain{right:calc(150px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));width:80px;height:80px;font-size:15px}
+body.mbl #bAlt{right:calc(156px + env(safe-area-inset-right));bottom:calc(104px + env(safe-area-inset-bottom));width:52px;height:52px}
+body.mbl #bLock{right:calc(12px + env(safe-area-inset-right));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bSmk{right:calc(66px + env(safe-area-inset-right));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bMsl{right:calc(120px + env(safe-area-inset-right));bottom:calc(164px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bScan{right:calc(12px + env(safe-area-inset-right));bottom:calc(200px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bMap{left:calc(12px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bExt{left:calc(66px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bExt.hot{background:#c0441ecc;border-color:#ffd0a0;animation:bl .6s infinite}
+body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
+/* จอเตี้ยมาก (มีแถบเบราว์เซอร์): ย่อแผงซ้าย ย้ายปุ่มสแกนไปฝั่งซ้าย */
+@media (max-height:330px){
+ body.mbl #dmgC,body.mbl #tMod,body.mbl #tSpot{display:none!important}
+ body.mbl #hLeft{width:120px}
+ body.mbl .stick{width:112px;height:112px}
+ body.mbl #bLock,body.mbl #bSmk,body.mbl #bMsl,body.mbl #bMap,body.mbl #bExt,body.mbl #bScan{bottom:calc(132px + env(safe-area-inset-bottom));width:44px;height:44px}
+ body.mbl #bSmk{right:calc(62px + env(safe-area-inset-right))}body.mbl #bMsl{right:calc(112px + env(safe-area-inset-right))}
+ body.mbl #bExt{left:calc(62px + env(safe-area-inset-left))}body.mbl #bScan{right:auto;left:calc(112px + env(safe-area-inset-left))}
+ body.mbl #bMain{right:calc(134px + env(safe-area-inset-right));width:72px;height:72px}
+ body.mbl #bAlt{right:calc(158px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom));width:42px;height:42px}
+}
+/* ── เมนูแนวนอนบนมือถือ ── */
+@media (orientation:landscape) and (max-height:520px){
+ .screen{padding:6px calc(10px + env(safe-area-inset-right)) 6px calc(10px + env(safe-area-inset-left))}
+ .wrap{padding-bottom:28px}
+ .screen h1{font-size:28px;margin:0;padding:.08em 0 0}
+ h2{font-size:16px;margin:8px 0 4px}h3{margin:6px 0 3px}
+ p.sub{font-size:11px;margin-bottom:4px;line-height:1.45}
+ .topbar{padding:4px;margin-bottom:5px}.res span{font-size:13px;padding:2px 6px}
+ .card{padding:6px 8px}.card .st{font-size:10px;line-height:1.4}
+ .btn{padding:8px 10px;font-size:13px}.btn.sm{padding:5px 8px}
+ .grid{gap:5px}.g3{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}.g4{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+ .tabs{gap:3px;margin-bottom:5px}.tab{padding:6px 3px;min-width:58px;font-size:11px}
+ #scMenu .wrap>div{display:grid;grid-template-columns:44% 1fr;column-gap:12px;align-items:start}
+ #scMenu h1{grid-column:1/3}#mTank{grid-column:1;grid-row:2/6;max-width:none!important;margin:2px 0!important}
+ #scMenu .topbar,#scMenu .grid,#scMenu .hint{grid-column:2}
+ #scGarage .gwrap{display:grid;grid-template-columns:41% 1fr;gap:10px;align-items:start}
+ #scGarage .gL{position:sticky;top:46px}#prev{max-width:none!important}
+ #flPrev{max-height:26vh;object-fit:contain}
+ #scBoot .grid .st{display:none}
+}
 </style>
 </head>
 <body>
 <div id="err"></div>
 <canvas id="cv"></canvas>
 <div id="vig"></div>
+<div id="rot"><div class="ph"></div><b>หมุนโทรศัพท์เป็นแนวนอน</b><span>เกมหยุดชั่วคราว · หมุนกลับเพื่อเล่นต่อ</span></div>
 <div class="wv" id="wvTxt"></div>
 
 <div id="hud">
@@ -217,7 +292,7 @@ input[type=range]::-moz-range-thumb{background:#ff9a3a;border-color:#ffdca6}
     <div class="row" style="margin:3px 0"><div class="bar r"><i id="bHP" style="width:100%"></i></div></div>
     <div style="color:#8d977c" id="lbRL">บรรจุ</div>
     <div class="row" style="margin:3px 0"><div class="bar b"><i id="bRL" style="width:100%"></i></div></div>
-    <div style="color:#8d977c">ศูนย์เล็งรวม</div>
+    <div style="color:#8d977c" id="lbAim">ศูนย์เล็งรวม</div>
     <div class="row" style="margin:3px 0"><div class="bar y"><i id="bAim" style="width:100%"></i></div></div>
     <div id="tDef" style="font-size:10px;color:#7fa4c0"></div>
     <div id="tSpot" style="font-size:10px;color:#7ec24a">🫥 ยังไม่ถูกตรวจพบ</div>
@@ -331,11 +406,13 @@ input[type=range]::-moz-range-thumb{background:#ff9a3a;border-color:#ffdca6}
 <div class="screen" id="scGarage"><div class="wrap">
   <div class="topbar"><div class="res" id="resG"></div>
     <button class="btn sm" style="width:auto" onclick="show('scMenu')">← กลับ</button></div>
+  <div class="gwrap"><div class="gL">
   <canvas id="prev" width="1040" height="520" style="width:100%;max-width:560px;display:block;margin:0 auto;border-radius:9px"></canvas>
   <div class="row" style="justify-content:center;margin-top:5px">
     <button class="btn sm" style="width:auto" onclick="pvSpin=!pvSpin">🔄 หมุน/หยุด</button>
     <button class="btn sm" style="width:auto" onclick="pvZoom=pvZoom>=2.7?1.3:pvZoom+0.45">🔍 ซูม</button>
   </div>
+  </div><div class="gR">
   <div class="tabs" style="margin-top:8px">
     <div class="tab on" onclick="gtab('t1',this)">ตัวถัง</div>
     <div class="tab" onclick="gtab('t2',this)">อำนาจยิง</div>
@@ -372,6 +449,7 @@ input[type=range]::-moz-range-thumb{background:#ff9a3a;border-color:#ffdca6}
   <div class="pane" id="t9"><h2>สกิน</h2><div class="grid g3" id="gSkin"></div></div>
   <div class="pane" id="t0"><h2>สมรรถนะรวม</h2><div class="card" style="cursor:default" id="gStat"></div></div>
   <div style="margin-top:12px"><button class="btn pri" onclick="show('scFront')">🌲 ออกรบ</button></div>
+  </div></div>
 </div></div>
 
 <!-- DUEL -->
@@ -426,6 +504,7 @@ input[type=range]::-moz-range-thumb{background:#ff9a3a;border-color:#ffdca6}
   <div class="grid g3"><div class="card" id="s_low" onclick="setGfx('low')"><div class="nm">🟢 ต่ำ</div></div>
     <div class="card" id="s_med" onclick="setGfx('med')"><div class="nm">🟡 กลาง</div></div>
     <div class="card" id="s_high" onclick="setGfx('high')"><div class="nm">🔴 สูง</div></div></div>
+  <h2>มือถือ</h2><div class="grid g3" id="mobSet"></div>
   <h2>ปุ่มควบคุม (คอมพิวเตอร์)</h2>
   <div class="card" style="cursor:default" id="keyList"></div>
   <div class="row"><button class="btn sm" style="width:auto" onclick="resetKeys()">คืนค่าปุ่มเริ่มต้น</button></div>
@@ -1225,7 +1304,7 @@ function defSave(){
    apsH:{ah0:1},radar:{rd0:1},drone:{dr0:1},skin:{std:1}},
   tune:tune,crew:crew,ammoMix:mix,ammoDev:dev,
   lay:{r1:40,r2:35,r3:25,crewL:'bal'},keys:keys,
-  vol:{m:80,s:100,e:55,u:70,a:60,mus:50},gfx:'med',plat:(/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)?'mb':'pc'),
+  vol:{m:80,s:100,e:55,u:70,a:60,mus:50},mob:{assist:1,autofire:1,haptic:1},gfx:'med',plat:(/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)?'mb':'pc'),
   stat:{wins:0,kills:0,games:0,best:0,caps:0,flWins:0}};}
 function loadSave(){
  var d=defSave(),raw=null;
@@ -1280,11 +1359,11 @@ function setGfx(q){SFX.ui(true);SV.gfx=q;GFX.q=q;
  if($(m[q]))$(m[q]).classList.add('sel');if($(m2[q]))$(m2[q]).classList.add('sel');
  resize();save();}
 var PLAT='pc',mobile=/Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent)||('ontouchstart'in window&&innerWidth<1100);
-function setPlat(p){SFX.ui(true);PLAT=p;SV.plat=p;
+function setPlat(p){SFX.ui(true);PLAT=p;SV.plat=p;updOrient();
  ['pfPC','pfMB','s_pc','s_mb'].forEach(function(i){if($(i))$(i).classList.remove('sel');});
  if($(p==='pc'?'pfPC':'pfMB'))$(p==='pc'?'pfPC':'pfMB').classList.add('sel');
  if($(p==='pc'?'s_pc':'s_mb'))$(p==='pc'?'s_pc':'s_mb').classList.add('sel');save();}
-function bootDone(){SFX.init();show('scMenu');SFX.music('menu');}
+function bootDone(){SFX.init();goFull();updOrient();show('scMenu');SFX.music('menu');}
 var cv=$('cv'),cx=cv.getContext('2d'),mc=$('mini'),mx=mc.getContext('2d');
 var pv=$('prev'),px=pv?pv.getContext('2d'):null;
 var bmc=$('bmc'),bmx=bmc?bmc.getContext('2d'):null;
@@ -1358,7 +1437,8 @@ function show(id){SFX.ui(true);
  if(id==='scInf')drawInf();
  if(id==='scBox')drawBox();
  if(id==='scMenu')drawMenu();
- if(id==='scSet')drawKeys();}
+ if(id==='scSet'){drawKeys();drawMobSet();}
+ document.body.classList.remove('inb');}
 function resStr(){return '<span>💰 '+fmt(SV.cr)+'</span><span>🔧 จูน '+(SV.tpMax-tuneUsed())+'/'+SV.tpMax+
  '</span><span>🎖️ '+SV.cp+'</span><span>🔬 '+SV.rp+'</span><span>🎁 '+
  (SV.boxes.c+SV.boxes.r+SV.boxes.e+SV.boxes.l)+'</span>';}
@@ -2365,7 +2445,7 @@ function fire(t,kind){
    col:t.team===1?(am==='apfsds'?'#ffc0b0':'#ff7a52'):(am==='apfsds'?'#cfe8ff':'#ffe08a'),r:s.mag?2.6:3.6,dist:0,cal:s.cal,zH:(!isP&&t.aimO)?(t.aimO.f==='t'?rnd(0,.4):rnd(.6,1)):Math.random()});
   SFX.at(t.x,t.y);if(s.mag)SFX.mg(s.cal,isP?0:dist);else SFX.cannon(s.cal/105,isP?0:dist);
   muzzle(t,a,mz,s.mag?6:14,'#ffcf6a');t.revealT=3;
-  if(isP){addShake(s.mag?2:s.cal/12,s.mag?.07:.3);G.fireGlow=s.mag?.04:.12;
+  if(isP){vib(s.mag?6:14);addShake(s.mag?2:s.cal/12,s.mag?.07:.3);G.fireGlow=s.mag?.04:.12;
    if(!s.mag)setTimeout(function(){if(G.run&&P&&!P.dead)
     (P.st.alK==='al0'||P.st.alK==='al1')?SFX.reload():SFX.autoload();},Math.min(900,s.rel*450));}
  }else if(kind===1){
@@ -2474,7 +2554,7 @@ function dmgCrew(t,c,amt){if(!c||c.h<=0)return -1;var p=c.h;c.h=Math.max(0,c.h-a
  return c.h<=0?2:(c.h<60&&p>=60?1:-1);}
 /* ── ไฟ ── */
 function ignite(t,why){if(t.dead)return;if(t.fire<=0){t.fire=18;t.fireT=0;
- if(t.team===0){addLog('🔥 ไฟไหม้'+(why?' ('+why+')':'')+'! กด '+keyName(SV.keys.ext).toUpperCase()+' ดับเพลิง','r');SFX.alarm();}}}
+ if(t.team===0){addLog('🔥 ไฟไหม้'+(why?' ('+why+')':'')+'! '+(isPhone()?'แตะปุ่ม ดับไฟ':'กด '+keyName(SV.keys.ext).toUpperCase()+' ดับเพลิง'),'r');SFX.alarm();vib([60,40,60]);}}}
 function fireTick(t,dt){t.fire-=dt;t.fireT+=dt;t.hp-=dt*t.mhp*.016;
  if(Math.random()<dt*1.2)dmgMod(t,Math.random()<.5?'eng':'fuel',8);
  if(Math.random()<dt*.5){var c=t.crew[ri(0,t.crew.length-1)];dmgCrew(t,c,rnd(6,14));applyFx(t);}
@@ -2600,7 +2680,7 @@ function hitTank(s,t,step){var A=AMMOT[s.ammo]||AMMOT.ap,sl=hyp(s.vx,s.vy)||1,dx
   burst(g.x,g.y,Math.round((s.kind===2?26:s.r<3?8:16)*GFX.parts),'#ff7a3c');addShake(isPT?(s.r<3?4:11):2.6,.24);
   if(io.det){if(io.det==='bus')blowout(t);else ammoDet(t,'แร็คกระสุนโดนยิง');R.det=1;}
   if(io.fire)ignite(t,io.fire);
-  applyFx(t);if(crewOut(t))crewKO(t);
+  applyFx(t);if(crewOut(t))crewKO(t);if(isPT)vib(45);else if(s.own===P)vib(18);
   if(isPT&&(io.m.length||io.c.length))addLog('⚠️ โดนเจาะ'+R.zone+': '+io.m.concat(io.c).join(', '),'r');
   return R;}
  /* ไม่เจาะ */
@@ -3050,6 +3130,7 @@ function resupply(t,dt){
 
 /* ═══════ KILL / RESPAWN ═══════ */
 function killTank(t){
+ if(!t.dead){if(t===P)vib([90,50,150]);else if(t.team===1&&P&&hyp(t.x-P.x,t.y-P.y)<900)vib(35);}
  if(t.dead)return;t.dead=true;
  if(G.lock===t)G.lock=null;
  var big=t.ammoBlew,dist=P?hyp(t.x-P.x,t.y-P.y):0;
@@ -3250,6 +3331,7 @@ function commonStart(mode){
  for(var i=0;i<s.length;i++)s[i].classList.remove('on');
  $('hud').classList.add('on');
  if(PLAT==='mb')$('mob').classList.add('on');
+ document.body.classList.add('inb');goFull();updOrient();
  $('hResp').classList.remove('on');closeBigMap();closeModal();
  G.mode=mode;buildMap(G.map);
  tanks=[];shots=[];parts=[];trails=[];debris=[];smokes=[];aps=[];arty=[];logs=[];
@@ -3377,7 +3459,7 @@ function update(dt){
   P.thr=clamp(th,-1,1);P.steer=clamp(sr,-1,1);
   var tv=P.st.tvel*dt;
   if(G.lock&&!G.lock.dead)P.ta+=clamp(angD(P.ta,Math.atan2(G.lock.y-P.y,G.lock.x-P.x)),-tv*1.15,tv*1.15);
-  else if(PLAT==='mb'){if(joyR.m>.22)P.ta+=clamp(angD(P.ta,joyR.a),-tv,tv);}
+  else if(PLAT==='mb')mobAim(dt);
   else P.ta+=clamp(angD(P.ta,Math.atan2(mouse.y+cam.y-P.y,mouse.x+cam.x-P.x)),-tv,tv);
   if(mouse.down&&PLAT==='pc')fire(P,wSel);
   if(P.burst>0&&P.secCd<=0&&wSel===1)fire(P,1);
@@ -3557,13 +3639,13 @@ function update(dt){
   if(FL.on&&FL.intel[0]>0)df.push('<span style="color:#8fd44a">📻 '+Math.ceil(FL.intel[0])+'s</span>');
   $('tDef').innerHTML=df.join(' · ');
   var md=[];
-  if(P.fire>0)md.push('<span style="color:#ff8030">🔥 ไฟไหม้! กด '+keyName(SV.keys.ext)+'</span>');
+  if(P.fire>0)md.push('<span style="color:#ff8030">🔥 ไฟไหม้! '+(isPhone()?'แตะ ดับไฟ':'กด '+keyName(SV.keys.ext))+'</span>');
   if(P.noMove)md.push('<span style="color:#e0603c">เคลื่อนที่ไม่ได้</span>');
   if(P.noFire)md.push('<span style="color:#e0603c">ยิงไม่ได้</span>');
   if(P.st.eraMax)md.push('ERA '+P.eraLeft+'/'+P.st.eraMax);
   if(G.lock)md.push('<span style="color:#ffbfae">🔒 ล็อก</span>');
   $('tMod').innerHTML=md.length?md.join(' · '):'ระบบปกติ';
-  if((G.dpT=(G.dpT||0)+dt)>.15){G.dpT=0;drawDmgPanel();}
+  if((G.dpT=(G.dpT||0)+dt)>.15){G.dpT=0;drawDmgPanel();$('bExt').classList.toggle('hot',P.fire>0);}
   if(!P.dead&&hr<.3&&hr>0)SFX.warn(hr);}}
 
 /* ═══════ REWARD (INF) ═══════ */
@@ -4427,6 +4509,33 @@ function drawAir(w,h){var E=FL.ev;if(!E)return;
   if(a.k==='heli'){var rt=G.t*38;cx.globalAlpha=.25;cx.fillStyle='#cfd4cf';cx.beginPath();cx.arc(0,0,40,0,6.2832);cx.fill();cx.globalAlpha=.8;cx.strokeStyle='#1a1c1a';cx.lineWidth=3;
    cx.beginPath();cx.moveTo(Math.cos(rt)*42,Math.sin(rt)*42);cx.lineTo(-Math.cos(rt)*42,-Math.sin(rt)*42);cx.moveTo(Math.cos(rt+1.57)*42,Math.sin(rt+1.57)*42);cx.lineTo(-Math.cos(rt+1.57)*42,-Math.sin(rt+1.57)*42);cx.stroke();cx.globalAlpha=1;}
   cx.restore();});}
+/* ═══════════ PHONE: เต็มจอ · ล็อกแนวนอน · ช่วยเล็ง · สั่น ═══════════ */
+function isPhone(){return PLAT==='mb';}
+function lockLand(){try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){});}catch(e){}}
+function goFull(){if(!isPhone())return;var d=document.documentElement,rq=d.requestFullscreen||d.webkitRequestFullscreen;
+ if(rq&&!document.fullscreenElement&&!document.webkitFullscreenElement){try{var pr=rq.call(d,{navigationUI:'hide'});if(pr&&pr.then)pr.then(lockLand).catch(function(){});else lockLand();}catch(e){}}
+ else lockLand();}
+function updOrient(){var b=document.body;b.classList.toggle('portrait',innerHeight>innerWidth);b.classList.toggle('mbl',isPhone());}
+addEventListener('resize',updOrient);addEventListener('orientationchange',function(){setTimeout(updOrient,120);});
+function vib(ms){try{if(isPhone()&&SV.mob&&SV.mob.haptic&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
+/* ช่วยเล็ง: หาศัตรูในกรวยรอบทิศที่โยกจอยขวา แล้วดึงเป้าไปหา (รวมการนำหน้าเป้าที่วิ่ง) */
+function aimAssist(want){if(!P||P.dead)return null;var best=null,bs=1e9,sv=Math.max(P.st.shellV/62,4);
+ for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead||t.gone||t.team!==1)continue;
+  var dx=t.x-P.x,dy=t.y-P.y,d=hyp(dx,dy);if(d>1700)continue;
+  var tof=d/sv/60,lx=dx+Math.cos(t.a)*t.spd*tof*60,ly=dy+Math.sin(t.a)*t.spd*tof*60,a=Math.atan2(ly,lx),df=Math.abs(angD(want,a)),cone=.24+Math.min(.5,70/Math.max(d,1));
+  if(df>cone)continue;var sc=df*(1+d/2600);if(sc<bs){bs=sc;best={a:a,t:t,d:d};}}
+ if(best&&!losClear(P,best.t))return null;return best;}
+function mobAim(dt){var tv=P.st.tvel*dt,M=SV.mob||{};
+ if(joyR.m>.22){var want=joyR.a,as=M.assist?aimAssist(want):null;
+  if(as){want=as.a;P.asT=as.t;P.asL=G.t;}else P.asT=null;
+  P.ta+=clamp(angD(P.ta,want),-tv,tv);
+  if(M.autofire&&joyR.m>.9&&Math.abs(angD(P.ta,want))<(as?.045:.03)){var k=wSel;if(k===0&&(P.st.mag||P.rl<=0))fire(P,0);else if(k!==0)fire(P,k);}}
+ else if(M.assist&&P.asT&&!P.asT.dead&&G.t-P.asL<1.5){var t=P.asT,sv=Math.max(P.st.shellV/62,4),dx=t.x-P.x,dy=t.y-P.y,tof=hyp(dx,dy)/sv/60;
+  P.ta+=clamp(angD(P.ta,Math.atan2(dy+Math.sin(t.a)*t.spd*tof*60,dx+Math.cos(t.a)*t.spd*tof*60)),-tv,tv);}}
+function setMob(k){SV.mob[k]=SV.mob[k]?0:1;save();SFX.ui(!!SV.mob[k]);drawMobSet();}
+function drawMobSet(){var el=$('mobSet');if(!el)return;var L=[['assist','🎯 ช่วยเล็ง','ดึงเป้าเข้าหาศัตรูที่ใกล้ทิศจอยขวา'],
+ ['autofire','🔥 ยิงอัตโนมัติ','โยกจอยขวาสุดขอบ + เล็งตรงแล้ว = ยิงเอง'],['haptic','📳 สั่น','สั่นเมื่อยิง/โดนยิง/ทำลายศัตรู']];
+ el.innerHTML=L.map(function(a){return '<div class="card'+(SV.mob[a[0]]?' sel':'')+'" onclick="setMob(\''+a[0]+'\')"><div class="nm">'+a[1]+(SV.mob[a[0]]?' ✔':'')+'</div><div class="st">'+a[2]+'</div></div>';}).join('');}
 function render(){
  var w=innerWidth,h=innerHeight,time=G.t,m=MAPS[G.map];
  var sx=G.shake?rnd(-G.shake,G.shake):0,sy=G.shake?rnd(-G.shake,G.shake):0;
@@ -4647,6 +4756,7 @@ function drawBigMap(){
    '</b> · แนวรบ Zone '+(FL.front[0]+1)+'–'+(FL.front[1]+1)+
    (FL.intel[0]>0?' · 📻 ข่าวกรองเหลือ '+Math.ceil(FL.intel[0])+' วิ':'')):'';}
 function loop(now){if(!G.run)return;
+ if(isPhone()&&innerHeight>innerWidth){G.last=now;requestAnimationFrame(loop);return;}  /* แนวตั้ง = หยุดชั่วคราว */
  var dt=Math.min((now-G.last)/1000,.05);G.last=now;G.t+=dt;update(dt);render();
  if($('bigmap').classList.contains('on')&&Math.random()<.25)drawBigMap();
  requestAnimationFrame(loop);}
@@ -4733,7 +4843,7 @@ function bindStick(padId,knobId,st){
  var pad=$(padId),knob=$(knobId),id=null,cxp=0,cyp=0,R=45;
  function start(e){var t=e.changedTouches?e.changedTouches[0]:e;
   id=t.identifier!==undefined?t.identifier:'m';
-  var r=pad.getBoundingClientRect();cxp=r.left+r.width/2;cyp=r.top+r.height/2;
+  var r=pad.getBoundingClientRect();cxp=r.left+r.width/2;cyp=r.top+r.height/2;R=Math.max(40,r.width*.4);
   SFX.init();SFX.resume();move(e);}
  function move(e){if(id===null)return;var t=null,ts=e.changedTouches;
   if(ts){for(var i=0;i<ts.length;i++)if(ts[i].identifier===id)t=ts[i];}else t=e;
@@ -4747,11 +4857,11 @@ function bindStick(padId,knobId,st){
  pad.addEventListener('touchend',end);pad.addEventListener('touchcancel',end);}
 bindStick('stL','knL',joyL);bindStick('stR','knR',joyR);
 function bindFire(id,kind){var el=$(id),held=false,iv=null;
- function on(e){e.preventDefault();SFX.init();SFX.resume();held=true;
+ function on(e){e.preventDefault();SFX.init();SFX.resume();held=true;el.classList.add('dn');
   if(G.run&&P&&!P.dead){wSel=kind;updAmmoUI();fire(P,kind);}
   var gap=kind===1?60:(P&&P.st.mag?70:120);
   iv=setInterval(function(){if(held&&G.run&&P&&!P.dead)fire(P,kind);},gap);}
- function off(){held=false;if(iv){clearInterval(iv);iv=null;}}
+ function off(){held=false;el.classList.remove('dn');if(iv){clearInterval(iv);iv=null;}}
  el.addEventListener('touchstart',on,{passive:false});
  el.addEventListener('touchend',off);el.addEventListener('touchcancel',off);
  el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);}
