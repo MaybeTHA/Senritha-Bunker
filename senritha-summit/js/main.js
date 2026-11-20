@@ -18,6 +18,7 @@ import { FreeCam, Walker, Footprints } from './controls.js';
 import { Soundscape } from './audio.js';
 import { STR } from './i18n.js';
 import { ALT0 } from './world.js';
+import { Tour } from './tour.js';
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -63,6 +64,7 @@ const S = {
 };
 
 let renderer, scene, camera, composer, bloom, grade, sky, terrain, sun, hemi, hf, cabin, summit, route, forest, rocks;
+let tour, tourSaved = null, forcedDt = 0, simTime = 0;
 let snowNear, snowFar, spindrift, driftNear, driftFar, clouds, wind, free, walker, prints, audio;
 const world = { colliders: [], floors: [], circles: [] };
 const clock = new THREE.Clock();
@@ -198,6 +200,11 @@ async function boot() {
 	audio.musicOn = store.get('music', false);
 	audio.muted = store.get('muted', false);
 
+	tour = new Tour({
+		hf, cabin, camera, fadeEl: $('fade'), titleEl: $('tour-title'),
+		setPreset: (name) => { sky.setPreset(name, true); segSelect('seg-time', name); },
+		setWind: (mode) => { wind.set(mode); wind.s = wind.target; segSelect('seg-wind', mode); },
+	});
 	addEventListener('resize', onResize);
 	wireUI();
 	progress(1, 'ready');
@@ -206,6 +213,12 @@ async function boot() {
 	$('enter').hidden = false;
 	$('enter').focus();
 	window.__audio = audio;
+	window.__capture = {
+		start: () => { startTour(); simTime = 30; },
+		step: (dt) => { frames = 0; forcedDt = dt; frame(); forcedDt = 0; },
+		seek: (t) => { tour.time = Math.max(0, t); tour.index = -1; },
+		info: () => ({ total: tour.total, shots: tour.shots.map((x) => ({ dur: x.dur, time: x.time, wind: x.wind, interior: !!x.interior })) }),
+	};
 	window.__app = { composer, renderer, scene, camera, terrain, sky, hf, U, cabin, summit, walker, free, wind, setTime, setWind, setView, goTo, interact, THREE, renderFrames: (n) => { for (let i = 0; i < n; i++) { frames = 0; frame(); } }, viewpoint };
 	renderer.setAnimationLoop(frame);
 }
@@ -335,6 +348,30 @@ function fade(fn) {
 	setTimeout(() => { fn(); setTimeout(() => $('fade').classList.remove('on'), 120); }, 520);
 }
 
+// ---------------------------------------------------------------- cinematic tour
+function startTour() {
+	if (tour.active) return;
+	tourSaved = { time: S.time, wind: S.wind, view: S.view, pos: camera.position.clone(), target: free.c.target.clone(), fov: camera.fov };
+	if (S.view === 'walk') setView('free');
+	free.enabled = false; free.flight = null;
+	$('fade').style.transition = 'none';
+	['settings', 'help'].forEach((p) => { $(p).hidden = true; });
+	tour.start();
+	audio.start?.();
+	$('btn-tour').setAttribute('aria-pressed', 'true');
+}
+function stopTour() {
+	if (!tour.active) return;
+	tour.stop();
+	$('fade').style.transition = '';
+	const sv = tourSaved; tourSaved = null;
+	setTime(sv.time); setWind(sv.wind);
+	camera.position.copy(sv.pos); free.c.target.copy(sv.target); camera.fov = sv.fov; camera.updateProjectionMatrix();
+	free.enabled = true; free.c.update();
+	if (sv.view === 'walk') setView('walk');
+	$('btn-tour').setAttribute('aria-pressed', 'false');
+}
+
 // ---------------------------------------------------------------- UI helpers
 function segSelect(id, v, pressed = false) {
 	document.querySelectorAll(`#${id} button`).forEach((b) => b.setAttribute(pressed ? 'aria-pressed' : 'aria-checked', String(b.dataset.v === v)));
@@ -365,6 +402,8 @@ function wireUI() {
 	soundBtn.setAttribute('aria-pressed', String(!audio.muted));
 	soundBtn.addEventListener('click', () => { audio.start(); audio.mute(!audio.muted); store.set('muted', audio.muted); soundBtn.setAttribute('aria-pressed', String(!audio.muted)); });
 	$('btn-full').addEventListener('click', toggleFull);
+	$('btn-tour').addEventListener('click', () => (tour.active ? stopTour() : startTour()));
+	renderer.domElement.addEventListener('pointerdown', () => { if (tour.active) stopTour(); });
 	const panel = (btn, id) => {
 		$(btn).addEventListener('click', () => {
 			const open = $(id).hidden;
@@ -398,6 +437,7 @@ function wireUI() {
 	addEventListener('keydown', (e) => {
 		if (e.target.closest?.('input,select,textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
 		const k = e.key.toLowerCase();
+		if (tour.active && k !== 'p' && k !== 'escape' && k !== 'f') stopTour();
 		if (k === '1') setTime('morning'); else if (k === '2') setTime('afternoon'); else if (k === '3') setTime('night');
 		else if (k === 'g') setWind(S.wind === 'light' ? 'strong' : 'light');
 		else if (k === 'v') setView(S.view === 'free' ? 'walk' : 'free');
@@ -405,6 +445,8 @@ function wireUI() {
 		else if (k === 'r') resetCamera(); else if (k === 'f') toggleFull();
 		else if (k === 'e') interact();
 		else if (k === 'h') $('btn-help').click();
+		else if (k === 'p') (tour.active ? stopTour() : startTour());
+		else if (k === 'escape' && tour.active) stopTour();
 	});
 
 	// touch: joystick and buttons
@@ -538,12 +580,13 @@ const _lf = new THREE.Vector3(), _lu = new THREE.Vector3();
 function frame() {
 	frames++;
 	if (still && frames > still) { renderer.setAnimationLoop(null); document.body.classList.add('still'); return; }
-	const dt = still ? 1 / 60 : Math.min(clock.getDelta(), 0.1);
-	const time = still ? 30 + frames / 60 : clock.elapsedTime;
+	let dt = still ? 1 / 60 : Math.min(clock.getDelta(), 0.1);
+	let time = still ? 30 + frames / 60 : clock.elapsedTime;
+	if (forcedDt) { dt = forcedDt; simTime += dt; time = simTime; }
 	U.uTime.value = time;
 	wind.update(dt, time);
 
-	if (S.view === 'walk') walker.update(dt); else free.update(dt);
+	if (tour.active) tour.update(dt, !forcedDt); else if (S.view === 'walk') walker.update(dt); else free.update(dt);
 
 	sky.update(dt, time);
 	const st = sky.state;

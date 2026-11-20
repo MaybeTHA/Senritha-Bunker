@@ -118,7 +118,7 @@ export class Summit {
 		const rnd = mulberry32(2024);
 
 		// crown rocks: jagged slabs around the platform
-		const rockMat = patch(new THREE.MeshStandardMaterial({ map: tex('rock_diff', 0.8), normalMap: tex('rock_nor', 0.8), roughnessMap: tex('rock_rough', 0.8), color: new THREE.Color(0.36, 0.38, 0.43), normalScale: new THREE.Vector2(1.4, 1.4) }), { snow: 0.5 });
+		const rockMat = patch(new THREE.MeshStandardMaterial({ map: tex('rock_diff', 0.8), normalMap: tex('rock_nor', 0.8), roughnessMap: tex('rock_rough', 0.8), color: new THREE.Color(0.24, 0.26, 0.31), normalScale: new THREE.Vector2(1.4, 1.4) }), { snow: 0.7 });
 		const slab = (x, z, w, h, d, ry, rx) => {
 			const g = new THREE.BoxGeometry(w, h, d, 6, 8, 4);
 			const p = g.attributes.position;

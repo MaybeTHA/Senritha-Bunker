@@ -147,6 +147,20 @@ body.nohud .readout { display: none; }
 .label.on { opacity: 1; }
 .hint { position: fixed; z-index: 9; left: 50%; bottom: calc(var(--gut-b) + 92px); transform: translateX(-50%); font-size: 12px; color: var(--ink-2); padding: 5px 12px; border-radius: 999px; background: var(--glass); pointer-events: none; white-space: nowrap; }
 
+/* ---------------------------------------------------------------- cinematic tour */
+body.touring .brand, body.touring .tools, body.touring .dock, body.touring .guide, body.touring .crosshair,
+body.touring .prompt, body.touring .hint, body.touring .touch, body.touring .label, body.touring .toast { display: none !important; }
+body.touring #stage canvas { cursor: pointer; }
+body.touring #fade { z-index: 8; }
+.tour-title {
+	position: fixed; z-index: 9; left: 0; right: 0; bottom: 14%; text-align: center; pointer-events: none; opacity: 0;
+	text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+}
+.tour-title h2 { margin: 0; font: 500 clamp(30px, 5vw, 56px)/1.05 var(--f-display); letter-spacing: 0.02em; }
+.tour-title h2 em { font: 600 11px/1 var(--f-ui); font-style: normal; letter-spacing: 0.18em; vertical-align: 0.9em; padding: 3px 6px 2px; border: 1px solid var(--line-2); border-radius: 4px; color: #ffb4ae; }
+.tour-title p { margin: 10px 0 0; font-size: clamp(12px, 1.4vw, 15px); letter-spacing: 0.06em; color: var(--ink-2); }
+.tour-title[data-kind="end"] { bottom: auto; top: 40%; }
+
 /* ---------------------------------------------------------------- panels */
 .panel {
 	position: fixed; z-index: 20; top: calc(var(--gut-t) + 48px); right: var(--gut-r);

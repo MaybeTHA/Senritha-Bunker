@@ -49,6 +49,7 @@
 
 <!-- top right: tools -->
 <div class="tools" role="toolbar" aria-label="Tools">
+	<button class="tool" id="btn-tour" type="button" data-tip="tour" aria-label="Cinematic tour" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="3.5" y="6" width="12" height="12" rx="2"/><path d="m15.5 10.5 5-3v9l-5-3"/></svg></button>
 	<button class="tool" id="btn-reset" type="button" data-tip="reset" aria-label="Reset camera"><svg viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4"/></svg></button>
 	<button class="tool" id="btn-sound" type="button" data-tip="sound" aria-label="Sound" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path class="on" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="off" d="m16 9.5 5 5m0-5-5 5"/></svg></button>
 	<button class="tool" id="btn-settings" type="button" data-tip="settings" aria-label="Settings" aria-expanded="false" aria-controls="settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
@@ -64,6 +65,10 @@
 <div class="crosshair" id="crosshair" hidden></div>
 <div class="prompt" id="prompt" hidden><kbd>E</kbd><span id="prompt-text"></span></div>
 <div class="toast" id="toast" role="status"></div>
+<div class="tour-title" id="tour-title" hidden aria-hidden="true">
+	<h2><span data-t="title">Senritha's Last Summit</span> <em>X3D</em></h2>
+	<p data-t="tagline">An alpine world of snow, wind and light</p>
+</div>
 <div class="label" id="dest-label" aria-hidden="true"></div>
 <div class="hint" id="hint" hidden></div>
 

@@ -20,7 +20,9 @@ Open `index.html` through any static web server (for example `npx serve .` or Gi
 | Walk: move / look | W A S D / mouse (click to capture, Esc to release) | Joystick / drag |
 | Run / jump / interact | Shift / Space / E | Run / Jump / hand buttons |
 
-Shortcuts: **1 2 3** time of day · **G** wind · **V** view · **C** rest camp · **T** summit · **R** reset camera · **F** full screen · **H** controls.
+Shortcuts: **1 2 3** time of day · **G** wind · **V** view · **C** rest camp · **T** summit · **P** cinematic tour · **R** reset camera · **F** full screen · **H** controls.
+
+**Cinematic tour:** the film button (or **P**) plays a 45-second, seven-shot tour through sunrise, a clear afternoon, a summit gale and the aurora night, looping until you press Esc or tap the screen. Your time of day, wind and camera come back when it ends.
 
 In Walk mode you can open the cabin door, rest in bed, sit on the sofa or lounge chair, add a log to the fire, sip the coffee and inspect the flag. Choosing a destination while walking shows a direction arrow that follows the route; tick **Fast travel** to jump there instead.
 
@@ -43,6 +45,7 @@ Time of day (sunrise, clear afternoon, aurora night), light or strong wind, free
 | `js/summit.js` | Summit rocks, flag cloth, route markers, sign |
 | `js/flora.js` | Pines, boulders, icicles |
 | `js/controls.js` | Free camera, first-person walker with collisions, footprints |
+| `js/tour.js` | Cinematic tour: shot list, spline camera paths, fades and title cards |
 | `js/effects.js` | Fire, steam and smoke |
 | `js/audio.js` | Sound: recorded footsteps, fireplace, door and creaks placed in 3D; generated wind, flag and music |
 | `js/sounds.js`, `sounds/`, `tools/make_sounds.py` | Sound sprites, their offsets, and the script that builds them |
