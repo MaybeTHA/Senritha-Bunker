@@ -15,3 +15,4 @@ Each project lives in its own folder. Keep a project's files inside its folder.
 | [`senritha-summit/`](senritha-summit/) | Senritha's Last Summit X3D: explorable alpine world with a rest camp and a red-flag summit |
 | [`senritha-workspace/`](senritha-workspace/) | Senritha's Work Space: channels, sub-channels, messages and images |
 | [`senritha-perf/`](senritha-perf/) | Senritha's Test performance: WebGL2 graphics benchmark |
+| [`senritha-clips/`](senritha-clips/) | Senritha's Random Clips: long screen-recording sessions that save short clips at random moments |

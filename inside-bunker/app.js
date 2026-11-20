@@ -14,6 +14,7 @@ const G={ /* two-tone glyphs: white strokes + one blue accent (.a) */
   motorhome:'<path d="M2.5 16.5V8a2 2 0 0 1 2-2h10.2l4.3 4.5h1a1.5 1.5 0 0 1 1.5 1.5v4.5h-2"/><path d="M9 16.5h6"/><circle cx="6.8" cy="16.8" r="1.9"/><circle cx="17.2" cy="16.8" r="1.9"/><path class="a" d="M6 9.5h4.5M14 9.5h3.2"/>',
   summit:'<path d="M2.5 20 10 7.5l3.5 5.5 2.5-3.5 5.5 10.5z"/><path d="M15 9.5V3.5"/><path class="a" d="M15.5 3.5h4l-1.2 1.5 1.2 1.5h-4"/>',
   perf:'<path d="M4 17.5a8 8 0 1 1 16 0"/><path d="M7 17.5h.01M17 17.5h.01M12 9.5v.01" opacity=".6"/><path class="a" d="m12 17.5 4.2-5.2"/>',
+  clips:'<rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M9 20h6"/><circle class="a" cx="12" cy="10.75" r="2.6"/>',
 };
 const APPS=[
   {id:'workspace',href:'senritha-workspace/',name:"Senritha's Work Space",desc:'Channels, sub-channels, messages and images. Saved on this device.',cat:'Productivity'},
@@ -23,6 +24,7 @@ const APPS=[
   {id:'motorhome',href:'senritha-motorhome/',name:"Senritha's Motorhome 3D",desc:'Walk through a luxury motorhome parked in a snowy forest at blue hour.',cat:'3D Worlds'},
   {id:'summit',href:'senritha-summit/',name:"Senritha's Last Summit X3D",desc:'Climb from a warm mountain cabin to a red flag on a snowy summit: sunrise, clear afternoon or aurora, light or strong wind.',cat:'3D Worlds'},
   {id:'perf',href:'senritha-perf/',name:"Senritha's Test Performance",desc:'WebGL2 graphics benchmark: GPU, CPU and frame pacing, measured.',cat:'System'},
+  {id:'clips',href:'senritha-clips/',name:"Senritha's Random Clips",desc:'Long screen-recording sessions that save short clips at random moments. Every timing is yours to set.',cat:'Productivity'},
 ];
 const byId=Object.fromEntries(APPS.map(a=>[a.id,a]));
 const slug=c=>c.toLowerCase().replace(/[^a-z0-9]+/g,'-');

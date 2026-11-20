@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Senritha's Random Clips</title>
+<meta name="description" content="อัดหน้าจอระยะยาว แล้วสุ่มเก็บคลิปสั้นเป็นช่วง ๆ ตั้งค่าได้อิสระ">
+<meta name="theme-color" content="#0B0C0F">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <a class="ib" href="../" aria-label="กลับ Inside Bunker" title="Inside Bunker"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></a>
+    <div class="brand">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M9 20h6"/><circle class="a" cx="12" cy="10.75" r="2.6"/></svg>
+      <div><b>Random Clips</b><small>อัดหน้าจอแบบสุ่มช่วงเวลา</small></div>
+    </div>
+    <div class="status" id="status" data-s="idle"><i></i><span id="statusText">พร้อม</span></div>
+    <div class="ctrls">
+      <button class="btn" id="manualBtn" disabled title="อัดคลิปทันที (R)">อัดตอนนี้ <kbd>R</kbd></button>
+      <button class="btn" id="skipBtn" disabled title="ข้ามคลิปที่สุ่มไว้ถัดไป">ข้ามคลิปถัดไป</button>
+      <button class="btn" id="pauseBtn" disabled title="พัก / ทำต่อ (P)">พัก <kbd>P</kbd></button>
+      <button class="btn primary" id="startBtn">เริ่ม</button>
+    </div>
+  </header>
+
+  <aside class="settings" id="settings" aria-label="ตั้งค่า">
+    <div class="presets">
+      <select id="presetSel" aria-label="พรีเซ็ต"></select>
+      <button class="btn sm" id="presetSave" title="บันทึกค่าปัจจุบันเป็นพรีเซ็ต">บันทึก</button>
+      <button class="btn sm ghost" id="presetDel" title="ลบพรีเซ็ตที่เลือก">ลบ</button>
+    </div>
+    <div id="form"></div>
+    <div class="estimate" id="estimate" aria-live="polite"></div>
+  </aside>
+
+  <main class="main">
+    <section class="stage" id="stage">
+      <video id="preview" muted playsinline autoplay></video>
+      <div class="stage-empty" id="stageEmpty">
+        <ol>
+          <li>ตั้งค่าทางซ้าย (หรือเลือกพรีเซ็ต)</li>
+          <li>กด <b>เริ่ม</b> แล้วเลือกจอ หน้าต่าง หรือแท็บที่จะอัด</li>
+          <li>ติ๊ก <b>แชร์เสียง</b> ในหน้าต่างเลือกจอ ถ้าต้องการเสียงระบบ</li>
+          <li>ปล่อยไว้ แอปจะสุ่มอัดคลิปเองจนครบเวลา</li>
+        </ol>
+      </div>
+      <div class="hud" id="hud"><div class="big" id="hudBig">พร้อม</div><div class="sub" id="hudSub">กด เริ่ม เพื่อเลือกหน้าจอ</div></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>ไทม์ไลน์</h2>
+        <span class="muted" id="tlInfo"></span>
+        <button class="btn sm" id="rerollBtn" title="สุ่มตารางเวลาที่เหลือใหม่">สุ่มใหม่</button>
+      </div>
+      <div class="timeline" id="timeline"><div class="tl-track" id="tlTrack"></div><div class="tl-head" id="tlHead"></div></div>
+      <div class="tl-axis" id="tlAxis"></div>
+      <div class="stats">
+        <div><span>เวลาผ่านไป</span><b id="stElapsed">00:00</b></div>
+        <div><span>เหลือ</span><b id="stLeft">—</b></div>
+        <div><span>คลิปที่ได้</span><b id="stClips">0</b></div>
+        <div><span>ขนาดรวม</span><b id="stSize">0 MB</b></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>คลิป <small id="clipCount">0</small></h2>
+        <span class="spacer"></span>
+        <button class="btn sm" id="dlAll" disabled>ดาวน์โหลดทั้งหมด</button>
+        <button class="btn sm ghost" id="clearAll" disabled>ล้างรายการ</button>
+      </div>
+      <ol class="clips" id="clips"></ol>
+      <p class="empty" id="clipsEmpty">ยังไม่มีคลิป คลิปที่อัดได้จะแสดงที่นี่ ใหม่สุดอยู่บน</p>
+    </section>
+  </main>
+</div>
+
+<dialog class="player" id="player">
+  <video controls playsinline></video>
+  <footer><code id="playerName"></code><button class="btn sm" id="playerClose">ปิด</button></footer>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
