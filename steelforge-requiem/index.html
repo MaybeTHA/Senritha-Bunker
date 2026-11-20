@@ -2284,7 +2284,7 @@ function fire(t,kind){
   shots.push({x:t.x+Math.cos(a)*mz,y:t.y+Math.sin(a)*mz,a:a,
    vx:Math.cos(a)*(s.shellV/62)*vB,vy:Math.sin(a)*(s.shellV/62)*vB,
    dmg:s.dmg*A.dM*bD,pen:s.pen*A.pM*bP,ammo:am,own:t,kind:0,life:230,
-   col:am==='apfsds'?'#cfe8ff':'#ffe08a',r:s.mag?2.6:3.6,dist:0,cal:s.cal,zH:Math.random()});
+   col:am==='apfsds'?'#cfe8ff':'#ffe08a',r:s.mag?2.6:3.6,dist:0,cal:s.cal,zH:(!isP&&t.aimO)?(t.aimO.f==='t'?rnd(0,.4):rnd(.6,1)):Math.random()});
   SFX.at(t.x,t.y);if(s.mag)SFX.mg(s.cal,isP?0:dist);else SFX.cannon(s.cal/105,isP?0:dist);
   muzzle(t,a,mz,s.mag?6:14,'#ffcf6a');t.revealT=3;
   if(isP){addShake(s.mag?2:s.cal/12,s.mag?.07:.3);G.fireGlow=s.mag?.04:.12;
@@ -2646,18 +2646,29 @@ function strategicBrain(){
   if(canHQ)want.push({z:hqZ,pri:9});
   if(!want.length)want.push({z:(side===0)?FL.front[0]+1:FL.front[1]-1,pri:1});
   want.sort(function(a,b){return b.pri-a.pri;});
-   /* assign */
-  var wi=0,top=Math.min(want.length,3);
+  /* assign — หมู่ละ 3 คัน · หมู่แรกของฝ่ายเราคุ้มกันผู้เล่น */
+  var top=Math.min(want.length,3),mem=[];
   for(var i=0;i<tanks.length;i++){var t=tanks[i];
-   if(t.dead||t.team===0)continue;
-   if(teamSide(t.team)!==side)continue;
+   if(t.dead||t.team===0||teamSide(t.team)!==side)continue;mem.push(t);}
+  mem.sort(function(a,b){return a.seed-b.seed;});
+  var esc=side===0&&P&&!P.dead&&mem.length>=4&&zoneOf(P.x)>=FL.front[0]-1;   /* คุ้มกันเฉพาะตอนผู้เล่นอยู่แนวหน้า */
+  for(var i=0;i<mem.length;i++){var t=mem[i];t.sq=Math.floor(i/3);
    if(t.hunt&&!t.hunt.dead&&t.huntT>0)continue;
    var frac=ammoTotal(t)/Math.max(1,t.maxAmmo);
    if(frac<0.20){t.obj=-2;continue;}
    if(t.obj===-2&&frac>0.72)t.obj=-1;
    if(t.obj===-2)continue;
-   t.obj=want[wi%top].z;wi++;}
- }}
+   if(esc&&t.sq===0){t.obj=-3;continue;}
+   t.obj=want[(t.sq-(esc?1:0))%top].z;}
+ }
+ /* สถานะหมู่: จุดศูนย์กลาง + อัตรากำลังรอบตัว → บุก / ปกติ / ตั้งรับ */
+ var W={light:.7,medium:1,heavy:1.3,mbt:1.5,ifv:.8},G2={};FL.sq={};
+ for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead||t.team===0||t.sq===undefined)continue;
+  var k=teamSide(t.team)+'_'+t.sq,q=G2[k]||(G2[k]={x:0,y:0,n:0,side:teamSide(t.team)});q.x+=t.x;q.y+=t.y;q.n++;}
+ for(var k in G2){var q=G2[k];q.x/=q.n;q.y/=q.n;var fa=0,fe=0;
+  for(var j=0;j<tanks.length;j++){var o=tanks[j];if(o.dead||hyp(o.x-q.x,o.y-q.y)>1000)continue;
+   var w=(W[o.st.cls]||1)*clamp(o.hp/o.mhp,.2,1)*(o===P?1.4:1);if(teamSide(o.team)===q.side)fa+=w;else fe+=w;}
+  q.ratio=fe>0?fa/fe:9;q.mode=fe===0?'norm':q.ratio<.65?'hold':q.ratio>1.35?'push':'norm';FL.sq[k]=q;}}
 
 /* ── หาโครงสร้างศัตรูที่ใกล้ที่สุด ── */
 function nearStruct(e,range){
@@ -2677,10 +2688,15 @@ function flGoal(e){
   if(z4ok)return{x:gs.x+Math.cos(e.seed)*140,y:gs.y+Math.sin(e.seed)*140};
   var hz=side===0?0:FLZ-1;
   return{x:zoneCX(hz),y:Math.sin(e.seed)*AY*.5};}
+ if(e.obj===-3&&P&&!P.dead){var dir=side===0?1:-1;
+  return{x:P.x-dir*(170+(e.seed%3)*55),y:P.y+((e.seed%3)-1)*170,thr:hyp(P.x-e.x,P.y-e.y)>420?1:.7};}
+ var q=sqInfo(e),dir2=side===0?1:-1;
+ if(q&&q.mode==='hold')return{x:q.x-dir2*260,y:q.y+Math.sin(e.seed)*130,thr:.8};
+ if(q&&q.n>1&&(e.x-q.x)*dir2>420)return{x:e.x,y:e.y,thr:0};      /* รอเพื่อนในหมู่ */
  var z=e.obj;
  if(z<0)z=side===0?clamp(FL.front[0]+1,1,FLZ-1):clamp(FL.front[1]-1,0,FLZ-2);
  var lane=(e.seed%LANE);
- return{x:zoneCX(z)+Math.cos(e.seed*1.7)*ZL*.22,y:laneCY(lane)+Math.sin(e.seed*2.3)*180};}
+ return{x:zoneCX(z)+Math.cos(e.seed*1.7)*ZL*.22,y:laneCY(lane)+Math.sin(e.seed*2.3)*180,thr:q&&q.mode==='push'?1:.9};}
 /* ── Flocking: เว้นระยะกันเอง ── */
 function flock(e){
  e.sepX=0;e.sepY=0;var n=0;
@@ -2690,91 +2706,162 @@ function flock(e){
   if(d<150&&d>.5){e.sepX+=dx/d*(150-d);e.sepY+=dy/d*(150-d);n++;}
   if(n>4)break;}}
 
-/* ═══════ AI ═══════ */
+/* ═══════════════════════════════════════════════════════════
+   AI v2 — หลบสิ่งกีดขวาง · รู้เกราะ · เอียงเกราะ · โอบข้าง
+           หาที่กำบัง · ถอยไปซ่อม · หมู่ (Frontline)
+   ═══════════════════════════════════════════════════════════ */
+/* ── นำทาง: เซนเซอร์ข้างหน้า 3 ระยะ × 3 แนว ── */
+function aiProbe(e,a){var c=Math.cos(a),s=Math.sin(a),px=-s*24,py=c*24;
+ for(var d=40;d<=125;d+=42){var x=e.x+c*d,y=e.y+s*d;
+  if(Math.abs(x)>AX-50||Math.abs(y)>AY-50)return false;
+  if(blocked(x,y)||blocked(x+px,y+py)||blocked(x-px,y-py))return false;}
+ return true;}
+var NAVO=[0,.35,.35,.7,.7,1.05,1.05,1.45,1.45,1.9,1.9,2.4,2.4];
+function avoidDir(e,ang){var sd=e.navSd||1;
+ for(var i=0;i<NAVO.length;i++){var o=i===0?0:(i%2?NAVO[i]*sd:-NAVO[i]*sd);
+  if(aiProbe(e,ang+o)){if(o)e.navSd=o>0?1:-1;return ang+o;}}
+ return ang+Math.PI*.7*sd;}
+function steerTo(e,ang,thr,dt){
+ if(e.unT>0){e.unT-=dt;e.thr=-.85;e.steer=e.unS;if(e.noMove){e.thr=0;e.steer=0;}return;}
+ var a2=ang;
+ if(thr>.05){e.navT=(e.navT||0)-dt;if(e.navT<=0||e.navA===undefined){e.navT=.15;e.navA=avoidDir(e,ang);}a2=e.navA;}
+ var da=angD(e.a,a2);e.steer=clamp(da*2.6,-1,1);
+ e.thr=thr>.05?(Math.abs(da)>2.2?-.6:thr*(Math.abs(da)>1.1?.45:1)):thr;
+ if(Math.abs(e.thr)>.35&&Math.abs(e.spd)<e.st.sp*.1&&!e.noMove){e.stuckT=(e.stuckT||0)+dt;
+  if(e.stuckT>1.2){e.stuckT=0;e.unT=rnd(.6,1.1);e.unS=Math.random()<.5?-1:1;e.navSd=-(e.navSd||1);e.navT=0;}}
+ else e.stuckT=0;
+ if(e.noMove){e.thr=0;e.steer=0;}}
+/* ── ประเมินว่ายิงตรงไหนของเป้าแล้วเจาะได้ดีที่สุด (ใช้ระบบเกราะจริง) ── */
+function aiPenEval(e,tgt){var M=mdl(tgt.b),L=M.L,W=M.W,R=M.TR,best=null,
+ C=[[0,0,'h'],[.6*L,-.55*W,'h'],[.6*L,.55*W,'h'],[0,-.88*W,'h'],[0,.88*W,'h'],[-.8*L,0,'h'],[.2*R,0,'t']];
+ if(tgt.ws&&(e.team===2||Math.random()<.2+G.lvl*.06)){var wp=wsPos(tgt),fr=tgt.ws.turret?'t':'h',lo=toLoc(tgt,fr==='t'?tgt.ta:tgt.a,wp.x,wp.y);C.push([lo[0],lo[1],fr]);}
+ var pen=e.st.pen*(AMMOT.ap.pM||1),sim={kind:0,cal:e.st.cal,ammo:'ap',pen:pen,dist:0};
+ for(var i=0;i<C.length;i++){var c=C[i],v=rotV(c[2]==='t'?tgt.ta:tgt.a,c[0],c[1]),dx=tgt.x+v[0]-e.x,dy=tgt.y+v[1]-e.y,d=hyp(dx,dy)||1;dx/=d;dy/=d;
+  var g=geoHit(tgt,e.x,e.y,dx,dy,c[2]==='t'?.1:.95,5000);if(!g||g.fr==='k')continue;
+  sim.dist=d;var pe=plateEff(tgt,g,dx,dy,AMMOT.ap,sim,true),r=pen*clamp(1-d/5400*.34,.62,1)/Math.max(1,pe.eff);
+  if(!pe.om&&pe.th>RICO.ap)r*=.35;
+  if(!best||r>best.r)best={r:r,lx:c[0],ly:c[1],f:c[2]};}
+ return best||{r:0,lx:0,ly:0,f:'h'};}
+function aiAimPt(e,tgt){var o=e.aimO;if(!o)return{x:tgt.x,y:tgt.y};var v=rotV(o.f==='t'?tgt.ta:tgt.a,o.lx,o.ly);return{x:tgt.x+v[0],y:tgt.y+v[1]};}
+/* ── ที่กำบัง: จุดหลังสิ่งกีดขวางที่ศัตรูมองไม่เห็น ── */
+function findCover(e,th){var best=null,bs=1e9,gx=Math.floor((e.x-OG.x0)/OG.cell),gy=Math.floor((e.y-OG.y0)/OG.cell);
+ for(var ax=-1;ax<=1;ax++)for(var ay=-1;ay<=1;ay++){var a=OG.m[(gx+ax)+','+(gy+ay)];if(!a)continue;
+  for(var i=0;i<a.length;i++){var o=a[i],sz=o.t==='c'?o.r:Math.min(o.w,o.h)<20?0:Math.max(o.w,o.h)*.5;if(sz<22)continue;
+   var dx=o.x-th.x,dy=o.y-th.y,d=hyp(dx,dy)||1,px=o.x+dx/d*(sz+42),py=o.y+dy/d*(sz+42);
+   if(Math.abs(px)>AX-60||Math.abs(py)>AY-60||blocked(px,py))continue;
+   var de=hyp(px-e.x,py-e.y);if(de>520)continue;
+   if(losClear({x:px,y:py},th))continue;
+   if(de<bs){bs=de;best={x:px,y:py};}}}
+ return best;}
+function retreatGoal(e,th){
+ if(FL.on){var side=teamSide(e.team),gs=null,hq=null;
+  for(var i=0;i<structs.length;i++){var s=structs[i];if(s.k==='gas'&&!s.dead)gs=s;if(s.k==='hq'&&s.team===side)hq=s;}
+  if(gs&&(FL.own[3]===side||FL.own[3]===-1)&&hyp(gs.x-e.x,gs.y-e.y)<hyp((hq?hq.x:e.x)-e.x,(hq?hq.y:e.y)-e.y))
+   return{x:gs.x+Math.cos(e.seed)*130,y:gs.y+60+Math.sin(e.seed)*90};
+  if(hq)return{x:hq.x+(side?-1:1)*300,y:hq.y+Math.sin(e.seed)*340};}
+ if(th){e.covT=(e.covT||0)-.1;if(!e.cov||e.covT<=0){e.covT=1.5;e.cov=findCover(e,th);}
+  if(e.cov)return e.cov;var a=Math.atan2(e.y-th.y,e.x-th.x);return{x:e.x+Math.cos(a)*500,y:e.y+Math.sin(a)*500};}
+ return null;}
+/* ── ข้อมูลหมู่ (คำนวณใน strategicBrain) ── */
+function sqInfo(e){return FL.on&&FL.sq?FL.sq[teamSide(e.team)+'_'+e.sq]:null;}
 function ai(e,dt){
  if(e.dead)return;
  if(e.huntT>0){e.huntT-=dt;if(e.huntT<=0)e.hunt=null;}
  if(e.hunt&&e.hunt.dead)e.hunt=null;
- var tgt=(e.see&&e.seeT&&!e.seeT.dead)?e.seeT:null;
- if(e.hunt&&!e.hunt.dead&&!tgt)tgt=null;
- var cls=e.st.cls;
- e.aiT-=dt;if(e.aiT<=0){e.aiT=rnd(1.0,2.4);e.aiS=pick([-1,1]);}
+ var tgt=(e.see&&e.seeT&&!e.seeT.dead)?e.seeT:null,cls=e.st.cls;
+ e.aiT-=dt;if(e.aiT<=0){e.aiT=rnd(1.4,3);e.aiS=pick([-1,1]);if(Math.random()<.35)e.angS=-(e.angS||1);}
+ if(!e.angS)e.angS=e.seed%2?1:-1;
  if(e.hp/e.mhp<.35&&e.st.smkAuto&&e.smkCd<=0&&e.smkN>0&&Math.random()<dt*.4)deploySmoke(e,true);
  flock(e);
+ /* ── ถอยไปซ่อม/เติม ── */
+ var hpF=e.hp/e.mhp,gunDead=e.mods&&e.mods.gun.st===2,burning=e.fire>0&&e.ext&&e.ext.n<=0;
+ if(!e.retreat&&(hpF<.3||gunDead||burning)){e.retreat=G.t||.01;e.cov=null;}
+ if(e.retreat&&(FL.on?(hpF>.62&&!gunDead&&!burning):(G.t-e.retreat>12&&!gunDead&&!burning)))e.retreat=0;
+ var sq=sqInfo(e);
  /* ── โครงสร้างเป้าหมาย ── */
  var stg=null;
- if(FL.on){
-  stg=nearStruct(e,1100);
-  if(stg&&tgt&&hyp(tgt.x-e.x,tgt.y-e.y)<820)stg=null;}
- /* ── ไม่มีเป้ารถ → เดินตามคำสั่ง ── */
+ if(FL.on&&!e.retreat){stg=nearStruct(e,1300);if(stg&&tgt&&hyp(tgt.x-e.x,tgt.y-e.y)<820)stg=null;}
+ /* ── ไม่มีเป้ารถ ── */
  if(!tgt&&!stg){
-  var gx,gy;
-  if(e.hunt&&!e.hunt.dead){gx=e.hunt.x;gy=e.hunt.y;}
-  else if(FL.on){var g=flGoal(e);gx=g.x;gy=g.y;}
+  var gx,gy,thr=.9;
+  if(e.retreat){var rg=retreatGoal(e,null);if(rg){gx=rg.x;gy=rg.y;}else{gx=e.x;gy=e.y;}}
+  else if(e.hunt&&!e.hunt.dead){gx=e.hunt.x;gy=e.hunt.y;}
+  else if(FL.on){var g=flGoal(e);gx=g.x;gy=g.y;thr=g.thr||.9;}
   else if(G.mode==='cap'&&G.caps.length){
    if(e.obj<0||e.obj>=G.caps.length||Math.random()<dt*.1)e.obj=ri(0,G.caps.length-1);
    var c=G.caps[e.obj];gx=c.x+Math.cos(e.seed)*90;gy=c.y+Math.sin(e.seed)*90;}
+  else if(e.lostT>8){/* ค้นหา: เดินไปทางที่น่าจะมีศัตรู */
+   if(!e.srch||hyp(e.srch.x-e.x,e.srch.y-e.y)<220){var foe=null,fd=1e9;
+    for(var i=0;i<tanks.length;i++){var o=tanks[i];if(o.dead||enemyOf(e.team).indexOf(o.team)<0)continue;var dd=hyp(o.x-e.x,o.y-e.y);if(dd<fd){fd=dd;foe=o;}}
+    var nz=clamp(900-e.lostT*8,250,900);e.srch=foe?{x:clamp(foe.x+rnd(-nz,nz),-AX+120,AX-120),y:clamp(foe.y+rnd(-nz,nz),-AY+120,AY-120)}:{x:e.x,y:e.y};}
+   gx=e.srch.x;gy=e.srch.y;thr=.85;}
   else{gx=e.lastKX;gy=e.lastKY;}
   gx+=e.sepX*.7;gy+=e.sepY*.7;
   var d=hyp(gx-e.x,gy-e.y),aim=Math.atan2(gy-e.y,gx-e.x);
   e.ta+=clamp(angD(e.ta,aim+Math.sin(G.t*1.2+e.seed)*0.45),-e.st.tvel*dt,e.st.tvel*dt);
-  if(d>130){var da=angD(e.a,aim);
-   e.steer=clamp(da*2.4,-1,1);e.thr=Math.abs(da)>2.1?-.6:.9;}
-  else{e.steer=e.aiS*.35;e.thr=.2;}
-  if(e.mod.trk>0){e.thr=0;e.steer=0;}
+  if(d>130)steerTo(e,aim,thr,dt);else{e.steer=e.aiS*.3;e.thr=thr<.3?0:.15;}
+  if(e.noMove){e.thr=0;e.steer=0;}
   return;}
- /* ── โจมตีโครงสร้าง ── */
+ /* ── โจมตีโครงสร้าง (เป็นกลุ่ม) ── */
  if(!tgt&&stg){
   var dx=stg.x-e.x,dy=stg.y-e.y,d=hyp(dx,dy),aim=Math.atan2(dy,dx);
   var tv=e.st.tvel*dt;e.ta+=clamp(angD(e.ta,aim),-tv,tv);
-  var want=stg.k==='turret'?620:480;
-  if(d>want){var da=angD(e.a,aim+ (e.sepX||e.sepY?Math.atan2(e.sepY,e.sepX)*0:0));
-   e.steer=clamp(da*2.4,-1,1);e.thr=Math.abs(da)>2.1?-.7:.85;}
-  else{e.thr=0;e.steer=e.aiS*.2;}
-  if(e.mod.trk>0){e.thr=0;e.steer=0;}
+  var mates=0;if(stg.k==='turret')for(var i=0;i<tanks.length;i++){var o=tanks[i];
+   if(o!==e&&!o.dead&&teamSide(o.team)===teamSide(e.team)&&hyp(o.x-stg.x,o.y-stg.y)<1000)mates++;}
+  var solo=stg.k==='turret'&&mates<2&&stg.hp/stg.mhp>.5,want=solo?1340:(stg.k==='turret'?820:480);
+  if(Math.abs(d-want)>90)steerTo(e,d>want?aim:aim+Math.PI,.85,dt);
+  else{steerTo(e,aim+e.angS*.45,0,dt);}
   var off=Math.abs(angD(e.ta,aim));
-  if(off<.06&&d<1200){
-   if(e.st.mag)fire(e,0);
-   else if(e.rl<=0&&e.aim>.55)fire(e,0);
+  if(!solo&&off<.06&&d<1250){
+   if(e.st.mag)fire(e,0);else if(e.rl<=0&&e.aim>.55)fire(e,0);
    if(e.atCd<=0&&e.st.atDmg&&d>380&&Math.random()<.4)fire(e,2);}
   return;}
  /* ── ปะทะรถ ── */
- var dx=tgt.x-e.x,dy=tgt.y-e.y,d=hyp(dx,dy),aim=Math.atan2(dy,dx),los=e.losOK!==false;
- var lead=aim;
+ var los=e.losOK!==false;
+ e.aiEvalT=(e.aiEvalT||0)-dt;if(e.aiEvalT<=0||e.aimTg!==tgt){e.aiEvalT=rnd(.4,.7);e.aimTg=tgt;var ev=aiPenEval(e,tgt);e.aimO=ev;e.penR=ev.r;}
+ var canPen=e.penR>=.95,ap=aiAimPt(e,tgt);
+ var dx=ap.x-e.x,dy=ap.y-e.y,d=hyp(dx,dy),aim=Math.atan2(dy,dx),lead=aim;
  if(d>200){var tof=d/(e.st.shellV/62)/60;
   lead=Math.atan2(dy+Math.sin(tgt.a)*tgt.spd*tof*60,dx+Math.cos(tgt.a)*tgt.spd*tof*60);}
  e.aimErr=lerp(e.aimErr,rnd(-1,1)*e.st.disp*1.8,dt*1.4);
- var tv=e.st.tvel*dt;
- e.ta+=clamp(angD(e.ta,lead+e.aimErr),-tv,tv);
- var desired,thr=1;
- if(cls==='light'||cls==='ifv'){
-  var toRear=angD(tgt.a,Math.atan2(e.y-tgt.y,e.x-tgt.x));
-  var flank=aim+(toRear>0?1:-1)*1.18;
-  if(d>1250)desired=aim;else if(d<(cls==='ifv'?520:400))desired=aim+Math.PI*.75*e.aiS;
-  else desired=flank+e.aiS*.32;
- }else if(cls==='medium'){
-  if(d>1080)desired=aim;else if(d<500)desired=aim+Math.PI*.8;
-  else desired=aim+e.aiS*(e.rl>e.st.rel*.5?1.3:.5);thr=.92;
- }else{desired=aim+(d>600?e.aiS*0.40:e.aiS*0.60);thr=d>400?.95:.32;}
- if(e.sepX||e.sepY){var sa=Math.atan2(e.sepY,e.sepX);desired=lerp(desired,sa,0.22);}
- if(!los&&d>250){desired=aim+e.aiS*.9;thr=1;}
- var da=angD(e.a,desired);
- e.steer=clamp(da*2.6,-1,1);
- e.thr=Math.abs(da)>2.15?-.8*thr:thr;
- var off=Math.abs(angD(e.ta,aim)),dsp=curDisp(e),spread=dsp*d;
- var wantShoot=los&&off<0.1&&d<2500&&e.rl<=0.35;
- if(wantShoot&&spread>36&&!e.st.mag){e.thr*=0.06;e.steer*=0.25;e.brakeT=.4;}
- else if(e.brakeT>0){e.brakeT-=dt;e.thr*=0.2;}
- if(e.mod.trk>0){e.thr=0;e.steer=0;}
- if(los&&off<0.12&&d<2400){e.lasing+=dt;
-  if(e.lasing>0.45){e.lasing=0;triggerLWS(tgt,e.x,e.y,0);}}
+ var tv=e.st.tvel*dt;e.ta+=clamp(angD(e.ta,lead+e.aimErr),-tv,tv);
+ var desired=aim,thr=1,bodyAim=Math.atan2(tgt.y-e.y,tgt.x-e.x);
+ var side=angD(tgt.a,Math.atan2(e.y-tgt.y,e.x-tgt.x))>0?1:-1;
+ var reloading=!e.st.mag&&e.rl>Math.max(1.8,e.st.rel*.45);
+ if(e.retreat){var rg2=retreatGoal(e,tgt);desired=rg2?Math.atan2(rg2.y-e.y,rg2.x-e.x):bodyAim+Math.PI;
+  thr=rg2&&hyp(rg2.x-e.x,rg2.y-e.y)<50?0:.95;}
+ else if(cls==='light'||cls==='ifv'){
+  var flank=bodyAim+side*1.18;
+  if(d>1250)desired=bodyAim;else if(d<(cls==='ifv'?520:400))desired=bodyAim+Math.PI*.75*e.aiS;
+  else desired=flank+e.aiS*.3;
+  if(canPen&&!reloading&&e.rl<=.2&&d<1100&&Math.random()<.5)thr=.3;}
+ else if(cls==='medium'){
+  if(d>1250||!los){desired=bodyAim+e.angS*.3;thr=.92;}
+  else if(!canPen){desired=bodyAim+side*1.3;thr=.92;}           /* โอบข้างหาจุดเจาะได้ */
+  else{desired=bodyAim+e.angS*.48;thr=reloading?.35:0;}}       /* หยุดยิง + เอียงเกราะ */
+ else{/* heavy / mbt */
+  if(d>1500||!los){desired=bodyAim+e.angS*.3;thr=.92;}
+  else if(!canPen&&d>480){desired=bodyAim+e.angS*.35;thr=.7;}
+  else{desired=bodyAim+e.angS*.48;thr=0;}}
+ /* หลบหลังที่กำบังระหว่างบรรจุ (ปืนบรรจุช้า) หรือหมู่สั่งตั้งรับ */
+ if(!e.retreat&&cls!=='light'&&cls!=='ifv'&&los&&d<1500&&(reloading||(sq&&sq.mode==='hold'))){
+  e.covT=(e.covT||0)-dt;if(e.covT<=0){e.covT=1.4;e.cov=findCover(e,tgt);}
+  if(e.cov){var cd=hyp(e.cov.x-e.x,e.cov.y-e.y);if(cd>40){desired=Math.atan2(e.cov.y-e.y,e.cov.x-e.x);thr=.85;}else{desired=bodyAim+e.angS*.48;thr=0;}}}
+ if((e.sepX||e.sepY)&&thr>0){var sa=Math.atan2(e.sepY,e.sepX);desired=desired+clamp(angD(desired,sa),-.5,.5)*.4;}
+ if(!los&&d>250&&!e.retreat){desired=bodyAim+e.aiS*.9;thr=1;}
+ var off=Math.abs(angD(e.ta,lead)),dsp=curDisp(e),spread=dsp*d;
+ var wantShoot=los&&off<0.1&&d<2500&&e.rl<=0.35&&(canPen||e.penR>.75);
+ if(wantShoot&&spread>36&&!e.st.mag&&thr>0){thr*=0.06;e.brakeT=.4;}
+ else if(e.brakeT>0){e.brakeT-=dt;thr*=0.2;}
+ if(thr>0)steerTo(e,desired,thr,dt);else steerTo(e,desired,0,dt);
+ if(los&&off<0.12&&d<2400){e.lasing+=dt;if(e.lasing>0.45){e.lasing=0;triggerLWS(tgt,e.x,e.y,0);}}
  else e.lasing=0;
- var acc=cls==='light'?.055:cls==='medium'?.045:.04;
+ var acc=cls==='light'?.055:cls==='medium'?.045:.04,try2=e.penR>.72&&e.aim>.8&&Math.random()<.3;
  if(los){
-  if(e.st.mag){if(off<.06&&d<1500)fire(e,0);}
-  else if(off<acc&&d<2400&&e.rl<=0&&spread<48)fire(e,0);
-  if(off<.10&&d<760&&e.st.secDmg)fire(e,1);
-  if(off<.035&&d>420&&d<2600&&e.atCd<=0&&e.st.atDmg&&Math.random()<.5)fire(e,2);}}
+  if(e.st.mag){if(off<.06&&d<1500&&(canPen||e.penR>.6))fire(e,0);}
+  else if(off<acc&&d<2400&&e.rl<=0&&spread<48&&(canPen||try2||tgt.st.cls==='light'))fire(e,0);
+  if(off<.10&&d<760&&e.st.secDmg&&(tgt.st.cls==='light'||tgt.st.cls==='ifv'||canPen))fire(e,1);
+  if(off<.035&&d>420&&d<2600&&e.atCd<=0&&e.st.atDmg&&Math.random()<(canPen?.35:.8))fire(e,2);}}
 
 /* ═══════ TURRETS ═══════ */
 function updTurrets(dt){
@@ -2918,7 +3005,7 @@ function flSpawnQueue(dt){
   q.t-=dt;
   if(q.t<=0){
    var sp=flSpawnPoint(q.team);
-   var st=foeStat(G.lvl+(q.team===1?0:-1),
+   var st=foeStat(G.lvl,
     pick(['light','medium','medium','heavy','mbt','ifv']),false);
    var nt=mkTank(sp.x,sp.y,st,q.team,{a:q.team===1?Math.PI:0,skin:st.skinKey});
    tanks.push(nt);FL.spawnQ.splice(i,1);}}
@@ -3122,7 +3209,7 @@ function startFrontline(){
  cam.x=P.x-innerWidth/2;cam.y=P.y-innerHeight/2;
  var pool=['light','medium','medium','heavy','mbt','ifv'];
  for(var i=0;i<flSel.size-1;i++){
-  var st=foeStat(Math.max(1,G.lvl-1),pick(pool),false);
+  var st=foeStat(G.lvl,pick(pool),false);
   var z=ri(0,1),cxz=zoneCX(z);
   tanks.push(mkTank(cxz+rnd(-ZL*.3,ZL*.3),rnd(-AY*.85,AY*.85),st,2,{a:0,skin:'nordic'}));}
  for(var i=0;i<flSel.size;i++){
@@ -3232,6 +3319,7 @@ function update(dt){
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead)continue;
   if(t.team!==0){updSpot(t,dt);ai(t,dt);}
   moveTank(t,dt);if(t.hp<=0)killTank(t);}
+ if((G.pruneT=(G.pruneT||0)+dt)>3){G.pruneT=0;tanks=tanks.filter(function(t){return !(t.dead&&t.gone)||t===P;});}
  if((G.evT=(G.evT||0)+dt)>.1){G.evT=0;SFX.engines(nearEngines());}
  if(P&&!P.dead)SFX.engineRPM(Math.abs(P.thr)*.72+Math.abs(P.spd)/Math.max(P.st.sp,.1)*.35,
   Math.abs(P.spd)/Math.max(P.st.sp,.1),P.st.turbo);
