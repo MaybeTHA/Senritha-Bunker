@@ -170,3 +170,31 @@ input:disabled,select:disabled{opacity:.45}
   .ctrls .btn{flex:1}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Review: filter chips, keep/discard, save bar */
+.review-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-2px 0 12px;padding:8px;border-radius:10px;background:var(--panel-2);border:1px solid var(--line)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line-2);font-size:13px;color:var(--fg-2)}
+.chip b{font:500 11px var(--mono);color:var(--muted);margin-left:2px}
+.chip:hover{color:var(--fg)}
+.chip.on{background:var(--fg);border-color:var(--fg);color:#0B0C0F}
+.chip.on b{color:#0B0C0F}
+.btn.keep{background:var(--good);border-color:var(--good);color:#06140D;font-weight:600}
+.btn.keep:hover:not(:disabled){background:#5BDA9E;border-color:#5BDA9E}
+.pick{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden;margin-right:4px}
+.pick button{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 10px;font-size:13px;color:var(--fg-2)}
+.pick button+button{border-left:1px solid var(--line-2)}
+.pick button svg{width:16px;height:16px}
+.pick button:hover{background:var(--raised);color:var(--fg)}
+.pick button.on:first-child{background:var(--good);color:#06140D}
+.pick button.on:last-child{background:var(--rec);color:#fff}
+.pick kbd{margin-left:2px}
+.pick button.on kbd{border-color:currentColor;color:inherit;opacity:.7}
+.pick.lg button{height:34px}
+.clip.keep{border-color:rgba(63,203,138,.55)}
+.clip.drop{opacity:.55}
+.clip.drop .thumb video{filter:grayscale(1)}
+.tl-track i.long.done{background:var(--good)}
+.player footer .pos{font:500 12px var(--mono);color:var(--fg-2);min-width:48px;text-align:center}
+.player footer .ib:disabled{opacity:.3;cursor:default;background:none}
+@media (max-width:960px){.pick button span{display:none}}

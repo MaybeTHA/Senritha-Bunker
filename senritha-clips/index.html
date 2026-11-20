@@ -49,7 +49,8 @@
           <li>ตั้งค่าทางซ้าย (หรือเลือกพรีเซ็ต)</li>
           <li>กด <b>เริ่ม</b> แล้วเลือกจอ หน้าต่าง หรือแท็บที่จะอัด</li>
           <li>ติ๊ก <b>แชร์เสียง</b> ในหน้าต่างเลือกจอ ถ้าต้องการเสียงระบบ</li>
-          <li>ปล่อยไว้ แอปจะสุ่มอัดคลิปเองจนครบเวลา</li>
+          <li>ปล่อยไว้ แอปจะสุ่มอัดคลิปเอง (หรืออัดยาวต่อเนื่อง) จนครบเวลา</li>
+          <li>จบแล้วเลือก <b>เก็บ</b> / <b>ทิ้ง</b> แล้วกด <b>เซฟที่เก็บ</b></li>
         </ol>
       </div>
       <div class="hud" id="hud"><div class="big" id="hudBig">พร้อม</div><div class="sub" id="hudSub">กด เริ่ม เพื่อเลือกหน้าจอ</div></div>
@@ -66,7 +67,7 @@
       <div class="stats">
         <div><span>เวลาผ่านไป</span><b id="stElapsed">00:00</b></div>
         <div><span>เหลือ</span><b id="stLeft">—</b></div>
-        <div><span>คลิปที่ได้</span><b id="stClips">0</b></div>
+        <div><span id="stClipsLabel">คลิปที่ได้</span><b id="stClips">0</b></div>
         <div><span>ขนาดรวม</span><b id="stSize">0 MB</b></div>
       </div>
     </section>
@@ -78,6 +79,13 @@
         <button class="btn sm" id="dlAll" disabled>ดาวน์โหลดทั้งหมด</button>
         <button class="btn sm ghost" id="clearAll" disabled>ล้างรายการ</button>
       </div>
+      <div class="review-bar" id="reviewBar" hidden>
+        <div class="chips" id="reviewChips" role="group" aria-label="ตัวกรอง"></div>
+        <span class="spacer"></span>
+        <button class="btn sm ghost" id="keepAll">เก็บทั้งหมด</button>
+        <button class="btn sm ghost" id="delDropped" disabled>ลบที่ทิ้ง (0)</button>
+        <button class="btn sm keep" id="saveKept" disabled>เซฟที่เก็บ (0)</button>
+      </div>
       <ol class="clips" id="clips"></ol>
       <p class="empty" id="clipsEmpty">ยังไม่มีคลิป คลิปที่อัดได้จะแสดงที่นี่ ใหม่สุดอยู่บน</p>
     </section>
@@ -86,7 +94,17 @@
 
 <dialog class="player" id="player">
   <video controls playsinline></video>
-  <footer><code id="playerName"></code><button class="btn sm" id="playerClose">ปิด</button></footer>
+  <footer>
+    <button class="ib" id="pPrev" aria-label="ก่อนหน้า" title="ก่อนหน้า (←)"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <span class="pos" id="pPos">1 / 1</span>
+    <button class="ib" id="pNext" aria-label="ถัดไป" title="ถัดไป (→)"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+    <code id="playerName"></code>
+    <span class="pick lg" id="pPick" role="group" aria-label="เลือก">
+      <button id="pKeep" title="เก็บแล้วไปไฟล์ถัดไป"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>เก็บ</span><kbd>K</kbd></button>
+      <button id="pDrop" title="ทิ้งแล้วไปไฟล์ถัดไป"><svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg><span>ทิ้ง</span><kbd>X</kbd></button>
+    </span>
+    <button class="btn sm" id="playerClose">ปิด</button>
+  </footer>
 </dialog>
 <div class="toast" id="toast" role="status"></div>
 <script src="app.js"></script>
