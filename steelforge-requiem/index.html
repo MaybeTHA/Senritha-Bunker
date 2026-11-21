@@ -277,6 +277,29 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
  #flPrev{max-height:26vh;object-fit:contain}
  #scBoot .grid .st{display:none}
 }
+/* โหมดผู้ชม */
+#specStat,#specFol,#specBar,#specBack,#respSpec{display:none}
+body.spec #hLeft,body.spec #hAmmo,body.spec #hScan,body.spec #hUse,body.spec #mob,body.spec #lws{display:none!important}
+body.spec #specStat,body.spec #specFol{display:block}
+body.spec #specBar{display:flex}
+body.specused:not(.spec) #specBack{display:block}
+body.specused #respSpec{display:block}
+#specStat{top:6px;left:6px;min-width:178px}
+#specFol{bottom:64px;left:6px;width:220px}
+#specBar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:max-content;gap:5px;pointer-events:auto;flex-wrap:wrap;justify-content:center;max-width:96vw}
+#specBack{top:6px;right:228px;pointer-events:auto;cursor:pointer;border-color:#4fa0e0;color:#bfe0ff}
+.spT{color:#f0b429;font-weight:700;font-size:11px;margin-bottom:3px}.spT span{color:#93a181;font-weight:400}
+.spTab{border-collapse:collapse;width:100%;font-size:10.5px}.spTab td,.spTab th{padding:1px 5px;text-align:center}.spTab td:first-child{text-align:left;color:#93a181}
+.spTab th{font-size:10px;font-weight:700}.spTab.big{font-size:13px}.spTab.big td,.spTab.big th{padding:3px 10px}
+.sb{color:#7fc0ff}.sr{color:#ff8a6a}.spM{font-size:10px;color:#c9d2b8;margin-top:3px}
+.spN{font-weight:700;font-size:12px}.spN span{font-weight:400;color:#93a181;font-size:10px}.spS{font-size:10px;color:#b6c2a4;line-height:1.5}
+body.mbl #specStat{top:calc(4px + env(safe-area-inset-top));left:calc(4px + env(safe-area-inset-left));min-width:0;width:150px;padding:4px 6px}
+body.mbl .spTab{font-size:9.5px}body.mbl .spTab td,body.mbl .spTab th{padding:0 3px}
+body.mbl #specFol{bottom:calc(60px + env(safe-area-inset-bottom));left:calc(4px + env(safe-area-inset-left));width:170px;padding:4px 6px}
+body.mbl #specBar{bottom:calc(6px + env(safe-area-inset-bottom));gap:4px}
+body.mbl #specBack{top:calc(4px + env(safe-area-inset-top));right:calc(164px + env(safe-area-inset-right));min-height:40px;display:none}
+body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
+@media (max-height:330px){body.mbl #specStat .spM{display:none}body.mbl #specFol{width:150px}body.mbl #specFol .spS:last-child{display:none}}
 </style>
 </head>
 <body>
@@ -307,6 +330,10 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
   <div class="hb" id="hScan"><div style="color:#f0b429;font-weight:700;font-size:11px">📡 เป้าหมาย</div>
     <div id="scList"></div></div>
   <div class="hb" id="hUse" onclick="useObj()">🅵 ใช้งาน</div>
+  <div class="hb" id="specStat"></div>
+  <div class="hb" id="specFol"></div>
+  <div id="specBar"></div>
+  <div class="hb" id="specBack" onclick="specResume()">👁️ กลับไปดู</div>
   <div id="hLog"></div>
   <div id="hAmmo">
     <div class="ab on" id="ab0" onclick="pickW(0)">ปืนหลัก<br><b id="n0">0</b></div>
@@ -321,7 +348,8 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
   <div style="font-size:22px;color:#e0603c;font-weight:800;letter-spacing:2px">ถูกทำลาย</div>
   <div style="font-size:46px;color:#f0b429;font-weight:800" id="respT">8</div>
   <div style="color:#9aa889;font-size:12px" id="respQ">กำลังจัดคิวเกิดใหม่...</div>
-  <div style="margin-top:12px;width:230px"><button class="btn blu sm" onclick="openBigMap()">🗺️ ดูแผนที่ใหญ่</button></div>
+  <div style="margin-top:12px;width:230px"><button class="btn blu sm" onclick="openBigMap()">🗺️ ดูแผนที่ใหญ่</button>
+  <button class="btn sm" id="respSpec" style="margin-top:6px" onclick="specResume()">👁️ ดูต่อ (โหมดผู้ชม)</button></div>
 </div></div>
 <div id="bigmap"><canvas id="bmc" width="1100" height="380"></canvas>
   <div style="margin-top:10px;width:260px"><button class="btn pri sm" onclick="closeBigMap()">ปิดแผนที่</button></div>
@@ -405,7 +433,7 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
    <b>Zone 3 / 5</b> — สถานีวิทยุ กด <b>ใช้งาน</b> เพื่อเปิดแผนที่ข่าวกรอง<br>
    <b>Zone 4</b> — ปั๊มน้ำมันริมทางหลวง จอดนิ่งเพื่อเติมเสบียง<br>
    ทางหลวงสายหลักตัดยาวกลางแผนที่ตั้งแต่ Zone 1 ถึง Zone 7</div></div>
-  <div style="margin-top:12px"><button class="btn grn" onclick="startFrontline()">🌲 เข้าสู่แนวรบ</button></div>
+  <div style="margin-top:12px"><button class="btn grn" onclick="startFrontline()">🌲 เข้าสู่แนวรบ</button><button class="btn" style="margin-top:6px" onclick="specStart('startFrontline')">👁️ ดู AI สู้กันเอง</button></div>
 </div></div>
 
 <!-- GARAGE -->
@@ -465,7 +493,7 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
   <h1 style="font-size:24px">โหมดดวล</h1>
   <h2>เลือกด่าน</h2><div class="grid g3" id="dMaps"></div>
   <h2>เลือกคู่ต่อสู้</h2><div class="grid g3" id="dFoes"></div>
-  <div style="margin-top:12px"><button class="btn dan" onclick="startDuel()">⚔️ เริ่มดวล</button></div>
+  <div style="margin-top:12px"><button class="btn dan" onclick="startDuel()">⚔️ เริ่มดวล</button><button class="btn" style="margin-top:6px" onclick="specStart('startDuel')">👁️ ดู AI สู้กันเอง</button></div>
 </div></div>
 
 <!-- BATTLE -->
@@ -476,7 +504,7 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
   <h2>รูปแบบ</h2><div class="grid g3" id="btModes"></div>
   <h2>เลือกด่าน</h2><div class="grid g3" id="btMaps"></div>
   <h2>ระดับความยาก</h2><div class="grid g4" id="btLvl"></div>
-  <div style="margin-top:12px"><button class="btn dan" onclick="startBattle()">⚔️ เข้าสู่สนามรบ</button></div>
+  <div style="margin-top:12px"><button class="btn dan" onclick="startBattle()">⚔️ เข้าสู่สนามรบ</button><button class="btn" style="margin-top:6px" onclick="specStart('startBattle')">👁️ ดู AI สู้กันเอง</button></div>
 </div></div>
 
 <!-- INF -->
@@ -486,7 +514,7 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
   <h1 style="font-size:24px">โหมด Infinity</h1>
   <h2>เลือกด่าน</h2><div class="grid g3" id="iMaps"></div>
   <div class="card" style="cursor:default;margin-top:10px" id="iRec"></div>
-  <div style="margin-top:12px"><button class="btn blu" onclick="startInf()">♾️ เริ่ม</button></div>
+  <div style="margin-top:12px"><button class="btn blu" onclick="startInf()">♾️ เริ่ม</button><button class="btn" style="margin-top:6px" onclick="specStart('startInf')">👁️ ดู AI สู้กันเอง</button></div>
 </div></div>
 
 <!-- BOX -->
@@ -546,6 +574,11 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
   <b style="color:#f0b429">■ ไฟไหม้</b><br>
   ไฟกิน HP · โมดูล · ลูกเรือ จนกว่าจะดับ · กด <b>E</b> (มือถือ: ปุ่ม ดับไฟ) ใช้ถังดับเพลิง · เติมได้ที่ปั๊ม/HQ<br>
   จูน "ระบบดับเพลิง" 3 แต้มขึ้นไป = ดับไฟอัตโนมัติ + ถังดับเพลิงเพิ่ม 1<br><br>
+  <b style="color:#f0b429">■ โหมดผู้ชม — ดู AI สู้กันเอง</b><br>
+  กดปุ่ม <b>👁️ ดู AI สู้กันเอง</b> ในหน้าเลือกโหมด · รถของคุณให้ AI ขับ (★) · เห็นทุกคัน ไม่มีหมอก<br>
+  กล้องอัตโนมัติตามจุดที่รบหนัก · คลิก/แตะรถ หรือ ←/→ เพื่อตามคันอื่น · Space = อัตโนมัติ<br>
+  1/2/3 = ความเร็ว x1/x2/x4 · <b>T</b> หรือ 🎮 = เข้าไปขับรถฝ่ายน้ำเงินคันนั้น · 👁️ กลับไปดูได้ตลอด<br>
+  ดูอย่างเดียวไม่ได้รางวัล · ถ้าเข้าไปขับ ได้รางวัลตามสัดส่วนเวลาที่เล่นเอง<br><br>
   <b style="color:#f0b429">■ FRONTLINE — บุก / ป้องกัน</b><br>
   60 วิแรกเตรียมพร้อม · จากนั้นผลัดกันบุก/ป้องกันทุก 3 นาที (ดูมุมบนจอ ⚔️/🛡️)<br>
   ฝ่ายป้องกันออกนอกเขตทีมได้ 5 วิ ไม่งั้นรถระเบิด · เส้นแดงกะพริบ = ขอบเขต · ลายแดง = ห้ามเข้า<br>
@@ -2472,7 +2505,7 @@ function fire(t,kind){
    dmg:s.dmg*A.dM*bD,pen:s.pen*A.pM*bP,ammo:am,own:t,kind:0,life:230,
    col:t.team===1?(am==='apfsds'?'#ffc0b0':'#ff7a52'):(am==='apfsds'?'#cfe8ff':'#ffe08a'),r:s.mag?2.6:3.6,dist:0,cal:s.cal,zH:(!isP&&t.aimO)?(t.aimO.f==='t'?rnd(0,.4):rnd(.6,1)):Math.random()});
   SFX.at(t.x,t.y);if(s.mag)SFX.mg(s.cal,isP?0:dist);else SFX.cannon(s.cal/105,isP?0:dist);
-  muzzle(t,a,mz,s.mag?6:14,'#ffcf6a');t.revealT=3;
+  muzzle(t,a,mz,s.mag?6:14,'#ffcf6a');t.revealT=3;specShot(t);
   if(isP){vib(s.mag?6:14);addShake(s.mag?2:s.cal/12,s.mag?.07:.3);G.fireGlow=s.mag?.04:.12;
    if(!s.mag)setTimeout(function(){if(G.run&&P&&!P.dead)
     (P.st.alK==='al0'||P.st.alK==='al1')?SFX.reload():SFX.autoload();},Math.min(900,s.rel*450));}
@@ -3055,6 +3088,7 @@ function ai(e,dt){
  var onMove=chg||(d<700&&(cls==='light'||cls==='medium'||cls==='ifv'));
  if(wantShoot&&spread>36&&!e.st.mag&&thr>0&&!onMove){thr*=0.06;e.brakeT=.4;}
  else if(e.brakeT>0){e.brakeT-=dt;thr*=0.2;}
+ if(e.brakeT>0&&Math.abs(angD(e.a,desired))<.7)desired=e.a;     /* หยุดเล็ง: ไม่หมุนตัวรถ ให้ศูนย์รวม */
  if(thr>0)steerTo(e,desired,thr,dt);else steerTo(e,desired,0,dt);
  if(los&&off<0.12&&d<2400){e.lasing+=dt;if(e.lasing>0.45){e.lasing=0;triggerLWS(tgt,e.x,e.y,0);}}
  else e.lasing=0;
@@ -3181,7 +3215,7 @@ function killTank(t){
  debris.push({x:t.x,y:t.y,vx:Math.cos(ang)*pw,vy:Math.sin(ang)*pw,z:0,
   vz:big?rnd(7,11):rnd(4,7),rot:t.ta,vrot:rnd(-.22,.22),b:t.b,st:t.st,
   skin:t.skin,seed:t.seed,life:5,ml:5,landed:0});
- t.gone=true;
+ t.gone=true;specKill(t);
  if(t.team===1){G.kills++;SV.stat.kills++;
   if(!FL.on||Math.random()<.4)addLog('☠️ ทำลาย'+(t.boss?'บอส':'ศัตรู')+'ได้!','g');}
  if(FL.on&&t.team!==0)FL.spawnQ.push({team:t.team,t:0,st:t.st,skin:t.skin});
@@ -3374,7 +3408,7 @@ function commonStart(mode){
  $('hResp').classList.remove('on');closeBigMap();closeModal();
  G.mode=mode;buildMap(G.map);
  tanks=[];shots=[];parts=[];trails=[];debris=[];smokes=[];aps=[];arty=[];logs=[];
- $('hLog').innerHTML='';
+ $('hLog').innerHTML='';specReset();
  G.score=[0,0];G.caps=[];G.lwsDir=null;G.alert=0;G.deaths=0;
  runBuff={dmg:1,pen:1,armor:1,hp:1,rel:1,spd:1,acc:1,cvg:1,regen:0,life:0,crew:0,scan:1,stealth:1};
  var ps=calc();
@@ -3430,18 +3464,19 @@ function startFrontline(){
  addLog('ผลัดกันบุก/ป้องกันทุก 3 นาที · ทำลาย HQ ศัตรูเพื่อชนะ','');
  bigMsg('FRONTLINE');}
 function nextWave(){
- G.wave++;if(G.wave>SV.stat.best){SV.stat.best=G.wave;save();}
+ G.wave++;var C=P;if(SPEC.on){C=SPEC.hero&&!SPEC.hero.dead?SPEC.hero:null;for(var ci=0;!C&&ci<tanks.length;ci++)if(!tanks[ci].dead&&teamSide(tanks[ci].team)===0)C=tanks[ci];C=C||P;}
+ if(!SPEC.on&&G.wave>SV.stat.best){SV.stat.best=G.wave;save();}
  var lvl=G.wave,boss=(G.wave%5===0),cnt=boss?1:Math.min(1+Math.floor(G.wave/2),5);
  for(var i=0;i<cnt;i++){
   var ang=rnd(0,6.28),dist=AX*rnd(.55,.78);
-  var ex=clamp(P.x+Math.cos(ang)*dist,-AX*.9,AX*.9),ey=clamp(P.y+Math.sin(ang)*dist,-AY*.9,AY*.9);
+  var ex=clamp(C.x+Math.cos(ang)*dist,-AX*.9,AX*.9),ey=clamp(C.y+Math.sin(ang)*dist,-AY*.9,AY*.9);
   var cls=boss?'mbt':pick(G.wave<3?['light','medium','ifv']:['light','medium','ifv','heavy','mbt']);
   var st=foeStat(lvl,cls,boss);
-  tanks.push(mkTank(ex,ey,st,1,{a:Math.atan2(P.y-ey,P.x-ex),skin:st.skinKey,boss:boss}));}
+  tanks.push(mkTank(ex,ey,st,1,{a:Math.atan2(C.y-ey,C.x-ex),skin:st.skinKey,boss:boss}));}
  G.waveState='fight';SFX.wave();
  bigMsg(boss?'★ เวฟ '+G.wave+' — บอส ★':'เวฟ '+G.wave);
  addLog('เวฟ '+G.wave+' — ศัตรู '+cnt+' คัน',boss?'r':'b');}
-function quitBattle(){G.run=false;flEvStop();FL.on=false;SFX.engineStop();SFX.music('menu');SFX.ui(false);
+function quitBattle(){G.run=false;SPEC.on=false;document.body.classList.remove('spec','specused');flEvStop();FL.on=false;SFX.engineStop();SFX.music('menu');SFX.ui(false);
  $('hud').classList.remove('on');$('mob').classList.remove('on');
  $('hScore').classList.remove('on');$('hResp').classList.remove('on');
  closeBigMap();closeModal();show('scMenu');}
@@ -3606,7 +3641,7 @@ function update(dt){
     if((s.own.team===0||s.own.team===2)&&(t.team===0||t.team===2))continue;
     if(s.own.team===1&&t.team===1)continue;
     if(Math.abs(s.x-t.x)>62||Math.abs(s.y-t.y)>62)continue;
-    var r=hitTank(s,t);if(!r)continue;
+    var r=hitTank(s,t);if(!r)continue;specHit(s,t,r);
     if((s.own===P||t===P)&&s.kind!==1||r.type==='pen'&&(s.own===P||t===P))hitPop(r,s.own===P);
     if(t.team===1&&s.own===P){
      if(r.type==='pen'||r.type==='spall'){$('hSub').textContent=(r.ws?'⚡ จุดอ่อน! ':'')+'เจาะ'+r.zone+' −'+r.dmg+(r.mods.length?' · '+r.mods.join(', '):'');
@@ -3650,24 +3685,28 @@ function update(dt){
   $('hInfo').textContent='ศัตรูเหลือ '+aliveE+' คัน';
   if(aliveE===0)endGame(true);
  }else if(G.mode==='cap'&&!G.over){updCaps(dt);
-  $('hInfo').textContent='ยึดจุด · เรา '+aliveF+' vs ศัตรู '+aliveE;
+  $('hInfo').textContent='ยึดจุด · '+(SPEC.on?'น้ำเงิน ':'เรา ')+aliveF+(SPEC.on?' vs แดง ':' vs ศัตรู ')+aliveE;
   if(aliveE===0)endGame(true);
  }else if(G.mode==='tdm'&&!G.over){
-  $('hInfo').textContent='เดธแมตช์ · เรา '+aliveF+' vs ศัตรู '+aliveE;
+  $('hInfo').textContent='เดธแมตช์ · '+(SPEC.on?'น้ำเงิน ':'เรา ')+aliveF+(SPEC.on?' vs แดง ':' vs ศัตรู ')+aliveE;
   if(aliveE===0)endGame(true);else if(aliveF===0)endGame(false);
  }else if(G.mode==='fl'&&!G.over){
   var z=P?zoneOf(P.x):0;
   $('hInfo').textContent='Zone '+(z+1)+' · แนวรบ '+(FL.front[0]+1)+'–'+(FL.front[1]+1)+
-   ' · เรา '+aliveF+' vs '+aliveE;}
+   (SPEC.on?' · น้ำเงิน ':' · เรา ')+aliveF+' vs '+aliveE;}
  if(P&&P.hp<=0&&!G.over&&(G.mode==='duel'||G.mode==='inf'))endGame(false);
+ if(SPEC.on&&!G.over&&aliveF===0&&(G.mode==='duel'||G.mode==='inf'))endGame(false);
+ if(SPEC.used&&!SPEC.on)SPEC.played+=dt;
+ if(SPEC.on)specFrame(dt);
  if(P&&P.dead&&(G.mode==='cap'||G.mode==='tdm')&&!G.over&&aliveF===0)endGame(false);
  /* ── กล้อง ── */
- if(P){var tx=P.x-innerWidth/2,ty=P.y-innerHeight/2;
+ if(SPEC.on)specCam(dt);
+ else if(P){var tx=P.x-innerWidth/2,ty=P.y-innerHeight/2;
   cam.x=lerp(cam.x,tx,1-Math.pow(.0015,dt));cam.y=lerp(cam.y,ty,1-Math.pow(.0015,dt));}
  if(G.shakeT>0){G.shakeT-=dt;G.shake*=.9;}else G.shake=0;
  if(G.fireGlow>0)G.fireGlow-=dt;
  /* ── HUD ── */
- if(P){var hr=clamp(P.hp/P.mhp,0,1);
+ if(P&&!SPEC.on){var hr=clamp(P.hp/P.mhp,0,1);
   $('bHP').style.width=(hr*100)+'%';$('tHP').textContent=Math.round(hr*100)+'%';
   $('bRL').style.width=(P.rl>0?(1-P.rl/Math.max(P.st.rel,.1))*100:100)+'%';
   $('bAim').style.width=Math.round(clamp(P.aim,0,1)*100)+'%';
@@ -3693,6 +3732,9 @@ function update(dt){
 
 /* ═══════ REWARD (INF) ═══════ */
 function waveReward(){
+ if(SPEC.on){var C=null;for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead||teamSide(t.team)!==0)continue;t.hp=Math.min(t.mhp,t.hp+t.mhp*.45);C=C||t;}
+  if(C&&G.wave%3===0){var st=foeStat(Math.max(1,G.wave-1),pick(['medium','heavy','mbt']),false);tanks.push(mkTank(C.x+rnd(-160,160),C.y+rnd(-160,160),st,2,{a:C.a,skin:'winter'}));addLog('🤝 พันธมิตรมาเสริม','b');}
+  addLog('🔧 เวฟ '+G.wave+' ผ่าน — ซ่อมรถ 45%','g');G.waveState='inter';G.inter=3;return;}
  var cr=1200+G.wave*550;SV.cr+=cr;
  if(G.wave%3===0){var b=G.wave%15===0?'l':G.wave%5===0?'e':'r';SV.boxes[b]++;addLog('🎁 ได้กล่องสุ่ม!','g');}
  save();
@@ -3748,7 +3790,7 @@ function takeBuff(k){
 /* ═══════ END ═══════ */
 function endGame(victory){
  if(G.over)return;G.over=true;flEvStop();SFX.music('menu');
- SV.stat.games++;if(victory)SV.stat.wins++;
+ if(!SPEC.on){SV.stat.games++;if(victory)SV.stat.wins++;}
  setTimeout(function(){
   G.run=false;SFX.engineStop();victory?SFX.win():SFX.lose();
   $('hResp').classList.remove('on');
@@ -3774,15 +3816,21 @@ function endGame(victory){
    if(G.wave>=5){box=G.wave>=15?'l':G.wave>=10?'e':'r';SV.boxes[box]++;}
    h='<h1 style="font-size:24px">♾️ จบเกม</h1><p class="sub">ไปถึงเวฟ <b style="color:#f0b429">'+
     G.wave+'</b></p>';}
-  h+='<div class="card" style="cursor:default;text-align:left"><div class="st" style="font-size:12.5px;line-height:1.9">'+
+  var spv=SPEC.used&&SPEC.on;
+  if(SPEC.used){var rw=spv?0:clamp(SPEC.played/Math.max(G.t,1),0,1),lost=cr-Math.round(cr*rw);SV.cr-=lost;cr-=lost;
+   if(box&&rw<.5){SV.boxes[box]--;box=null;}
+   if(spv)h=specSummary(victory);else h+='<div class="hint">เล่นเอง '+Math.round(rw*100)+'% ของเกม — รางวัลตามสัดส่วน</div>';}
+  if(!spv)h+='<div class="card" style="cursor:default;text-align:left"><div class="st" style="font-size:12.5px;line-height:1.9">'+
    'ทำลายศัตรู: <b>'+G.kills+'</b> คัน<br>ดาเมจรวม: <b>'+fmt(G.dmgDone)+'</b><br>'+
    'เครดิต: <b style="color:#f0b429">'+fmt(cr)+'</b>'+
    (box?'<br>กล่องสุ่ม: <b style="color:#f0b429">'+{c:'ธรรมดา',r:'หายาก',e:'Epic',l:'ตำนาน'}[box]+' ×1</b>':'')+
    '</div></div>';
   var again=G.mode==='duel'?'startDuel()':G.mode==='inf'?'startInf()':
    G.mode==='fl'?'startFrontline()':'startBattle()';
-  h+='<div class="row" style="margin-top:12px"><button class="btn pri" onclick="closeModal();'+again+
-   '">🔁 เล่นอีกครั้ง</button>'+
+  var fnS=G.mode==='duel'?'startDuel':G.mode==='inf'?'startInf':G.mode==='fl'?'startFrontline':'startBattle';
+  h+='<div class="row" style="margin-top:12px">'+(SPEC.used?'<button class="btn blu" onclick="closeModal();specStart(\''+fnS+'\')">👁️ ดูอีกครั้ง</button>':'')+
+   '<button class="btn pri" onclick="closeModal();'+again+
+   '">'+(SPEC.used?'🎮 เล่นเอง':'🔁 เล่นอีกครั้ง')+'</button>'+
    (box?'<button class="btn blu" onclick="quitBattle();show(\'scBox\')">🎁 เปิดกล่อง</button>':'')+
    '<button class="btn" onclick="quitBattle()">← เมนูหลัก</button></div>';
   FL.on=false;save();modal(h);},1200);}
@@ -4599,14 +4647,14 @@ function flAirStrike(side,z){var E=FL.ev;if(!E)return;var foe=1-side,x=clamp(zon
  pl.drops.sort(function(a,b){return (a.y-b.y)*dir;});pl.snd=SFX.loop('jet');E.air.push(pl);}
 function flRolesTick(dt){if(FL.rt===undefined)return;FL.rt+=dt;FL.phaseT-=dt;
  if(FL.prep&&FL.phaseT<=0){FL.prep=false;FL.phaseT=FLR.swap;FL.warned=false;
-  var us=FL.atk===0;bigMsg(us?'ฝ่ายเรา: บุก!':'ฝ่ายเรา: ป้องกัน!');SFX.horn();
+  var us=FL.atk===0;bigMsg(SPEC.on?(us?'🟦 น้ำเงินบุก!':'🟥 แดงบุก!'):us?'ฝ่ายเรา: บุก!':'ฝ่ายเรา: ป้องกัน!');SFX.horn();
   addLog(us?'⚔️ เริ่มรบ! ฝ่ายเราเป็นฝ่ายบุก 3 นาที — ทุกคันบุก!':'🛡️ เริ่มรบ! ฝ่ายเราป้องกัน 3 นาที — ห้ามออกนอกเขตตัวเอง','b');}
  else if(!FL.prep){
   if(!FL.warned&&FL.phaseT<=FLR.warn){FL.warned=true;SFX.radio('air');
    addLog(FL.atk===0?'⏱️ อีก 10 วิ สลับเป็นฝ่ายป้องกัน — กลับเข้าเขตตัวเอง!':'⏱️ อีก 10 วิ ฝ่ายเราได้บุก!','b');}
   if(FL.phaseT<=0){FL.atk=1-FL.atk;FL.phaseT=FLR.swap;FL.warned=false;FL.swapN++;
    for(var i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)!==FL.atk){t.oobMax=FLR.grace;t.oob=0;}}
-   var us=FL.atk===0;bigMsg(us?'สลับ! ฝ่ายเราบุก':'สลับ! ฝ่ายเราป้องกัน');SFX.horn();
+   var us=FL.atk===0;bigMsg(SPEC.on?(us?'สลับ! 🟦 น้ำเงินบุก':'สลับ! 🟥 แดงบุก'):us?'สลับ! ฝ่ายเราบุก':'สลับ! ฝ่ายเราป้องกัน');SFX.horn();
    addLog(us?'⚔️ ฝ่ายเราบุก 3 นาที!':'🛡️ ฝ่ายเราป้องกัน 3 นาที — มี '+FLR.grace+' วิ กลับเข้าเขต','b');}}
  if(FL.ev){FL.ev.charge[0]=flRole(0)==='atk'?1:0;FL.ev.charge[1]=flRole(1)==='atk'?1:0;}
  /* ปิดล้อม: ถ้าศัตรูยึดโซนติด HQ ได้ HQ จะเสียหายต่อเนื่อง */
@@ -4628,10 +4676,12 @@ function flZoneLostGrace(z,side){for(var i=0;i<tanks.length;i++){var t=tanks[i];
 function mmss(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+('0'+s%60).slice(-2);}
 function flRoleHUD(){var el=$('flRole');if(!el||FL.rt===undefined)return;
  if(FL.prep){el.innerHTML='<b style="color:#f0c43a">⏳ เตรียมพร้อม '+mmss(FL.phaseT)+'</b>';return;}
- var us=FL.atk===0;el.innerHTML=(us?'<b style="color:#ffb347">⚔️ เราบุก</b>':'<b style="color:#7fc8ff">🛡️ เราป้องกัน</b>')+
+ var us=FL.atk===0;if(SPEC.on){el.innerHTML=(us?'<b class="sb">⚔️ น้ำเงินบุก</b> · <b class="sr">🛡️ แดงป้องกัน</b>':'<b class="sr">⚔️ แดงบุก</b> · <b class="sb">🛡️ น้ำเงินป้องกัน</b>')+
+  ' · สลับใน <b>'+mmss(FL.phaseT)+'</b> · เหลือ '+mmss(FLR.limit-FL.rt);return;}
+ el.innerHTML=(us?'<b style="color:#ffb347">⚔️ เราบุก</b>':'<b style="color:#7fc8ff">🛡️ เราป้องกัน</b>')+
   ' · สลับใน <b>'+mmss(FL.phaseT)+'</b> · เหลือ '+mmss(FLR.limit-FL.rt);}
 /* ภาพ: เขตห้ามเข้า + เป้าหมายบุก + นับถอยหลังนอกเขต */
-function drawZoneRules(w,h){if(!FL.on||FL.rt===undefined||!P)return;var rl=flRole(0),i;
+function drawZoneRules(w,h){if(!FL.on||FL.rt===undefined||!P||SPEC.on)return;var rl=flRole(0),i;
  for(var z=0;z<FLZ;z++){var x0=(-AX+z*ZL)-cam.x;if(x0>w||x0+ZL<0)continue;
   var ban=(rl==='prep'||rl==='def'||rl==='ret')&&FL.own[z]!==0;
   if(ban){cx.fillStyle=rl==='ret'?'rgba(240,180,40,.06)':'rgba(220,50,30,.09)';cx.fillRect(x0,-40,ZL,h+80);
@@ -4647,6 +4697,136 @@ function drawOobWarn(w,h){if(!FL.on||!P||P.dead||!(P.oob>0))return;var left=(P.o
  cx.fillStyle='rgba(200,20,10,'+(.12+Math.abs(Math.sin(G.t*6))*.12)+')';cx.fillRect(0,0,w,h);
  cx.textAlign='center';cx.font='800 '+(PLAT==='mb'?20:28)+'px Kanit, Tahoma';cx.lineWidth=4;cx.strokeStyle='rgba(0,0,0,.8)';
  var t='⚠️ กลับเข้าเขต! '+left.toFixed(1)+' วิ';cx.strokeText(t,w/2,h*.32);cx.fillStyle='#ff6a4a';cx.fillText(t,w/2,h*.32);cx.textAlign='left';}
+/* ═══════════════════════════════════════════════════════════
+   SPECTATOR — ดู AI สู้กันเอง (ทุกโหมด)
+   · รถของผู้เล่นให้ AI ขับ (team 2) · P = ตัวหลอกที่ตามกล้อง (ตาย/ซ่อน)
+   · กล้องอัตโนมัติ + กดสลับคัน · ความเร็ว x1/x2/x4 · เข้าไปขับแทน · ไม่มีหมอก · สถิติสด
+   ═══════════════════════════════════════════════════════════ */
+var SPEC={on:false,want:false,used:false,fol:null,hero:null,auto:true,hold:0,evT:0,deadT:0,spd:1,st:null,fn:'',played:0,uiT:0,mvp:null};
+function specReset(){SPEC.on=!!SPEC.want;SPEC.used=SPEC.on;SPEC.fol=null;SPEC.hero=null;SPEC.auto=true;SPEC.hold=0;SPEC.evT=0;SPEC.deadT=0;
+ SPEC.played=0;SPEC.mvp=null;SPEC.st={sh:[0,0],hit:[0,0],dmg:[0,0],k:[0,0]};if(!SPEC.on)SPEC.spd=1;
+ document.body.classList.toggle('spec',SPEC.on);document.body.classList.toggle('specused',SPEC.on);}
+function specStart(fn){SPEC.want=true;SPEC.fn=fn;try{window[fn]();}finally{SPEC.want=false;}if(SPEC.on)specSetup();}
+function specDummy(x,y,h){return{x:x,y:y,a:0,ta:0,spd:0,thr:0,steer:0,hp:1,mhp:1,dead:true,gone:true,team:0,dummy:true,st:h.st,b:h.b,
+ mods:h.mods,crew:h.crew,ext:{n:0,cd:0},ammo:{},racks:{},mod:{trk:0,eng:0,gun:0},crewHurt:{},rl:0,aim:0,mag:0,nS:0,nA:0,smkN:0,eraLeft:0,apsCh:0,fire:0,oob:0};}
+function specSetup(){var h=P;h.team=2;h.isP=false;h.hero=true;SPEC.hero=h;SPEC.fol=h;SPEC.hold=6;
+ P=specDummy(h.x,h.y,h);G.lock=null;SFX.engineStop();
+ addLog('👁️ โหมดผู้ชม — AI สู้กันเอง'+(isPhone()?' · แตะรถเพื่อตามคันนั้น':' · คลิกรถเพื่อตาม · ←/→ สลับ · 1/2/3 ความเร็ว · T ขับ'),'b');
+ specUI();specHUD();}
+/* ── สถิติ ── */
+function specShot(t){if(SPEC.st)SPEC.st.sh[teamSide(t.team)]++;}
+function specHit(s,t,r){if(!SPEC.st||!s.own)return;var d=r.dmg||0;if(d<=0)return;var sd=teamSide(s.own.team);
+ if(s.kind===0&&!s.hc){s.hc=1;SPEC.st.hit[sd]++;}SPEC.st.dmg[sd]+=d;s.own.dmgD=(s.own.dmgD||0)+d;t.lastBy=s.own;t.lastByT=G.t;specMvp(s.own);}
+function specKill(t){if(!SPEC.st)return;var b=t.lastBy&&G.t-(t.lastByT||0)<20?t.lastBy:null;
+ SPEC.st.k[1-teamSide(t.team)]++;if(b){b.kills=(b.kills||0)+1;specMvp(b);}
+ if(SPEC.on&&b&&b.st&&(!FL.on||Math.random()<.5)){var bs=teamSide(b.team);addLog((bs===0?'🟦 ':'🟥 ')+tkName(b)+' ทำลาย '+tkName(t),bs===0?'b':'r');}}
+function specMvp(o){var sc=(o.kills||0)*1000+(o.dmgD||0);
+ if(!SPEC.mvp||sc>=SPEC.mvp.sc)SPEC.mvp={sc:sc,n:tkName(o),sd:teamSide(o.team),k:o.kills||0,d:Math.round(o.dmgD||0)};}
+function tkName(t){return t.hero?'รถของคุณ':(t.st&&t.st.name)||'รถถัง';}
+var CLSN={light:'เบา',medium:'กลาง',heavy:'หนัก',mbt:'MBT',ifv:'IFV'};
+/* ── กล้อง ── */
+function specInterest(t){var s=0,n=0,sd=teamSide(t.team),i,o,d;
+ if(t.revealT>2)s+=2.2;else if(t.revealT>0)s+=1;
+ if(t.hitFlash>0)s+=2.5;if(t.see)s+=1.2;if(t.fire>0)s+=1;
+ for(i=0;i<tanks.length;i++){o=tanks[i];if(o.dead||teamSide(o.team)===sd)continue;d=hyp(o.x-t.x,o.y-t.y);if(d<900)n+=d<450?1.5:1;}
+ s+=Math.min(n,6)*1.1+(1-clamp(t.hp/t.mhp,0,1))*1.2;
+ if(t.hero)s+=1.2;if(t.boss)s+=1;return s;}
+function specList(){var L=[];for(var i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&!t.gone)L.push(t);}
+ L.sort(function(a,b){var sa=teamSide(a.team),sb=teamSide(b.team);return sa!==sb?sa-sb:a.x-b.x;});return L;}
+function specFollow(t,manual){if(!t)return;if(manual){SPEC.auto=false;SFX.ui(true);}
+ if(t!==SPEC.fol){SPEC.fol=t;SPEC.hold=manual?0:7;SPEC.deadT=0;}specUI();specHUD();}
+function specCycle(d){var L=specList();if(!L.length)return;var i=L.indexOf(SPEC.fol);i=i<0?0:(i+d+L.length)%L.length;specFollow(L[i],true);}
+function specAuto(){SPEC.auto=!SPEC.auto;SPEC.hold=0;SPEC.evT=0;SFX.ui(true);specUI();}
+function specSpeed(n){SPEC.spd=n;SFX.ui(true);specUI();}
+function specTick(dt){var f=SPEC.fol;
+ if(f&&f.dead)SPEC.deadT+=dt;if(SPEC.hold>0)SPEC.hold-=dt;
+ SPEC.evT-=dt;if(SPEC.evT>0)return;SPEC.evT=.8;
+ var need=!f||(f.dead&&SPEC.deadT>1.8);
+ if(need&&!SPEC.auto){SPEC.auto=true;specUI();}            /* คันที่ล็อกไว้ถูกทำลาย → กลับเป็นอัตโนมัติ */
+ if(!SPEC.auto&&!need)return;
+ var L=specList(),best=null,bs=-1,cur=f&&!f.dead?specInterest(f):-1;
+ for(var i=0;i<L.length;i++){var sc=specInterest(L[i]);if(sc>bs){bs=sc;best=L[i];}}
+ if(best&&best!==f&&(need||(SPEC.hold<=0&&bs>cur*1.35+1.2)))specFollow(best,false);}
+function specCam(dt){var f=SPEC.fol;if(f){var lk=f.dead?0:110,tx=f.x+Math.cos(f.ta)*lk-innerWidth/2,ty=f.y+Math.sin(f.ta)*lk*.6-innerHeight/2;
+  cam.x=lerp(cam.x,tx,1-Math.pow(.004,dt));cam.y=lerp(cam.y,ty,1-Math.pow(.004,dt));}
+ P.x=cam.x+innerWidth/2;P.y=cam.y+innerHeight/2;}
+/* ── เข้าไปขับ / กลับมาดู ── */
+function specTake(){var t=SPEC.fol;if(!SPEC.on)return;
+ if(!t||t.dead||teamSide(t.team)!==0){toast('เลือกรถฝ่ายน้ำเงินที่ยังไม่ถูกทำลายก่อน');SFX.ui(false);return;}
+ SPEC.on=false;document.body.classList.remove('spec');
+ t.team=0;t.isP=true;t.thr=0;t.steer=0;t.oob=0;t.retreat=0;t.cov=null;t.hunt=null;
+ P=t;G.lock=null;wSel=0;aSel=firstAmmo();G.scan=0;G.scanning=false;
+ cam.x=P.x-innerWidth/2;cam.y=P.y-innerHeight/2;
+ SFX.engineStart();updAmmoUI();updScanList();
+ bigMsg('🎮 เข้าควบคุม!');addLog('🎮 คุณเข้าควบคุม '+tkName(t)+' แล้ว','g');}
+function specResume(){if(!SPEC.used||SPEC.on||G.over)return;var old=P;
+ if(old&&!old.dead){old.team=2;old.isP=false;}
+ else if(FL.on&&FL.pRespawn>0){FL.spawnQ.push({team:2,t:0});}   /* แทนคันที่เราไม่ได้เกิดใหม่ */
+ FL.pRespawn=0;$('hResp').classList.remove('on');
+ SPEC.on=true;document.body.classList.add('spec');
+ P=specDummy(old?old.x:cam.x+innerWidth/2,old?old.y:cam.y+innerHeight/2,old||SPEC.hero||tanks[0]);
+ SPEC.fol=old&&!old.dead?old:null;SPEC.auto=true;SPEC.hold=4;SPEC.evT=0;G.lock=null;SFX.engineStop();
+ addLog('👁️ กลับสู่โหมดผู้ชม','b');specUI();specHUD();}
+/* ── UI ── */
+function specUI(){var el=$('specBar');if(!el)return;var f=SPEC.fol,can=f&&!f.dead&&teamSide(f.team)===0;
+ el.innerHTML='<div class="ab" onclick="specCycle(-1)">◀<br><b>ก่อน</b></div>'+
+  '<div class="ab'+(SPEC.auto?' on':'')+'" onclick="specAuto()">'+(SPEC.auto?'🎬':'📌')+'<br><b>'+(SPEC.auto?'อัตโนมัติ':'ล็อกคัน')+'</b></div>'+
+  '<div class="ab" onclick="specCycle(1)">▶<br><b>ถัดไป</b></div>'+
+  [1,2,4].map(function(n){return '<div class="ab'+(SPEC.spd===n?' on':'')+'" onclick="specSpeed('+n+')">⏩<br><b>x'+n+'</b></div>';}).join('')+
+  '<div class="ab'+(can?' on':' no')+'" onclick="specTake()">🎮<br><b>ขับคันนี้</b></div>';}
+function specState(t){if(t.dead)return '💀 ถูกทำลาย';var s;
+ if(t.retreat)s='↩️ ถอยไปซ่อม';
+ else if(t.see&&t.seeT&&!t.seeT.dead)s='🎯 ปะทะ '+tkName(t.seeT);
+ else if(t.hunt&&!t.hunt.dead)s='🔎 ไล่ล่าเป้าหมาย';
+ else if(FL.on){var r=flRole(teamSide(t.team));s=r==='atk'?'⚔️ บุกแนวหน้า':r==='prep'?'⏳ เตรียมพร้อม':r==='ret'?'↩️ กลับเข้าเขต':r==='def'?'🛡️ ตั้งรับ':'🚚 เคลื่อนที่';}
+ else s='🚚 เคลื่อนที่';
+ if(t.fire>0)s+=' · 🔥';if(t.oob>0)s+=' · ⚠️ นอกเขต '+Math.max(0,(t.oobMax||5)-t.oob).toFixed(1)+'s';return s;}
+function specHUD(){var a=$('specStat'),b=$('specFol');if(!a||!SPEC.st)return;var S=SPEC.st,al=[0,0],i,t;
+ for(i=0;i<tanks.length;i++){t=tanks[i];if(!t.dead)al[teamSide(t.team)]++;}
+ function acc(s){return S.sh[s]?Math.round(S.hit[s]/S.sh[s]*100)+'%':'—';}
+ function k(n){return n>=1e4?(n/1e3).toFixed(1)+'k':fmt(Math.round(n));}
+ var rows=[['เหลือ',al[0],al[1]],['ทำลาย',S.k[0],S.k[1]],['ยิงเข้า',acc(0),acc(1)],['ดาเมจ',k(S.dmg[0]),k(S.dmg[1])]];
+ if(FL.on){var c=[0,0];FL.own.forEach(function(o){if(o>=0)c[o]++;});rows.push(['โซน',c[0],c[1]],['HQ',k(FL.hq[0]),k(FL.hq[1])]);}
+ else if(G.mode==='cap'){var cp=[0,0];G.caps.forEach(function(q){if(q.own>=0)cp[q.own]++;});rows.push(['จุดยึด',cp[0],cp[1]]);}
+ else if(G.mode==='inf')rows.push(['เวฟ',G.wave||0,'']);
+ a.innerHTML='<div class="spT">👁️ โหมดผู้ชม <span>'+mmss(G.t)+(SPEC.spd>1?' · x'+SPEC.spd:'')+'</span></div>'+
+  '<table class="spTab"><tr><th></th><th class="sb">🟦 น้ำเงิน</th><th class="sr">🟥 แดง</th></tr>'+
+  rows.map(function(r){return '<tr><td>'+r[0]+'</td><td class="sb">'+r[1]+'</td><td class="sr">'+r[2]+'</td></tr>';}).join('')+'</table>'+
+  (SPEC.mvp?'<div class="spM">⭐ MVP: <b class="'+(SPEC.mvp.sd===0?'sb':'sr')+'">'+SPEC.mvp.n+'</b> · '+SPEC.mvp.k+' คัน</div>':'');
+ var f=SPEC.fol;if(!f){b.innerHTML='<div class="spT">🎥 กำลังหามุมกล้อง...</div>';return;}
+ var sd=teamSide(f.team),hr=clamp(f.hp/f.mhp,0,1);
+ b.innerHTML='<div class="spT">🎥 '+(SPEC.auto?'กล้องอัตโนมัติ':'ตามคันนี้')+'</div>'+
+  '<div class="spN '+(sd===0?'sb':'sr')+'">'+(f.hero?'★ ':'')+tkName(f)+' <span>'+(CLSN[f.st.cls]||'')+'</span></div>'+
+  '<div class="bar '+(sd===0?'b':'r')+'" style="margin:3px 0"><i style="width:'+(hr*100)+'%"></i></div>'+
+  '<div class="spS">HP '+Math.round(hr*100)+'% · ทำลาย '+(f.kills||0)+' · ดาเมจ '+k(f.dmgD||0)+'</div>'+
+  '<div class="spS">'+specState(f)+'</div>';}
+function specFrame(dt){specTick(dt);if((SPEC.uiT-=dt)<=0){SPEC.uiT=.25;specHUD();var f=SPEC.fol,can=f&&!f.dead&&teamSide(f.team)===0,el=$('specBar');
+ if(el&&el.lastChild&&el.lastChild.classList.contains('no')===can)specUI();}}
+function specSummary(v){var S=SPEC.st;function acc(s){return S.sh[s]?Math.round(S.hit[s]/S.sh[s]*100)+'%':'—';}
+ var h='<h1 style="font-size:24px">'+(G.mode==='inf'?'♾️ AI ไปถึงเวฟ '+G.wave:v?'🏆 ฝ่ายน้ำเงินชนะ!':'🏆 ฝ่ายแดงชนะ!')+'</h1>'+
+  '<p class="sub">โหมดผู้ชม · เวลา '+mmss(G.t)+(FL.on||G.mode==='fl'?' · HQ '+fmt(FL.hq[0])+' / '+fmt(FL.hq[1]):'')+'</p>'+
+  '<div class="card" style="cursor:default"><table class="spTab big"><tr><th></th><th class="sb">🟦 น้ำเงิน</th><th class="sr">🟥 แดง</th></tr>'+
+  [['ทำลาย',S.k[0],S.k[1]],['ยิง',S.sh[0],S.sh[1]],['ยิงเข้า',acc(0),acc(1)],['ดาเมจ',fmt(Math.round(S.dmg[0])),fmt(Math.round(S.dmg[1]))]]
+  .map(function(r){return '<tr><td>'+r[0]+'</td><td class="sb">'+r[1]+'</td><td class="sr">'+r[2]+'</td></tr>';}).join('')+'</table>'+
+  (SPEC.mvp?'<div class="spM" style="margin-top:6px">⭐ MVP: <b class="'+(SPEC.mvp.sd===0?'sb':'sr')+'">'+SPEC.mvp.n+'</b> · ทำลาย '+SPEC.mvp.k+' · ดาเมจ '+fmt(SPEC.mvp.d)+'</div>':'')+
+  '<div class="hint" style="margin-top:4px">โหมดผู้ชมไม่ได้รับเครดิต/กล่อง</div></div>';
+ return h;}
+addEventListener('keydown',function(e){if(!SPEC.on||!G.run||awaitKey)return;var k=(e.key||'').toLowerCase(),hd=1;
+ if(k==='arrowleft'||k==='a'||k==='q')specCycle(-1);
+ else if(k==='arrowright'||k==='d'||k==='e')specCycle(1);
+ else if(k===' ')specAuto();
+ else if(k==='1')specSpeed(1);else if(k==='2')specSpeed(2);else if(k==='3'||k==='4')specSpeed(4);
+ else if(k==='t'||k==='enter')specTake();
+ else hd=0;
+ if(hd){e.preventDefault();e.stopImmediatePropagation();}},true);
+cv.addEventListener('pointerdown',function(e){if(!SPEC.on||!G.run)return;var wx=e.clientX+cam.x,wy=e.clientY+cam.y+18,best=null,bd=95;
+ for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead||t.gone)continue;var d=hyp(t.x-wx,t.y-wy);if(d<bd){bd=d;best=t;}}
+ if(best)specFollow(best,true);});
+function drawSpecMark(w,h){var f=SPEC.fol;if(!f||f.gone)return;var x=f.x-cam.x,y=f.y-cam.y,col=teamSide(f.team)===0?'#6fb8ff':'#ff6a4a';
+ cx.save();cx.strokeStyle=col;cx.globalAlpha=.5+Math.sin(G.t*5)*.25;cx.lineWidth=2.5;cx.setLineDash([10,8]);
+ cx.beginPath();cx.ellipse(x,y,62,62*VK,0,0,6.2832);cx.stroke();cx.setLineDash([]);cx.globalAlpha=1;
+ cx.font='700 12px Kanit, Tahoma';cx.textAlign='center';cx.lineWidth=3;cx.strokeStyle='rgba(0,0,0,.75)';
+ var lb=(f.hero?'★ ':'')+tkName(f);cx.strokeText(lb,x,y-84);cx.fillStyle=col;cx.fillText(lb,x,y-84);cx.textAlign='left';cx.restore();}
 function render(){
  var w=innerWidth,h=innerHeight,time=G.t,m=MAPS[G.map];
  var sx=G.shake?rnd(-G.shake,G.shake):0,sy=G.shake?rnd(-G.shake,G.shake):0;
@@ -4689,7 +4869,7 @@ function render(){
  drawWrecks(w,h);drawDecor(w,h);
  /* โลก 2.5D: สิ่งกีดขวาง ต้นไม้ โครงสร้าง รถ — เรียงตามความลึก */
  if(FL.on)drawAirShadows(w,h);
- drawWorld(w,h,time);
+ drawWorld(w,h,time);if(SPEC.on)drawSpecMark(w,h);
  for(var i=0;i<trails.length;i++){var t2=trails[i];
   cx.globalAlpha=t2.l/t2.ml*.7;cx.fillStyle=t2.c;
   cx.fillRect(t2.x-cam.x-1.5,t2.y-cam.y-1.5-SHZ,3.2,3.2);}
@@ -4815,11 +4995,12 @@ function renderMini(){
   mx.fillStyle='rgba(190,192,186,.35)';
   mx.beginPath();mx.arc(q[0],q[1],Math.max(1.2,smokes[i].r*sc),0,6.2832);mx.fill();}
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead)continue;
-  var vis=(t.team!==1)||t.known||t.see||t.marked||(FL.on&&FL.intel[0]>0);
+  var vis=SPEC.on||(t.team!==1)||t.known||t.see||t.marked||(FL.on&&FL.intel[0]>0);
   if(!vis)continue;
   var q=mp(t);
   mx.fillStyle=t.team===0?'#8fd44a':t.team===2?'#4fa0e0':(t.marked?'#ff3030':'#e05a3c');
   var sz=t.team===0?5:3.4;mx.fillRect(q[0]-sz/2,q[1]-sz/2,sz,sz);}
+ if(SPEC.on&&SPEC.fol&&!SPEC.fol.dead){var q=mp(SPEC.fol);mx.strokeStyle='#fff';mx.lineWidth=1.4;mx.beginPath();mx.arc(q[0],q[1],5.5,0,6.2832);mx.stroke();}
  if(P&&!P.dead){var q=mp(P);mx.strokeStyle='#8fd44a';mx.lineWidth=1.2;
   mx.beginPath();mx.moveTo(q[0],q[1]);mx.lineTo(q[0]+Math.cos(P.ta)*10,q[1]+Math.sin(P.ta)*10);mx.stroke();}}
 function drawBigMap(){
@@ -4868,7 +5049,9 @@ function drawBigMap(){
    (FL.intel[0]>0?' · 📻 ข่าวกรองเหลือ '+Math.ceil(FL.intel[0])+' วิ':'')):'';}
 function loop(now){if(!G.run)return;
  if(isPhone()&&innerHeight>innerWidth){G.last=now;requestAnimationFrame(loop);return;}  /* แนวตั้ง = หยุดชั่วคราว */
- var dt=Math.min((now-G.last)/1000,.05);G.last=now;G.t+=dt;update(dt);render();
+ var dt=Math.min((now-G.last)/1000,.05);G.last=now;
+ for(var si=0,sn=SPEC.on?SPEC.spd:1;si<sn;si++){G.t+=dt;update(dt);if(!G.run)break;}
+ render();
  if($('bigmap').classList.contains('on')&&Math.random()<.25)drawBigMap();
  requestAnimationFrame(loop);}
 
@@ -4931,6 +5114,8 @@ addEventListener('keydown',function(e){
   SV.keys[awaitKey]=k;awaitKey=null;save();SFX.ui(true);drawKeys();return;}
  keys[k]=true;
  if(!G.run)return;
+ if(SPEC.on){if(k===SV.keys.map){if($('bigmap').classList.contains('on'))closeBigMap();else openBigMap();}
+  if(k===SV.keys.quit){if($('bigmap').classList.contains('on'))closeBigMap();else quitBattle();}return;}
  if(k===SV.keys.w1)pickW(0);
  if(k===SV.keys.w2)pickW(1);
  if(k===SV.keys.w3)pickW(2);
