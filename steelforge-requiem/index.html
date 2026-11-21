@@ -3628,6 +3628,10 @@ function update(dt){
   else gxWreck(p,dt);
   p.l-=dt;if(p.l<=0)parts.splice(i,1);}
  for(var i=trails.length-1;i>=0;i--){trails[i].l-=dt;if(trails[i].l<=0)trails.splice(i,1);}
+ /* แสง/คลื่นระเบิด: นับถอยหลังในเกม (ไม่ใช่ตอนวาด) — ไม่สะสมแม้จอไม่ได้วาด */
+ for(var i=GX.lights.length-1;i>=0;i--){GX.lights[i].l-=dt;if(GX.lights[i].l<=0)GX.lights.splice(i,1);}
+ if(GX.lights.length>80)GX.lights.splice(0,GX.lights.length-80);
+ for(var i=GX.rings.length-1;i>=0;i--){GX.rings[i].l-=dt;if(GX.rings[i].l<=0)GX.rings.splice(i,1);}
  for(var i=marks.length-1;i>=0;i--){marks[i].l-=dt;if(marks[i].l<=0)marks.splice(i,1);}
  for(var i=debris.length-1;i>=0;i--){var d=debris[i];d.life-=dt;
   if(!d.landed){d.x+=d.vx;d.y+=d.vy;d.z+=d.vz;d.vz-=22*dt;d.rot+=d.vrot;d.vx*=.99;d.vy*=.99;
@@ -4235,12 +4239,11 @@ function drawFx(w,h,dt){var i,p,x,y,f,r;
   else if(p.t==='fl'){cx.save();cx.translate(x,y);cx.rotate(p.a);cx.globalAlpha=f;cx.drawImage(flashSpr(),-3,-p.r*.28,p.r,p.r*.56);cx.restore();}
   else{cx.globalAlpha=f;cx.strokeStyle=p.c;cx.lineWidth=Math.max(1,p.r*.5*f+.5);cx.beginPath();cx.moveTo(x,y);cx.lineTo(x-p.vx*2.6,y-p.vy*2.6);cx.stroke();}}
  cx.globalCompositeOperation='screen';var nL=0,lk=1/Math.sqrt(Math.max(1,GX.lights.length/5));
- for(i=GX.lights.length-1;i>=0;i--){var L=GX.lights[i];L.l-=dt;if(L.l<=0){GX.lights.splice(i,1);continue;}
+ for(i=GX.lights.length-1;i>=0;i--){var L=GX.lights[i];if(L.l<=0)continue;
   x=L.x-cam.x;y=L.y-cam.y;if(x<-L.r||x>w+L.r||y<-L.r||y>h+L.r||nL>=14)continue;nL++;
   cx.globalAlpha=clamp(L.l/L.ml,0,1)*.6*lk;cx.drawImage(glowSpr(L.c),x-L.r,y-L.r,L.r*2,L.r*2);}
- if(GX.lights.length>60)GX.lights.splice(0,GX.lights.length-60);
  cx.globalCompositeOperation='source-over';
- for(i=GX.rings.length-1;i>=0;i--){var g=GX.rings[i];g.l-=dt;if(g.l<=0){GX.rings.splice(i,1);continue;}
+ for(i=GX.rings.length-1;i>=0;i--){var g=GX.rings[i];if(g.l<=0)continue;
   f=1-g.l/g.ml;cx.globalAlpha=(1-f)*.55;cx.strokeStyle='#ffe2b0';cx.lineWidth=2+(1-f)*5;
   cx.beginPath();cx.arc(g.x-cam.x,g.y-cam.y,g.R*(.2+f*.8),0,6.2832);cx.stroke();}
  cx.globalAlpha=1;}
