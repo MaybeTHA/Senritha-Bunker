@@ -265,6 +265,7 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
  body.mbl #bLock,body.mbl #bSmk,body.mbl #bMsl,body.mbl #bMap,body.mbl #bExt,body.mbl #bScan{bottom:calc(132px + env(safe-area-inset-bottom));width:44px;height:44px}
  body.mbl #bSmk{right:calc(62px + env(safe-area-inset-right))}body.mbl #bMsl{right:calc(112px + env(safe-area-inset-right))}
  body.mbl #bExt{left:calc(62px + env(safe-area-inset-left))}body.mbl #bScan{right:auto;left:calc(112px + env(safe-area-inset-left))}
+ body.mbl #bPax{left:calc(162px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));width:44px;height:44px}
  body.mbl #bMain{right:calc(134px + env(safe-area-inset-right));width:72px;height:72px}
  body.mbl #bAlt{right:calc(158px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom));width:42px;height:42px}
 }
@@ -598,6 +599,11 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   ฝ่ายที่ยึด Zone 4 ได้จะเป็นฝ่ายป้องกัน อีกฝ่ายบุกก่อน · แล้วสลับบุก/ป้องกันทุก 3 นาที (ดูมุมบนจอ ⚔️/🛡️)<br>
   ฝ่ายป้องกันออกนอกเขตทีมได้ 5 วิ ไม่งั้นรถระเบิด · เส้นแดงกะพริบ = ขอบเขต · ลายแดง = ห้ามเข้า<br>
   ฝ่ายบุกจะเห็นกรอบ <b>⚔️ บุก Zone N</b> เป็นเป้าหมาย · ครบ 25 นาทีตัดสินจากจำนวนโซน<br><br>
+  <b style="color:#f0b429">■ วิทยุ · เสบียง · อากาศยาน</b><br>
+  ที่สถานีวิทยุ (Zone 3/5) กด <b>F</b> → เรียก CAS / ปืนใหญ่ / สอดแนม · มาร์คเป้าบนสนามรบหรือแผนที่ แล้วกดยืนยัน (Enter) · Esc ยกเลิก<br>
+  ห้ามโจมตีฐานทัพหลักศัตรู รอบ HQ และเขตจุดเกิด · แต่ละอย่างมีคูลดาวน์ · AI ก็ใช้กติกาเดียวกัน<br>
+  เติมเสบียง: จอดนิ่งที่ปั๊ม Zone 4 หรือรอบ HQ ฝ่ายเรา (ช่วงเตรียมพร้อมเติมได้ทุกที่ในเขตเรา) — เติมเฉพาะที่ขาด ไม่เกินความจุ<br>
+  เฮลิคอปเตอร์ออกจากฐานไปช่วยจุดที่ปะทะ อยู่ราว 80 วิ แล้วบินกลับ · ยิงตกได้ด้วยปืนกล/ปืนใหญ่กล/จรวดทหาร<br><br>
   <b style="color:#f0b429">■ ทหารราบ & IFV</b><br>
   IFV บรรทุกทหารได้ตามขนาด (4/6/7/8 นาย) · ทหารต่อต้านรถถังยิงจรวด HEAT · ทหารนับช่วยยึดโซน (2 นาย = 1 หน่วย)<br>
   ขับ IFV: กด <b>G</b> (มือถือ: ปุ่มลงรถ) เพื่อส่งทหารลง / เรียกทหารใกล้ ๆ ขึ้นรถ · ทหารที่ลงจะคุ้มกันรถคุณ · เติมจรวด/ระเบิดมือที่ปั๊ม, HQ หรือข้าง IFV<br><br>
@@ -3417,8 +3423,8 @@ function resupply(t,dt){var st=supStation(t);t.supAt=st;
  if(t===P){updAmmoUI();SFX.supTick();}
  if(supFill(t)>=.999){t.supAct=false;supDone(t);}}
 function supDone(t){if(t!==P)return;SFX.supDone();updAmmoUI();addLog('✅ เติมเสบียงครบ — กระสุน/อาวุธรอง/ATGM/ควัน/อุปกรณ์เต็ม','g');pop(P.x,P.y-46,'✅ เสบียงเต็ม','#8fd44a',14);}
-function supHUD(){var el=$('hSup');if(!el)return;var on=FL.on&&P&&!P.dead&&P.supAt&&!SPEC.on;el.classList.toggle('on',!!on);if(!on)return;
- var f=supFill(P);el.innerHTML=(f>=.999?'✅ เสบียงเต็ม':P.supOn?'⛽ กำลังเติมเสบียง '+Math.round(f*100)+'%':'⛽ จอดนิ่งเพื่อเติมเสบียง ('+Math.round(f*100)+'%)')+
+function supHUD(){var el=$('hSup');if(!el)return;var on=FL.on&&P&&!P.dead&&P.supAt&&!SPEC.on,f=on?supFill(P):1;if(on&&P.supAt===SUP_PREP&&f>=.999)on=false;el.classList.toggle('on',!!on);if(!on)return;
+el.innerHTML=(f>=.999?'✅ เสบียงเต็ม':P.supOn?'⛽ กำลังเติมเสบียง '+Math.round(f*100)+'%':'⛽ จอดนิ่งเพื่อเติมเสบียง ('+Math.round(f*100)+'%)')+
   '<div class="bar" style="margin-top:3px"><i style="width:'+(f*100).toFixed(0)+'%"></i></div>';}
 function drawSupRing(){if(!FL.on||!P||P.dead||!P.supOn||SPEC.on)return;var f=supFill(P);if(f>=.999)return;var x=P.x-cam.x,y=P.y-cam.y;
  cx.save();cx.lineWidth=4;cx.strokeStyle='rgba(0,0,0,.45)';cx.beginPath();cx.ellipse(x,y,70,70*VK,0,0,6.2832);cx.stroke();
