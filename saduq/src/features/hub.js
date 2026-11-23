@@ -36,7 +36,8 @@ function typedLine() {
 export function homeView(root, keepFocus = false) {
   const d = new Date(), unread = S().notices.filter(n => !n.read).length, cp = curPerson();
   const input = h('input', { id: 'hub-q', type: 'search', value: hs.q, autocomplete: 'off', placeholder: 'ค้นหาสินค้า บริการ สิทธิ เช่น ผ้าอ้อม รถเข็น บัตรทอง', 'aria-label': 'ค้นหาสินค้า บริการ และสิทธิ',
-    oninput: e => { hs.q = e.target.value; homeView(root, true); } });
+    oninput: e => { hs.q = e.target.value; homeView(root, true); },
+    onkeydown: e => { if (e.key === 'Enter' && hs.q.trim().split(/\s+/).length >= 2) { const q = hs.q.trim(); hs.q = ''; go('ai/' + encodeURIComponent(q)); } } });
   const keepTyped = keepFocus && root.querySelector('.typed');
   put(root,
     h('header.hubtop',
@@ -48,7 +49,8 @@ export function homeView(root, keepFocus = false) {
       h('h1.htitle', h('span.sr', `ผู้ช่วยของผู้ดูแลผู้สูงอายุ ค้นหาอะไรดี${PQ()}`), h('span', { 'aria-hidden': 'true' }, cp ? `ดูแล${cp.name}วันนี้ ต้องหา..` : 'ผู้ดูแลต้องหา..'), keepTyped || typedLine()),
       h('label.hsearch.big', h('span', { html: ic('search') }), input, hs.q ? h('button.clr', { type: 'button', onclick: () => { hs.q = ''; homeView(root); }, 'aria-label': 'ล้างคำค้น' }, 'ล้าง') : ''),
       h('div.popular', { role: 'group', 'aria-label': 'คำค้นยอดนิยม' }, h('span', 'ค้นหาบ่อย'),
-        POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k)))),
+        POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k))),
+      h('a.aicta', { href: '#ai' }, h('span.aicta-ic', { html: ic('spark') }), h('span', h('b', 'ไม่รู้จะค้นอะไร? เล่าปัญหาให้ AI ฟัง'), h('small', 'เช่น "แม่เดินไม่สะดวก ต้องไปหาหมอทุกเดือน" → ได้ 3 ตัวเลือก')), h('span.aicta-go', { html: ic('arrow') }))),
     hs.q.trim() ? h('div.panel', searchResults(hs.q)) : [
       h('div.panel.board', h('div.boardcols', h('div.col', careBoard()), h('div.col', todayCare()))),
       catPanel(root),
@@ -121,6 +123,7 @@ function searchResults(q) {
   const n = svcs.length + prods.length + rems.length + reqs.length;
   return h('section.results', { 'aria-live': 'polite' },
     h('p.rcount', n ? `พบ ${n} รายการ` : `ไม่พบ "${q}" ลองคำที่สั้นลง เช่น ผ้าอ้อม เตียง ยา`),
+    h('a.aicta.inline', { href: '#ai/' + encodeURIComponent(q) }, h('span.aicta-ic', { html: ic('spark') }), h('span', h('b', `ให้ AI ช่วยคิดจาก "${q}"`), h('small', 'กด Enter หรือแตะที่นี่ — ได้ 3 ตัวเลือกพร้อมเหตุผล')), h('span.aicta-go', { html: ic('arrow') })),
     svcs.length ? [h('h2.rh', 'บริการและสิทธิ'), h('div.svclist', svcs.map(svcRow))] : '',
     prods.length ? [h('h2.rh', 'สินค้าและอุปกรณ์'), h('div.prodgrid', prods.map(productCard))] : '',
     rems.length ? [h('h2.rh', 'งานดูแล'), h('div.actlist', rems.map(t => h('button.actrow', { onclick: () => openReminder(t.id) }, h('span.ar-ic', { html: ic('bell') }), h('span.ar-tx', h('b', t.title), h('small', dueLine(t))))))] : '',

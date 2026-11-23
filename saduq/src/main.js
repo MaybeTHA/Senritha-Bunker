@@ -14,16 +14,17 @@ import { needsOnboarding } from './features/onboard.js';
 import { addHubSamples } from './features/family.js';
 import { personView } from './features/people.js';
 import { productsView, productView } from './features/shop.js';
+import { assistantView } from './features/assistant.js';
 
-globalThis.SABAII_VERSION = '2.0.0';
+globalThis.SABAII_VERSION = '2.1.0';
 const VIEWS = {
   home: ['หน้าหลัก', homeView], services: ['บริการ', servicesView], cat: ['บริการ', categoryView], svc: ['บริการ', serviceView],
   activity: ['งานดูแล', activityView], req: ['เรื่องที่ติดตาม', requestView], notif: ['การแจ้งเตือน', notifView], subject: ['หมวดการเตือน', subjectView],
-  family: ['ทีมดูแล', familyView], person: ['ผู้รับการดูแล', personView], shop: ['สินค้าและอุปกรณ์', productsView], product: ['สินค้า', productView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
+  family: ['ทีมดูแล', familyView], person: ['ผู้รับการดูแล', personView], ai: ['ผู้ช่วย AI', assistantView], shop: ['สินค้าและอุปกรณ์', productsView], product: ['สินค้า', productView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
 };
 const ALIAS = { tasks: 'activity' }; // ลิงก์รุ่นนักเรียนเดิม
 const NAV_OF = { services: 'home', cat: 'home', svc: 'home', emergency: 'home', person: 'home', product: 'shop', req: 'activity', notif: 'activity', subject: 'activity', family: 'me' };
-const NAV = [['home', 'home', 'หน้าหลัก'], ['activity', 'activity', 'งานดูแล'], ['shop', 'bag', 'สินค้า'], ['me', 'me', 'ฉัน']];
+const NAV = [['home', 'home', 'หน้าหลัก'], ['ai', 'spark', 'ผู้ช่วย AI'], ['activity', 'activity', 'งานดูแล'], ['shop', 'bag', 'สินค้า'], ['me', 'me', 'ฉัน']];
 
 /** รับทั้ง #home และ #/home และ #svc/h-appt */
 export function route() {
@@ -63,11 +64,11 @@ async function boot() {
     page.scrollTop = y;
     const here = NAV_OF[r.name] || r.name;
     document.querySelectorAll('#nav a, #topnav a').forEach(a => a.dataset.r === here ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
-    sos.hidden = r.name === 'emergency' || r.name === 'home';
+    sos.hidden = r.name === 'emergency' || r.name === 'home' || r.name === 'ai';
     if (key !== last) { const h1 = wrap.querySelector('h1'); if (last && h1) { h1.tabIndex = -1; h1.focus({ preventScroll: true }); } }
     last = key;
   }
-  app.refresh = () => { applyScale(); if (!document.activeElement?.matches?.('#hub-q')) render(); else homeRefreshKeepFocus(); };
+  app.refresh = () => { applyScale(); if (route().name === 'ai') { if (document.activeElement?.matches?.('#ai-q')) paintTop(); else render(); return; } if (!document.activeElement?.matches?.('#hub-q')) render(); else homeRefreshKeepFocus(); };
   const homeRefreshKeepFocus = () => { const r = route(); if (r.name === 'home') homeView(wrap, true); else render(); };
   store.subscribe(() => { gcUrls(); app.refresh(); });
   addEventListener('hashchange', render);
