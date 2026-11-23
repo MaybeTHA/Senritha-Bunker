@@ -1,0 +1,17 @@
+# Gradle / Android
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.kotlin/
+captures/
+*.apk
+*.aab
+# Secrets — ห้าม commit
+google-services.json
+*.jks
+*.keystore
+firebase/functions/node_modules/
+firebase/functions/lib/
+firebase/.firebaserc

@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function signedIn() { return request.auth != null; }
+    function elderDoc(id) { return get(/databases/$(db)/documents/elders/$(id)).data; }
+    function isCaregiverOf(id) { return signedIn() && request.auth.uid in elderDoc(id).caregivers; }
+    function isDeviceOf(id) { return signedIn() && elderDoc(id).elderUid == request.auth.uid; }
+    function changes() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    match /elders/{elderId} {
+      // ผู้ดูแลสร้างโปรไฟล์ โดยใส่ตัวเองเป็นผู้ดูแลคนแรก
+      allow create: if signedIn()
+        && request.resource.data.caregivers == [request.auth.uid]
+        && request.resource.data.elderUid == null;
+      // อ่านได้เฉพาะผู้ดูแลที่ผูกไว้ และเครื่องผู้สูงอายุเอง
+      allow read: if signedIn() && (request.auth.uid in resource.data.caregivers
+        || resource.data.elderUid == request.auth.uid);
+      allow update: if signedIn() && (
+        // ผู้ดูแลแก้ไขได้ (ชื่อ, geofence, รายชื่อผู้ดูแล ฯลฯ)
+        request.auth.uid in resource.data.caregivers
+        // เครื่องผู้สูงอายุอัปเดตได้แค่ deviceStatus
+        || (resource.data.elderUid == request.auth.uid && changes().hasOnly(['deviceStatus']))
+        // จับคู่: ต้องมีรหัสที่ยังไม่หมดอายุ และชี้มาที่ผู้สูงอายุคนนี้
+        || (resource.data.elderUid == null
+            && request.resource.data.elderUid == request.auth.uid
+            && changes().hasOnly(['elderUid', 'pairCode', 'pairedAt'])
+            && get(/databases/$(db)/documents/pairingCodes/$(request.resource.data.pairCode)).data.elderId == elderId
+            && get(/databases/$(db)/documents/pairingCodes/$(request.resource.data.pairCode)).data.expiresAt > request.time)
+      );
+      allow delete: if signedIn() && request.auth.uid in resource.data.caregivers;
+
+      match /medications/{id} {
+        allow read: if isCaregiverOf(elderId) || isDeviceOf(elderId);
+        allow write: if isCaregiverOf(elderId);
+      }
+      match /events/{id} {
+        allow read: if isCaregiverOf(elderId) || isDeviceOf(elderId);
+        allow create: if isCaregiverOf(elderId) || isDeviceOf(elderId);
+        allow update: if isCaregiverOf(elderId); // เช่น กด "จัดการแล้ว"
+      }
+    }
+
+    match /pairingCodes/{code} {
+      allow get: if signedIn();     // รู้รหัสถึงอ่านได้ (ห้าม list)
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid
+        && isCaregiverOf(request.resource.data.elderId);
+      allow delete: if signedIn() && resource.data.createdBy == request.auth.uid;
+    }
+
+    match /caregivers/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+  }
+}
