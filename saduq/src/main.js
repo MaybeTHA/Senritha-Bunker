@@ -12,16 +12,18 @@ import { openReminder } from './features/remind.js';
 import { avatar } from './features/common.js';
 import { needsOnboarding } from './features/onboard.js';
 import { addHubSamples } from './features/family.js';
+import { personView } from './features/people.js';
+import { productsView, productView } from './features/shop.js';
 
-globalThis.SABAII_VERSION = '1.3.0';
+globalThis.SABAII_VERSION = '2.0.0';
 const VIEWS = {
   home: ['หน้าหลัก', homeView], services: ['บริการ', servicesView], cat: ['บริการ', categoryView], svc: ['บริการ', serviceView],
-  activity: ['กิจกรรม', activityView], req: ['คำขอบริการ', requestView], notif: ['การแจ้งเตือน', notifView], subject: ['หมวดการเตือน', subjectView],
-  family: ['ครอบครัว', familyView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
+  activity: ['งานดูแล', activityView], req: ['เรื่องที่ติดตาม', requestView], notif: ['การแจ้งเตือน', notifView], subject: ['หมวดการเตือน', subjectView],
+  family: ['ทีมดูแล', familyView], person: ['ผู้รับการดูแล', personView], shop: ['สินค้าและอุปกรณ์', productsView], product: ['สินค้า', productView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
 };
 const ALIAS = { tasks: 'activity' }; // ลิงก์รุ่นนักเรียนเดิม
-const NAV_OF = { services: 'home', cat: 'home', svc: 'home', emergency: 'home', req: 'activity', notif: 'activity', subject: 'activity', family: 'me' };
-const NAV = [['home', 'home', 'หน้าหลัก'], ['activity', 'activity', 'กิจกรรม'], ['me', 'me', 'ฉัน']];
+const NAV_OF = { services: 'home', cat: 'home', svc: 'home', emergency: 'home', person: 'home', product: 'shop', req: 'activity', notif: 'activity', subject: 'activity', family: 'me' };
+const NAV = [['home', 'home', 'หน้าหลัก'], ['activity', 'activity', 'งานดูแล'], ['shop', 'bag', 'สินค้า'], ['me', 'me', 'ฉัน']];
 
 /** รับทั้ง #home และ #/home และ #svc/h-appt */
 export function route() {
@@ -72,13 +74,29 @@ async function boot() {
   render();
   // เปิดแอปครั้งแรก: เข้าหน้าหลักทันที พร้อมข้อมูลตัวอย่างกรอกไว้แล้ว (แก้/ลบได้ที่เมนู ฉัน)
   if (needsOnboarding()) {
-    await store.setPref('display_name', 'สมศรี', false); await store.setPref('name_sample', true, false);
-    await store.setPref('role', 'senior', false); await store.setPref('polite', 'ka', false);
-    await store.setPref('medinfo', { blood: 'O (ตัวอย่าง)', conditions: 'ความดันสูง เบาหวาน (ตัวอย่าง)', allergies: 'ไม่มี (ตัวอย่าง)', meds: 'ยาความดัน เช้า 1 เม็ด (ตัวอย่าง)', hospital: '', address: '' }, false);
+    await store.setPref('display_name', 'เมย์', false); await store.setPref('name_sample', true, false);
+    await store.setPref('polite', 'ka', false); await store.setPref('cg_v2', true, false);
     await store.setPref('hub_onboarded', true);
     await addHubSamples();
-  }
+  } else if (!store.state.prefs.cg_v2) await migrateToCaregiver(store);
   addEventListener('offline', () => toast('ออฟไลน์อยู่ — ใช้การเตือนและข้อมูลในเครื่องได้ตามปกติ'));
   globalThis.__sabaii = store;
+}
+/** รุ่น 1.x ผู้ใช้คือผู้สูงอายุเอง → รุ่น 2 ผู้ใช้คือผู้ดูแล: ย้ายข้อมูลการแพทย์ของ "ฉัน" ไปเป็นผู้รับการดูแล 1 คน */
+async function migrateToCaregiver(store) {
+  const p = store.state.prefs, hasR = store.state.family.some(m => m.role === 'senior');
+  const info = p.medinfo || {}, hasInfo = Object.values(info).some(v => String(v || '').trim());
+  if (p.name_sample) { // ข้อมูลตัวอย่างชุดเก่า → ชุดผู้ดูแล
+    await store.setPref('display_name', 'เมย์', false);
+    for (const m of store.state.family.filter(m => m.sample)) await store.removeMember(m.id);
+    for (const r of store.state.requests.filter(r => r.sample)) await store.removeRequest(r.id);
+    await store.removeSamples();
+    await addHubSamples();
+  } else if (!hasR && (p.role === 'senior' || hasInfo)) {
+    const m = await store.saveMember({ name: p.role === 'senior' && p.display_name ? p.display_name : 'ผู้สูงอายุที่ดูแล', relation: 'อื่น ๆ', role: 'senior', rights: 'ucs', mobility: 'walk', medinfo: info, perms: {} });
+    await store.setPref('cur_person', m.id, false);
+    if (p.role === 'senior') await store.setPref('display_name', '', false);
+  }
+  await store.setPref('cg_v2', true);
 }
 boot();

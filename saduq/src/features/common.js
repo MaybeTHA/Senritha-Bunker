@@ -9,7 +9,8 @@ import { fromYMD, DOW_SHORT, MONTH_SHORT } from '../domain/dates.js';
 export const tone = () => S().prefs.polite || 'none';
 export const P = () => ({ krub: 'ครับ', ka: 'ค่ะ' })[tone()] || '';
 export const PQ = () => ({ krub: 'ครับ', ka: 'คะ' })[tone()] || '';
-export const role = () => S().prefs.role === 'family' ? 'family' : 'senior';
+/** แอปนี้ใช้โดย "ผู้ดูแล" เสมอ — ผู้สูงอายุเป็นโปรไฟล์ผู้รับการดูแล ไม่ได้เป็นผู้ใช้ */
+export const role = () => 'family';
 export const myName = () => S().prefs.display_name || '';
 export function greeting() {
   const hr = new Date().getHours(), n = myName();
@@ -24,9 +25,18 @@ export function whoName(id) {
   if (!id || id === 'me') return myName() ? `${myName()} (ฉัน)` : 'ฉัน';
   return member(id)?.name || 'สมาชิกที่ถูกลบ';
 }
-/** คนที่รับบริการได้: ตัวฉัน + สมาชิกที่เป็นผู้สูงอายุ */
-export const careTargets = () => [{ id: 'me', name: whoName('me') }, ...members().filter(m => m.role === 'senior').map(m => ({ id: m.id, name: m.name }))];
-export const initial = s => (String(s || '?').trim()[0] || '?');
+/** ผู้รับการดูแล (ผู้สูงอายุ) · ทีมดูแล (คนช่วยดูแล) */
+export const recipients = () => members().filter(m => m.role === 'senior');
+export const team = () => members().filter(m => m.role !== 'senior');
+/** ผู้รับการดูแลที่กำลังดูอยู่ (เลือกได้ถ้ามีหลายคน) */
+export const curPerson = () => recipients().find(m => m.id === S().prefs.cur_person) || recipients()[0] || null;
+export const personName = id => member(id)?.name || '';
+/** คนที่งาน/เรื่องเป็นของ: ผู้รับการดูแลทุกคน (ไม่มีเลย = ตัวผู้ดูแลเอง) */
+export const careTargets = () => recipients().length ? recipients().map(m => ({ id: m.id, name: m.name })) : [{ id: 'me', name: whoName('me') }];
+/** งานของคนนี้: ผูกกับคนนี้ หรือไม่ได้ผูกกับใคร */
+export const forPerson = (t, id) => !t.for_id || t.for_id === id || !member(t.for_id);
+/** ตัวอักษรแรกที่อ่านเป็นชื่อได้: ข้ามคำนำหน้า (คุณ ป้า ลุง) และสระหน้า (เ แ โ ใ ไ) */
+export const initial = s => (String(s || '?').trim().replace(/^(คุณ|ป้า|ลุง|ยาย|ตา|พี่|น้อง)(?=.)/, '').replace(/^[เแโใไ]+/, '')[0] || '?');
 const AV = ['#0A6CF1', '#16A06A', '#E07A2E', '#7C4DFF', '#D9468F', '#0E8FA3'];
 export const avatarColor = id => AV[[...String(id)].reduce((a, c) => a + c.charCodeAt(0), 0) % AV.length];
 export const avatar = (id, name, cls = '') => h('span.avatar.av' + (id === 'me' ? '.grad' : '') + cls, { style: id === 'me' ? null : { background: avatarColor(id) }, 'aria-hidden': 'true' }, initial(name));

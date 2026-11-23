@@ -38,6 +38,7 @@ export function makeTask(input, nowISO = new Date().toISOString()) {
     status: STATUS[input.status] ? input.status : 'todo',
     est_min: Number.isFinite(input.est_min) ? input.est_min : null,
     source: input.source || 'manual',
+    for_id: input.for_id || null, // ผู้รับการดูแลที่งานนี้เป็นของ (null = ทุกคน/ไม่ระบุ)
     created_at: nowISO,
     updated_at: nowISO,
     completed_at: null,

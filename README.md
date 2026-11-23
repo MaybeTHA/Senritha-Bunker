@@ -17,4 +17,4 @@ Each project lives in its own folder. Keep a project's files inside its folder.
 | [`senritha-perf/`](senritha-perf/) | Senritha's Test performance: WebGL2 graphics benchmark |
 | [`senritha-clips/`](senritha-clips/) | Senritha's Random Clips: long screen-recording sessions that save short clips at random moments |
 | [`steelforge-requiem/`](steelforge-requiem/) | Steelforge Requiem: top-down tank battle game (Frontline, duel, capture, Infinity) |
-| [`saduq/`](saduq/) | Saduq: all-in-one hub for seniors and families (health, daily help, family care, benefits, emergency), Thai |
+| [`saduq/`](saduq/) | Saduq: assistant for people who care for older adults (care schedule, health log, real benefits and products with sources), Thai |
