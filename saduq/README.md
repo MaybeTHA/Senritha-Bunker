@@ -9,6 +9,11 @@
 - `build.py` — รวมทุกอย่างเป็น `dist/index.html` หน้าเดียว
 - `dist/` — ไฟล์พร้อม deploy (เช่น Vercel: ตั้ง Output Directory = `saduq/dist`)
 
+## เปิดเป็นเว็บแอป (GitHub Pages)
+1. merge PR เข้า `main`
+2. GitHub → repo → **Settings → Pages** → Source: **Deploy from a branch** → Branch: **main** / **(root)** → Save
+3. รอ 1–2 นาที แล้วเปิด https://maybetha.github.io/Senritha-Bunker/saduq/
+
 ## Build
 ```bash
 python3 build.py

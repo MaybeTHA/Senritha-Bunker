@@ -1,4 +1,4 @@
-"""Build Saduq into one HTML page: dist/index.html (+ dist/assets/photos).
+"""Build Saduq into one HTML page: dist/index.html (+ dist/assets/photos) and index.html (for GitHub Pages).
 Usage (from this folder):  python3 build.py      needs Node (npx esbuild)"""
 import subprocess, sys, os, shutil, base64
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -39,5 +39,7 @@ html = f'''<!doctype html>
 </html>
 '''
 open('dist/index.html', 'w', encoding='utf8').write(html)
+# สำเนาที่ saduq/index.html สำหรับ GitHub Pages (ใช้ assets/photos ในโฟลเดอร์นี้) → https://<user>.github.io/<repo>/saduq/
+open('index.html', 'w', encoding='utf8').write(html)
 shutil.copytree('assets/photos', 'dist/assets/photos', dirs_exist_ok=True)
 print('dist/index.html', len(html), 'bytes')
