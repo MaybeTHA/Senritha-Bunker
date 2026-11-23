@@ -6,16 +6,20 @@ import { app, S, ranked, dueLine } from './shared.js';
 import { addTask } from './add.js';
 import { openReminder } from './remind.js';
 import { requestForm, familyAsk, shopModal, reqRow } from './care.js';
+import { statusPill } from './common.js';
 import { greeting, P, PQ, role, myName, thaiDay, ago, whoName, pageHead, secHead, catCard, svcRow, recCard, myReviews, avgStars, callBox, mapsUrl, demoTag, go, avatar } from './common.js';
 import { isActiveReq } from '../domain/catalog.js';
 import { photoOf } from '../domain/photos.js';
+import { hasMarket, marketStats, baht } from '../domain/providers.js';
+import { marketView } from './market.js';
+import { members } from './common.js';
 
 const DOWL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'], MON = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 const hs = { q: '', cat: 'health' };
 const MARK = '__MARK__';
 
 /* ================= หน้าหลัก (เว็บแอป: ฮีโร่ + ค้นหา · แท็บหมวด + ไทล์ · แบนเนอร์ · ทำไมต้อง Saduq) ================= */
-const TYPED = ['นัดหมอ', 'หาผู้ดูแล', 'เตือนกินยา', 'ขอรถรับส่ง', 'เช็กสิทธิผู้สูงอายุ'];
+const TYPED = ['สั่งอาหารอ่อนให้คุณแม่', 'หาผู้ดูแลรายวัน', 'จองรถพาไปหาหมอ', 'นัดตรวจสุขภาพ', 'หาช่างติดราวจับ'];
 let typeTimer = 0;
 function typedLine() {
   const out = h('span.tw'), wrap = h('span.typed', { 'aria-hidden': 'true' }, out, h('i.caret'));
@@ -32,7 +36,7 @@ function typedLine() {
 }
 export function homeView(root, keepFocus = false) {
   const d = new Date(), unread = S().notices.filter(n => !n.read).length;
-  const input = h('input', { id: 'hub-q', type: 'search', value: hs.q, autocomplete: 'off', placeholder: 'ค้นหาบริการที่คุณต้องการ เช่น หมอ รถรับส่ง', 'aria-label': 'ค้นหาบริการ',
+  const input = h('input', { id: 'hub-q', type: 'search', value: hs.q, autocomplete: 'off', placeholder: 'ค้นหาบริการ เช่น อาหารอ่อน ผู้ดูแล รถรับส่ง', 'aria-label': 'ค้นหาบริการ',
     oninput: e => { hs.q = e.target.value; homeView(root, true); } });
   const keepTyped = keepFocus && root.querySelector('.typed');
   put(root,
@@ -42,12 +46,13 @@ export function homeView(root, keepFocus = false) {
       h('a.mebtn', { href: '#me', 'aria-label': 'หน้าฉัน' }, avatar('me', myName() || 'ฉ'))),
     h('section.hero',
       h('p.hgreet', greeting(), h('span.hg-date', ` · ${DOWL[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`)),
-      h('h1.htitle', h('span.sr', `วันนี้อยากให้เราช่วยอะไรดี${PQ()}`), h('span', { 'aria-hidden': 'true' }, 'ให้เราช่วย..'), keepTyped || typedLine()),
+      h('h1.htitle', h('span.sr', `วันนี้อยากให้เราช่วยอะไรดี${PQ()}`), h('span', { 'aria-hidden': 'true' }, role() === 'family' ? 'ดูแลคนที่คุณรัก ให้เราช่วย..' : 'ให้เราช่วย..'), keepTyped || typedLine()),
       h('label.hsearch.big', h('span', { html: ic('search') }), input, hs.q ? h('button.clr', { type: 'button', onclick: () => { hs.q = ''; homeView(root); }, 'aria-label': 'ล้างคำค้น' }, 'ล้าง') : ''),
       h('div.popular', { role: 'group', 'aria-label': 'คำค้นยอดนิยม' }, h('span', 'ค้นหาบ่อย'),
         POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k)))),
     hs.q.trim() ? h('div.panel', searchResults(hs.q)) : [
       catPanel(root),
+      caredFor(),
       banner(),
       whySabaii(),
       h('div.homecols',
@@ -67,8 +72,20 @@ function catPanel(root) {
   return h('section.panel.catpanel',
     h('div.ctabwrap', tabs),
     h('div.tiles2', { role: 'tabpanel', 'aria-label': c.name }, list.map(s => h('a.ptile' + (photoOf(s) ? '.photo' : ''), { href: '#svc/' + s.id, style: { '--ci': c.ink, '--ct': c.tint, backgroundImage: photoOf(s) ? `url("${photoOf(s).src}")` : null } },
-      h('span.pt-art', { html: ic(s.icon) }), h('b', s.name), h('small', s.provider?.phone ? `โทร ${s.provider.phone}` : s.short)))),
+      h('span.pt-art', { html: ic(s.icon) }), marketStats(s.id) ? h('span.pt-badge', `${marketStats(s.id).count} เจ้า · ★ ${marketStats(s.id).rating.toFixed(1)}`) : '', h('b', s.name), h('small', s.provider?.phone ? `โทร ${s.provider.phone}` : marketStats(s.id) ? `เริ่มต้น ${baht(marketStats(s.id).min)} ${marketStats(s.id).unit}` : s.short)))),
     h('div.panelfoot', h('span', c.sub), h('a.morearrow', { href: cur === 'emergency' ? '#emergency' : '#cat/' + cur }, 'ดูเพิ่มเติม', h('span', { html: ic('arrow') }))));
+}
+
+/** ผู้ที่คุณดูแล (มุมผู้ดูแล): การ์ดต่อคน · คำขอที่กำลังดำเนินการ · ทางลัดสั่งของ/จองบริการให้คนนั้น */
+function caredFor() {
+  const sr = members().filter(m => m.role === 'senior');
+  const quick = [['l-meal', 'bowl', 'สั่งอาหาร'], ['l-care', 'hand', 'หาผู้ดูแล'], ['l-ride', 'car', 'จองรถ'], ['h-appt', 'steth', 'นัดหมอ']];
+  return h('section.cared', secHead(role() === 'family' ? 'ผู้ที่คุณดูแล' : 'ครอบครัวของคุณ', ['จัดการ', 'family']),
+    sr.length ? h('div.crow', sr.map(m => { const act = S().requests.filter(r => r.for_id === m.id && isActiveReq(r));
+      return h('article.ccard', h('div.cc-top', avatar(m.id, m.name), h('div', h('b', m.name), h('small', [m.relation, act.length ? `กำลังดำเนินการ ${act.length} รายการ` : 'ไม่มีรายการค้าง'].filter(Boolean).join(' · ')))),
+        act.length ? h('div.cc-act', act.slice(0, 2).map(r => h('a', { href: '#req/' + r.id }, statusPill(r.status, r), ' ', r.title.split(' · ').pop()))) : '',
+        h('div.cc-quick', quick.map(([sid, i, t]) => h('a', { href: '#svc/' + sid, html: ic(i) + `<span>${t}</span>` })))); }))
+      : h('div.emptybox.fam', h('span.eb-ic', { html: ic('users') }), h('div', h('b', 'เพิ่มคนที่คุณดูแล'), h('p', 'เช่น คุณแม่ คุณพ่อ เพื่อสั่งของและจองบริการให้แต่ละคน')), h('a.btn.primary.sm', { href: '#family' }, 'เพิ่ม')));
 }
 
 /** แบนเนอร์: ข้อมูลจริงที่ควรรู้ (ไม่ใช่โปรโมชั่น) */
@@ -81,17 +98,17 @@ function banner() {
 
 /** ทำไมต้องใช้ Saduq? — หัวข้อใหญ่ + 3 คอลัมน์ (บอกเฉพาะที่จริง) */
 function whySabaii() {
-  const pts = [['users', 'ครอบครัวเห็นตรงกัน', 'เพิ่มลูกหลานหรือผู้ดูแล แล้วเลือกเองว่าแต่ละคนเห็นอะไร'], ['shield', 'ข้อมูลจริง ไม่แต่งเติม', 'เบอร์สายด่วนจากหน่วยงานรัฐ ไม่มีรีวิวหรือราคาที่แต่งขึ้น'], ['lock', 'ข้อมูลอยู่ในเครื่องคุณ', 'นัดหมอ ยา และข้อมูลการแพทย์ เก็บในเครื่องนี้เท่านั้น']];
-  return h('section.why', h('p.eyebrow', 'ทำไมถึงต้องใช้ Saduq?'), h('h2.whyh', 'รวมทุกเรื่องของผู้สูงอายุไว้ที่เดียว ตั้งแต่สุขภาพ งานบ้าน จนถึงสิทธิรัฐ'),
+  const pts = [['grid', 'บริการผู้สูงอายุทั่วประเทศในที่เดียว', 'อาหาร ผู้ดูแล รถรับส่ง หมอ ช่าง และของใช้ จากหลายเจ้าในทุกภาค'], ['star', 'เทียบก่อนเลือก', 'ดูคะแนน รีวิวจากลูกหลานคนอื่น ราคา และแพ็กเกจ เทียบกันได้ทีละ 3 เจ้า'], ['users', 'ดูแลได้แม้อยู่ไกล', 'สั่งให้คุณพ่อคุณแม่จากที่ทำงาน ติดตามสถานะ และแชร์ให้พี่น้องรู้']];
+  return h('section.why', h('p.eyebrow', 'ทำไมถึงต้องใช้ Saduq?'), h('h2.whyh', 'ตลาดบริการสำหรับลูกหลานและผู้ดูแล ครบทุกเรื่องของคนที่คุณรัก'),
     h('div.why3', pts.map(([i, t, d]) => h('div.wy', h('span.wy-ic', { html: ic(i) }), h('b', t), h('p', d)))),
     howItWorks());
 }
 
-const POPULAR = ['เตือนกินยา', 'นัดหมอ', 'รถรับส่ง', 'ผู้ดูแล', 'เบี้ยยังชีพ', '1669'];
+const POPULAR = ['อาหารอ่อน', 'ผู้ดูแล', 'รถรับส่ง', 'แม่บ้าน', 'นัดหมอ', 'เบี้ยยังชีพ'];
 
 /** ใช้งานอย่างไร — 3 ขั้น (แบบตลาดบริการ) */
 function howItWorks() {
-  const steps = [['search', 'ค้นหาบริการ', 'เลือกหมวด หรือพิมพ์สิ่งที่ต้องการ'], ['clip', 'ส่งคำขอหรือตั้งเตือน', 'เลือกวันที่สะดวก บอกรายละเอียดสั้น ๆ'], ['activity', 'ติดตามและรีวิว', 'ดูสถานะที่เมนู กิจกรรม แล้วรีวิวเมื่อเสร็จ']];
+  const steps = [['search', 'เลือกบริการ', 'เลือกหมวด หรือพิมพ์สิ่งที่ต้องการ'], ['star', 'เทียบแล้วเลือกเจ้า', 'ดูคะแนน รีวิว ราคา แล้วกดสั่งหรือจอง'], ['activity', 'ติดตามและรีวิว', 'ดูสถานะที่เมนู กิจกรรม แล้วรีวิวเมื่อเสร็จ']];
   return h('section.howsec', h('h3.howh', 'ใช้งานง่ายใน 3 ขั้น'),
     h('ol.how', steps.map(([i, t, d], n) => h('li', h('span.how-ic', { html: ic(i) }), h('div', h('small', `ขั้นที่ ${n + 1}`), h('b', t), h('p', d))))));
 }
@@ -178,7 +195,7 @@ export function categoryView(root, id) {
     h('div.cathero', { style: { '--ct': c.tint, '--ci': c.ink } }, h('span.cc-ic.xl', { html: ic(c.icon) }),
       h('p', id === 'benefits' ? 'ข้อมูลทั่วไปจากหน่วยงานรัฐ หลักเกณฑ์อาจเปลี่ยน โปรดตรวจสอบกับหน่วยงานก่อนเสมอ'
         : id === 'emergency' ? 'เหตุฉุกเฉินทางการแพทย์ โทร 1669 ฟรี 24 ชั่วโมง'
-        : 'บริการที่ติดป้าย "ยังไม่มีผู้ให้บริการ" ส่งคำขอได้ในโหมดตัวอย่าง เพื่อจดความต้องการและติดตามเอง')),
+        : 'เลือกบริการ แล้วเทียบเจ้าที่ให้บริการจากคะแนน รีวิว และราคา')),
     h('div.svclist', svcsIn(id).map(svcRow)));
 }
 
@@ -187,6 +204,7 @@ const CTA = { request: 'ส่งคำขอบริการ', reminder: 'ต
 export function serviceView(root, id) {
   const s = svcOf(id);
   if (!s) return servicesView(root);
+  if (hasMarket(s.id)) return marketView(root, s);
   const c = catOf(s.cat), revs = myReviews(s.id), mine = S().requests.filter(r => r.service_id === s.id);
   const prov = s.provider
     ? h('div.provcard', h('span.pv-ic', { html: ic('landmark') }), h('div', h('b', s.provider.name), h('small', s.provider.public ? 'หน่วยงานรัฐ / สายด่วนทางการ' : '')))
@@ -194,7 +212,7 @@ export function serviceView(root, id) {
     : h('div.provcard.none', h('span.pv-ic', { html: ic('info') }), h('div', h('b', 'ยังไม่มีผู้ให้บริการในแอป'), h('small', 'ส่งคำขอได้ แอปจะบันทึกไว้ให้ติดตามเอง แต่ยังไม่ส่งถึงผู้ให้บริการ')));
   const act = () => runAction(s);
   put(root, pageHead(s.name, { back: 'cat/' + s.cat }),
-    photoOf(s) ? h('figure.svcphoto', h('img', { src: photoOf(s).src, alt: '', loading: 'lazy' }), h('figcaption', `ภาพประกอบ: ${photoOf(s).artist || 'Wikimedia Commons'} · ${photoOf(s).license}`)) : '',
+    photoOf(s) ? h('figure.svcphoto', h('img', { src: photoOf(s).src, alt: '', loading: 'lazy' }), photoOf(s).own ? '' : h('figcaption', `ภาพประกอบ: ${photoOf(s).artist || 'Wikimedia Commons'} · ${photoOf(s).license}`)) : '',
     h('div.svchero', { style: { '--ct': c.tint, '--ci': c.ink } },
       h('span.cc-ic.xl', { html: ic(s.icon) }),
       h('div', h('a.chipcat', { href: '#cat/' + c.id }, c.short), h('p.lead', s.short))),

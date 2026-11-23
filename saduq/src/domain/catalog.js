@@ -138,8 +138,8 @@ export function searchCatalog(q) {
 /** บริการแนะนำ: ตามบทบาท + สิ่งที่ยังไม่ได้ทำ (เช่น ยังไม่ตั้งเตือนยา ยังไม่เพิ่มครอบครัว) */
 export function recommendFor({ role = 'senior', hasMed = false, hasFamily = false } = {}) {
   const ids = role === 'family'
-    ? ['f-ask', 'l-care', 'l-ride', 'h-appt', 'b-tax', 's-mobility']
-    : ['h-med', 'h-appt', 'l-ride', 'b-allowance', 'c-club', 'l-care'];
+    ? ['l-meal', 'l-care', 'l-ride', 'h-appt', 's-daily', 'l-house', 'b-tax']
+    : ['l-meal', 'h-med', 'h-appt', 'l-ride', 'b-allowance', 'c-events'];
   return ids.filter(id => !(id === 'h-med' && hasMed) && !(id === 'f-members' && hasFamily)).map(svcOf);
 }
 
@@ -158,7 +158,7 @@ export const isActiveReq = r => r.status !== 'done' && r.status !== 'cancelled';
 /** ช่วงเวลาที่สะดวก (คนสูงวัยเลือกช่วงง่ายกว่าพิมพ์เวลา) */
 export const SLOTS = { morning: 'ช่วงเช้า (8–12 น.)', afternoon: 'ช่วงบ่าย (13–16 น.)', evening: 'ช่วงเย็น (16–19 น.)' };
 
-export const RELATIONS = ['ลูก', 'หลาน', 'คู่สมรส', 'พี่น้อง', 'ผู้ดูแล', 'เพื่อนบ้าน', 'อื่น ๆ'];
+export const RELATIONS = ['แม่', 'พ่อ', 'ยาย/ย่า', 'ตา/ปู่', 'ลูก', 'หลาน', 'คู่สมรส', 'พี่น้อง', 'ผู้ดูแล', 'อื่น ๆ'];
 export const PERMS = {
   appts: 'เห็นนัดหมายและการเตือน',
   requests: 'เห็นคำขอบริการ',

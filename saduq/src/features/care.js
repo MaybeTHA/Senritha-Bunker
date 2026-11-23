@@ -1,5 +1,6 @@
 // คำขอบริการ (ส่ง → ติดตาม → รีวิว) · ขอให้ครอบครัวช่วย · รายการซื้อ · หน้ากิจกรรมของฉัน · หน้าแจ้งเตือน
 import { h, ic, put, toast, openModal, closeModal, confirmBox } from '../ui/kit.js';
+import { providerOf, stepsOf, baht } from '../domain/providers.js';
 import { svcOf, catOf, REQ_STEPS, REQ_LABEL, SLOTS, stepIndex, nextStatus, isActiveReq } from '../domain/catalog.js';
 import { app, S, today } from './shared.js';
 import { dayChips } from './add.js';
@@ -80,7 +81,7 @@ export function reqRow(r) {
   const c = catOf(r.cat) || catOf('living');
   return h('a.actrow', { href: '#req/' + r.id, style: { '--ct': c.tint, '--ci': c.ink } },
     h('span.ar-ic.req', { html: ic(svcOf(r.service_id)?.icon || 'clip') }),
-    h('span.ar-tx', h('b', r.title), h('small', statusPill(r.status), ' ', [thaiDay(r.date), r.assignee_id ? 'ขอ ' + whoName(r.assignee_id) : ''].filter(Boolean).join(' · '), r.demo ? demoTag() : '')),
+    h('span.ar-tx', h('b', r.title), h('small', statusPill(r.status, r), ' ', [r.price ? baht(r.price) : '', 'ให้ ' + whoName(r.for_id).replace(' (ฉัน)', ''), thaiDay(r.date), r.assignee_id ? 'ขอ ' + whoName(r.assignee_id) : ''].filter(Boolean).join(' · '))),
     h('span.sr-go', { html: ic('right') }));
 }
 
@@ -90,26 +91,28 @@ export function requestView(root, id) {
   if (!r) { put(root, pageHead('ไม่พบคำขอ', { back: 'activity' }), h('p.muted', 'คำขอนี้อาจถูกลบไปแล้ว')); return; }
   const s = svcOf(r.service_id), si = stepIndex(r.status), nx = nextStatus(r.status), fam = r.assignee_id;
   put(root, pageHead(r.title, { back: 'activity', sub: s ? s.name : '' }),
-    r.demo ? h('p.demo-note', h('span', { html: ic('info') }), fam ? `บันทึกในเครื่องนี้ ยังไม่ได้ส่งถึง ${whoName(fam)} — โทรบอกด้วยตัวเอง` : 'ยังไม่มีผู้ให้บริการรับเรื่อง เมื่อมีความคืบหน้า กดอัปเดตสถานะด้านล่างเอง') : '',
-    h('section.statusbox', h('div.sb-top', statusPill(r.status), h('small', `อัปเดต ${ago(r.updated_at)}`)),
-      r.status === 'cancelled' ? '' : h('ol.stepper', REQ_STEPS.map(([k, v], i) => h('li' + (i < si ? '.done' : i === si ? '.now' : ''), h('i', i < si ? h('span', { html: ic('check') }) : String(i + 1)), h('span', fam && k === 'confirmed' ? 'รับเรื่องแล้ว' : v))))),
+    r.provider_id ? '' : r.demo ? h('p.demo-note', h('span', { html: ic('info') }), fam ? `บันทึกในเครื่องนี้ ยังไม่ได้ส่งถึง ${whoName(fam)} — โทรบอกด้วยตัวเอง` : 'ยังไม่มีผู้ให้บริการรับเรื่อง เมื่อมีความคืบหน้า กดอัปเดตสถานะด้านล่างเอง') : '',
+    h('section.statusbox', h('div.sb-top', statusPill(r.status, r), h('small', `อัปเดต ${ago(r.updated_at)}`)),
+      r.status === 'cancelled' ? '' : h('ol.stepper', REQ_STEPS.map(([k, v], i) => h('li' + (i < si ? '.done' : i === si || (i === si && k === 'done') ? '.now' : ''), h('i', i < si || (k === 'done' && si === 3) ? h('span', { html: ic('check') }) : String(i + 1)), h('span', stepsOf(r)?.[i] || (fam && k === 'confirmed' ? 'รับเรื่องแล้ว' : v)))))),
     h('dl.facts',
       h('div', h('dt', 'สำหรับ'), h('dd', whoName(r.for_id))),
       h('div', h('dt', 'ขอโดย'), h('dd', whoName(r.by_id))),
-      fam ? h('div', h('dt', 'ผู้รับเรื่อง'), h('dd', whoName(fam))) : h('div', h('dt', 'ผู้ให้บริการ'), h('dd', s?.provider?.name || 'ยังไม่มีในระบบ')),
-      h('div', h('dt', 'วันที่'), h('dd', `${thaiDay(r.date)} · ${SLOTS[r.slot] || ''}`)),
+      fam ? h('div', h('dt', 'ผู้รับเรื่อง'), h('dd', whoName(fam))) : h('div', h('dt', 'ผู้ให้บริการ'), h('dd', r.provider_id ? h('a', { href: '#prov/' + r.provider_id }, whoName(r.provider_id)) : s?.provider?.name || 'ยังไม่มีในระบบ')),
+      r.pkg ? h('div', h('dt', 'แพ็กเกจ'), h('dd', `${r.pkg} · ${baht(r.price)}`)) : '',
+      h('div', h('dt', 'วันที่'), h('dd', [thaiDay(r.date), SLOTS[r.slot]].filter(Boolean).join(' · '))),
+      r.addr ? h('div', h('dt', 'ที่อยู่'), h('dd', r.addr)) : '',
       r.phone ? h('div', h('dt', 'เบอร์ติดต่อกลับ'), h('dd', r.phone)) : '',
       r.note ? h('div', h('dt', 'รายละเอียด'), h('dd', r.note)) : ''),
     fam && S().family.find(m => m.id === fam)?.phone ? h('a.btn.ghost.full', { href: 'tel:' + S().family.find(m => m.id === fam).phone, html: ic('phone') + `<span>โทรหา ${whoName(fam)} ${S().family.find(m => m.id === fam).phone}</span>` }) : '',
     r.status === 'done' ? reviewBox(r) : '',
     isActiveReq(r) ? h('div.reqacts',
-      nx ? h('button.btn.primary', { onclick: async () => { await app.store.patchRequest(r.id, { status: nx }, `${r.title}: ${REQ_LABEL[nx]}`); toast(`อัปเดตเป็น "${REQ_LABEL[nx]}" แล้ว`); } },
+      nx && !r.auto ? h('button.btn.primary', { onclick: async () => { await app.store.patchRequest(r.id, { status: nx }, `${r.title}: ${REQ_LABEL[nx]}`); toast(`อัปเดตเป็น "${REQ_LABEL[nx]}" แล้ว`); } },
         `อัปเดตสถานะเป็น: ${fam && nx === 'confirmed' ? 'รับเรื่องแล้ว' : REQ_LABEL[nx]}`) : '',
       h('button.btn.danger', { onclick: async () => {
         if (!await confirmBox({ title: `ยกเลิกคำขอ "${r.title}"?`, body: 'ยกเลิกแล้วต้องส่งคำขอใหม่ถ้าต้องการอีกครั้ง', ok: 'ยกเลิกคำขอ', cancel: 'เก็บไว้', danger: true })) return;
         await app.store.patchRequest(r.id, { status: 'cancelled' }, `ยกเลิก: ${r.title}`); toast('ยกเลิกคำขอแล้ว');
       } }, 'ยกเลิกคำขอ')) : '',
-    h('section.dsec', h('h2', 'ประวัติ'), h('ul.timeline', [...(r.history || [])].reverse().map(x => h('li', h('b', REQ_LABEL[x.status] || x.status), h('small', `${whoName(x.by)} · ${ago(x.at)}`))))),
+    h('section.dsec', h('h2', 'ประวัติ'), h('ul.timeline', [...(r.history || [])].reverse().map(x => h('li', h('b', (stepsOf(r)?.[REQ_STEPS.findIndex(([k]) => k === x.status)]) || REQ_LABEL[x.status] || x.status), h('small', `${whoName(x.by)} · ${ago(x.at)}`))))),
     !isActiveReq(r) ? h('button.linkbtn', { onclick: async () => { if (await confirmBox({ title: 'ลบคำขอนี้ออกจากเครื่อง?', ok: 'ลบ', danger: true })) { await app.store.removeRequest(r.id); go('activity'); } } }, 'ลบคำขอนี้') : '');
 }
 

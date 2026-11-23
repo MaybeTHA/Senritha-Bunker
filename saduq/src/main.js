@@ -10,17 +10,18 @@ import { familyView, emergencyView, profileView, applyScale } from './features/f
 import { subjectView } from './features/tasks.js';
 import { openReminder } from './features/remind.js';
 import { avatar } from './features/common.js';
+import { providerView, compareView, startOrderSim } from './features/market.js';
 import { needsOnboarding } from './features/onboard.js';
-import { addHubSamples } from './features/family.js';
+import { seedCaregiver } from './features/family.js';
 
-globalThis.SABAII_VERSION = '1.3.0';
+globalThis.SABAII_VERSION = '1.4.1';
 const VIEWS = {
   home: ['หน้าหลัก', homeView], services: ['บริการ', servicesView], cat: ['บริการ', categoryView], svc: ['บริการ', serviceView],
   activity: ['กิจกรรม', activityView], req: ['คำขอบริการ', requestView], notif: ['การแจ้งเตือน', notifView], subject: ['หมวดการเตือน', subjectView],
-  family: ['ครอบครัว', familyView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
+  family: ['ครอบครัว', familyView], prov: ['ผู้ให้บริการ', providerView], compare: ['เปรียบเทียบ', compareView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
 };
 const ALIAS = { tasks: 'activity' }; // ลิงก์รุ่นนักเรียนเดิม
-const NAV_OF = { services: 'home', cat: 'home', svc: 'home', emergency: 'home', req: 'activity', notif: 'activity', subject: 'activity', family: 'me' };
+const NAV_OF = { services: 'home', cat: 'home', svc: 'home', prov: 'home', compare: 'home', emergency: 'home', req: 'activity', notif: 'activity', subject: 'activity', family: 'me' };
 const NAV = [['home', 'home', 'หน้าหลัก'], ['activity', 'activity', 'กิจกรรม'], ['me', 'me', 'ฉัน']];
 
 /** รับทั้ง #home และ #/home และ #svc/h-appt */
@@ -70,14 +71,10 @@ async function boot() {
   store.subscribe(() => { gcUrls(); app.refresh(); });
   addEventListener('hashchange', render);
   render();
-  // เปิดแอปครั้งแรก: เข้าหน้าหลักทันที พร้อมข้อมูลตัวอย่างกรอกไว้แล้ว (แก้/ลบได้ที่เมนู ฉัน)
-  if (needsOnboarding()) {
-    await store.setPref('display_name', 'สมศรี', false); await store.setPref('name_sample', true, false);
-    await store.setPref('role', 'senior', false); await store.setPref('polite', 'ka', false);
-    await store.setPref('medinfo', { blood: 'O (ตัวอย่าง)', conditions: 'ความดันสูง เบาหวาน (ตัวอย่าง)', allergies: 'ไม่มี (ตัวอย่าง)', meds: 'ยาความดัน เช้า 1 เม็ด (ตัวอย่าง)', hospital: '', address: '' }, false);
-    await store.setPref('hub_onboarded', true);
-    await addHubSamples();
-  }
+  // เปิดแอปครั้งแรก: เข้าหน้าหลักทันที พร้อมข้อมูลตัวอย่างมุมผู้ดูแล (แก้/ลบได้ที่เมนู ฉัน)
+  // รุ่นก่อนที่ยังใช้ข้อมูลตัวอย่างเดิม (ไม่ได้แก้ชื่อเอง) → เปลี่ยนเป็นชุดใหม่ให้
+  if (needsOnboarding() || (store.state.prefs.name_sample && !store.state.prefs.seed_v2)) await seedCaregiver();
+  startOrderSim();
   addEventListener('offline', () => toast('ออฟไลน์อยู่ — ใช้การเตือนและข้อมูลในเครื่องได้ตามปกติ'));
   globalThis.__sabaii = store;
 }
