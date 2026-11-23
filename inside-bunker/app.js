@@ -28,7 +28,7 @@ const APPS=[
   {id:'perf',href:'senritha-perf/',name:"Senritha's Test Performance",desc:'WebGL2 graphics benchmark: GPU, CPU and frame pacing, measured.',cat:'System'},
   {id:'clips',href:'senritha-clips/',name:"Senritha's Random Clips",desc:'Long screen-recording sessions that save short clips at random moments. Every timing is yours to set.',cat:'Productivity'},
   {id:'steelforge',href:'steelforge-requiem/',name:'Steelforge Requiem',desc:'Top-down tank battles: Frontline, duels, capture, and endless waves. Build your tank part by part. PC and phone.',cat:'Games'},
-  {id:'saduq',href:'saduq/',name:'Saduq',desc:'All-in-one hub for seniors and families: health, daily help, family care, government benefits and emergency. Thai.',cat:'Health & Care'},
+  {id:'saduq',href:'saduq/',name:'Saduq',desc:'Assistant for caregivers of older adults: care schedule, health log, real government benefits and products with sources. Thai.',cat:'Health & Care'},
 ];
 const byId=Object.fromEntries(APPS.map(a=>[a.id,a]));
 const slug=c=>c.toLowerCase().replace(/[^a-z0-9]+/g,'-');

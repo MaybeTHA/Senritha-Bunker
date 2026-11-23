@@ -1,8 +1,7 @@
-// ตลาดบริการ: เลือกเจ้า (เรียง/กรองจังหวัด) · หน้าร้าน (แพ็กเกจ · รีวิว) · เปรียบเทียบสูงสุด 3 เจ้า · สั่ง/จอง → ติดตามสถานะ
+// ตลาดบริการตัวอย่าง (ข้อมูลจำลอง แยกจากแค็ตตาล็อกจริง): เลือกเจ้า (เรียง/กรองจังหวัด) · หน้าร้าน (แพ็กเกจ · รีวิว) · เปรียบเทียบสูงสุด 3 เจ้า · สั่ง/จอง → ติดตามสถานะ
 import { h, ic, put, toast, openModal } from '../ui/kit.js';
-import { svcOf, catOf, SLOTS } from '../domain/catalog.js';
-import { providersOf, providerOf, packagesOf, reviewsOf, breakdown, kindOf, baht, MARKET } from '../domain/providers.js';
-import { photoOf } from '../domain/photos.js';
+import { SLOTS } from '../domain/catalog.js';
+import { providersOf, providerOf, packagesOf, reviewsOf, breakdown, kindOf, baht, MARKET, demoSvc, demoSvcs, DEMO_GROUPS, marketStats } from '../domain/providers.js';
 import { app, S } from './shared.js';
 import { dayChips } from './add.js';
 import { P, careTargets, pageHead, avatarColor, goAfterModal } from './common.js';
@@ -30,9 +29,9 @@ const cmpBar = () => ms.cmp.length ? h('div.cmpbar', { role: 'region', 'aria-lab
 
 /** การ์ดเจ้า: รูป · ชื่อ · คะแนน · รีวิว · พื้นที่ · จุดเด่น · ราคาเริ่มต้น · เวลา · ปุ่มดูร้าน/เทียบ */
 export function provCard(p, rerender) {
-  const s = svcOf(p.sid);
+  const s = demoSvc(p.sid);
   return h('article.pcard',
-    h('a.pc-img', { href: '#prov/' + p.id, style: { backgroundImage: photoOf(s) ? `url("${photoOf(s).src}")` : null }, 'aria-label': `ดูร้าน ${p.name}` }, h('span.pc-eta', p.eta)),
+    h('a.pc-img', { href: '#prov/' + p.id, style: { backgroundImage: `url("${s.photo}")` }, 'aria-label': `ดูร้าน ${p.name}` }, h('span.pc-eta', p.eta)),
     h('div.pc-body',
       h('div.pc-top', pAvatar(p), h('div', h('a.pc-name', { href: '#prov/' + p.id }, p.name), h('small', p.area))),
       h('div.pc-rate', stars(p.rating), h('b', p.rating.toFixed(1)), h('small', `(${p.reviews.toLocaleString('th-TH')} รีวิว)`)),
@@ -43,15 +42,16 @@ export function provCard(p, rerender) {
 }
 
 /* ================= เลือกเจ้า (หน้าบริการที่มีตลาด) ================= */
-export function marketView(root, s) {
-  const c = catOf(s.cat), all = providersOf(s.id);
+export function marketView(root, sid) {
+  const s = demoSvc(sid); if (!s) return demoView(root);
+  const all = providersOf(s.id);
   const provs = [...new Set(all.map(p => p.province))];
   if (ms.prov && !provs.includes(ms.prov)) ms.prov = '';
   const list = sorted(all.filter(p => !ms.prov || p.province === ms.prov));
-  const re = () => marketView(root, s);
-  put(root, pageHead(s.name, { back: 'cat/' + s.cat, sub: `${all.length} เจ้าให้เลือก · ${s.short}` }),
-    photoOf(s) ? h('div.mkhero', { style: { backgroundImage: `url("${photoOf(s).src}")`, '--ci': c.ink } },
-      h('div', h('a.chipcat', { href: '#cat/' + c.id }, c.short), h('p', s.desc))) : '',
+  const re = () => marketView(root, sid);
+  put(root, pageHead(s.name, { back: 'demo', sub: `${all.length} เจ้าให้เลือก · ${s.short}` }),
+    h('div.mkhero', { style: { backgroundImage: `url("${s.photo}")`, '--ci': s.ink } },
+      h('div', h('a.chipcat', { href: '#demo' }, `ตลาดตัวอย่าง · ${s.groupName}`), h('p', s.short))),
     h('div.mktools',
       h('div.qchips.filt', { role: 'group', 'aria-label': 'เรียงตาม' }, Object.entries(SORTS).map(([k, v]) =>
         h('button.qchip', { type: 'button', 'aria-pressed': String(ms.sort === k), onclick: () => { ms.sort = k; re(); } }, v))),
@@ -67,13 +67,13 @@ let pickPk = 0;
 export function providerView(root, id) {
   const p = providerOf(id);
   if (!p) { put(root, pageHead('ไม่พบร้านนี้', { back: 'home' })); return; }
-  const s = svcOf(p.sid), pks = packagesOf(p), bd = breakdown(p), maxBd = Math.max(...bd, 1), k = kindOf(p);
+  const s = demoSvc(p.sid), pks = packagesOf(p), bd = breakdown(p), maxBd = Math.max(...bd, 1), k = kindOf(p);
   if (!pks[pickPk]) pickPk = 0;
   const re = () => providerView(root, id);
   const others = providersOf(p.sid).filter(x => x.id !== p.id);
-  put(root, pageHead(p.name, { back: 'svc/' + p.sid, sub: s.name }),
+  put(root, pageHead(p.name, { back: 'dsvc/' + p.sid, sub: `${s.name} · ตลาดตัวอย่าง` }),
     h('section.phead2',
-      h('div.ph-img', { style: { backgroundImage: photoOf(s) ? `url("${photoOf(s).src}")` : null } }),
+      h('div.ph-img', { style: { backgroundImage: `url("${s.photo}")` } }),
       h('div.ph-info', pAvatar(p, true),
         h('div', h('h2', p.name), h('p.ph-area', h('span', { html: ic('map') }), p.area),
           h('div.pc-rate', stars(p.rating), h('b', p.rating.toFixed(1)), h('small', `${p.reviews.toLocaleString('th-TH')} รีวิว · ใช้บริการแล้ว ${p.done.toLocaleString('th-TH')} ครั้ง`))),
@@ -97,7 +97,7 @@ export function providerView(root, id) {
 export function compareView(root) {
   const ps = ms.cmp.map(providerOf).filter(Boolean);
   if (ps.length < 2) {
-    put(root, pageHead('เปรียบเทียบ', { back: 'auto' }), h('div.emptybox', h('b', 'เลือกอย่างน้อย 2 เจ้า'), h('p', 'ไปที่บริการที่ต้องการ แล้วแตะ "เทียบ" บนการ์ดร้าน'), h('a.btn.primary.sm', { href: ps[0] ? '#svc/' + ps[0].sid : '#services' }, 'เลือกร้าน')));
+    put(root, pageHead('เปรียบเทียบ', { back: 'auto' }), h('div.emptybox', h('b', 'เลือกอย่างน้อย 2 เจ้า'), h('p', 'ไปที่บริการที่ต้องการ แล้วแตะ "เทียบ" บนการ์ดร้าน'), h('a.btn.primary.sm', { href: ps[0] ? '#dsvc/' + ps[0].sid : '#demo' }, 'เลือกร้าน')));
     return;
   }
   const best = (f, low) => { const v = ps.map(f); const b = low ? Math.min(...v) : Math.max(...v); return p => f(p) === b; };
@@ -121,7 +121,7 @@ export function compareView(root) {
 
 /* ================= สั่ง/จอง ================= */
 export function orderForm(p, pk) {
-  const s = svcOf(p.sid), k = kindOf(p), targets = careTargets();
+  const s = demoSvc(p.sid), k = kindOf(p), targets = careTargets();
   const f = { for_id: targets[0].id, date: null, slot: 'morning', note: '', addr: S().prefs.my_addr || '' };
   const body = h('div.rform');
   const note = h('textarea.field', { id: 'od-note', rows: 2, maxlength: 300, placeholder: p.kind === 'food' ? 'เช่น ไม่ใส่ผักชี เคี้ยวยาก ขอหั่นชิ้นเล็ก' : 'สิ่งที่ผู้ให้บริการควรรู้ เช่น โรคประจำตัว ใช้รถเข็น', oninput: e => { f.note = e.target.value; } });
@@ -140,7 +140,7 @@ export function orderForm(p, pk) {
       if (!now && !f.date) return toast(`เลือกวันก่อน${P()}`);
       if (!f.addr.trim()) return toast('ใส่ที่อยู่ก่อน');
       await app.store.setPref('my_addr', f.addr.trim(), false);
-      const r = await app.store.addRequest({ service_id: s.id, cat: s.cat, title: `${s.name} · ${p.name}`, provider_id: p.id, pkg: pk.name, price: pk.price,
+      const r = await app.store.addRequest({ service_id: 'demo:' + s.id, cat: 'living', title: `${s.name} · ${p.name}`, provider_id: p.id, pkg: pk.name, price: pk.price,
         for_id: f.for_id, by_id: 'me', date: now ? new Date().toISOString().slice(0, 10) : f.date, slot: now ? null : f.slot, note: f.note.trim(), addr: f.addr.trim(), auto: true });
       m.close(true); toast(`${k.book}แล้ว${P()} ติดตามสถานะได้ที่เมนู กิจกรรม`); goAfterModal('req/' + r.id);
     } }, `ยืนยัน${k.book} ${baht(pk.price)}`) });
@@ -161,6 +161,20 @@ export function startOrderSim() {
   };
   tick(); setInterval(tick, 3000);
 }
-export const PKG_OF = MARKET;
 /** ตั้งรายการเปรียบเทียบจากภายนอก (เช่น ผู้ช่วย AI เลือก 3 เจ้า) */
 export function setCompare(ids) { ms.cmp = ids.slice(0, 3); }
+
+/* ================= หน้ารวมตลาดตัวอย่าง (#demo) ================= */
+export function demoView(root) {
+  const groups = Object.entries(DEMO_GROUPS);
+  put(root, pageHead('ตลาดบริการ (ตัวอย่าง)', { back: 'home', sub: 'ทดลองเลือกเจ้า ดูรีวิว เปรียบเทียบ และสั่ง/จอง' }),
+    h('p.demo-note', h('span', { html: ic('info') }), 'ทุกร้านในหน้านี้เป็นข้อมูลจำลองเพื่อทดลองการใช้งาน ชื่อแต่งขึ้น ไม่มีการเก็บเงิน ส่วนบริการและสินค้าจริงอยู่ที่หน้าหลักและเมนูสินค้า'),
+    h('form.demoai', { onsubmit: e => { e.preventDefault(); const v = e.target.q.value.trim(); if (v) location.hash = '#ai/' + encodeURIComponent(v); } },
+      h('span', { html: ic('spark') }), h('input.field', { name: 'q', id: 'demo-q', placeholder: 'เล่าปัญหาให้ AI เช่น แม่เดินไม่สะดวก ต้องไปหาหมอทุกเดือน', 'aria-label': 'เล่าปัญหาให้ผู้ช่วย AI' }),
+      h('button.btn.primary.sm', { type: 'submit' }, 'ถาม AI')),
+    groups.map(([g, [name, tint, ink]]) => { const list = demoSvcs().filter(s => s.group === g);
+      return h('section.dgroup', h('h2', name), h('div.tiles2', list.map(s => { const st = marketStats(s.id);
+        return h('a.ptile.photo', { href: '#dsvc/' + s.id, style: { '--ci': ink, '--ct': tint, backgroundImage: `url("${s.photo}")` } },
+          st ? h('span.pt-badge', `${st.count} เจ้า · ★ ${st.rating.toFixed(1)}`) : '', h('b', s.name), h('small', st ? `เริ่มต้น ${baht(st.min)} ${st.unit}` : s.short)); }))); }),
+    cmpBar());
+}

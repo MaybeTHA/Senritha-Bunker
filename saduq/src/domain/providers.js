@@ -232,3 +232,32 @@ export const allProviders = () => _P ||= Object.entries(MARKET).flatMap(([sid, m
     unit: m.unit, eta: m.eta, reply: `ตอบกลับใน ~${[5, 10, 15, 30][Math.floor(r() * 4)]} นาที`, done: Math.round(reviews * (2.2 + r())),
     feats: Object.keys(FEAT_RX).filter(f => FEAT_RX[f].test(badges.join(' ') + ' ' + about)) };
 }));
+
+/* ================= 2.x: ตลาดตัวอย่างแยกจากแค็ตตาล็อกจริง — มีรายการบริการของตัวเอง (ไม่ใช้ id ของ catalog.js) ================= */
+const G = { food: ['อาหาร', '#FFEADB', '#B4561A'], home: ['ดูแลที่บ้าน', '#E2F6EB', '#0E7F52'], go: ['เดินทาง', '#E7F0FE', '#0A5BD1'], health: ['สุขภาพ', '#FFE6EE', '#B23463'], shop: ['สินค้า', '#FFF4D2', '#8A6200'], fun: ['กิจกรรม', '#EDE5FF', '#5B3FD0'] };
+const DS = {
+  'l-meal': ['food', 'bowl', 'อาหารสำหรับผู้สูงอายุ', 'อาหารอ่อน ลดเค็ม ส่งถึงบ้าน', 'l-meal'],
+  'l-care': ['home', 'hand', 'ผู้ดูแลผู้สูงอายุ', 'รายวัน ค้างคืน ผู้ช่วยพยาบาล', 'l-care'],
+  'l-house': ['home', 'broom', 'แม่บ้านทำความสะอาด', 'ทำความสะอาด ซักรีด', 'l-house'],
+  'l-personal': ['home', 'smile', 'ดูแลส่วนตัว', 'ตัดผม ตัดเล็บ อาบน้ำ ถึงบ้าน', 'l-personal'],
+  'l-repair': ['home', 'tool', 'ช่างปรับบ้านให้ปลอดภัย', 'ราวจับ พื้นกันลื่น ทางลาด', 'l-repair'],
+  'l-daycare': ['home', 'sun', 'ศูนย์ดูแลกลางวัน', 'ฝากดูแลระหว่างวัน มีอาหารและกิจกรรม', 'b-fund'],
+  'l-ride': ['go', 'car', 'รถรับส่ง', 'ไปโรงพยาบาล ธนาคาร ธุระ', 'l-ride'],
+  'l-escort': ['go', 'handheart', 'ผู้ช่วยพาไปโรงพยาบาล', 'พาไปหาหมอ เดินเรื่อง รับยา', 'h-appt'],
+  'l-wheel': ['go', 'wheel', 'รถตู้วีลแชร์', 'นั่งรถเข็นขึ้นรถได้เลย', 'l-ride'],
+  'h-appt': ['health', 'steth', 'คลินิกและแพทย์เยี่ยมบ้าน', 'ตรวจโรคเรื้อรัง นัดได้ไว', 'h-appt'],
+  'h-consult': ['health', 'phone', 'ปรึกษาสุขภาพทางไกล', 'แพทย์/พยาบาลออนไลน์', 'h-consult'],
+  'h-check': ['health', 'clip', 'ตรวจสุขภาพ', 'แพ็กเกจตรวจตามวัย', 'h-check'],
+  'h-physio': ['health', 'walk', 'กายภาพบำบัดที่บ้าน', 'ฝึกเดิน ฟื้นฟูหลังป่วย', 'c-club'],
+  'h-nurse': ['health', 'steth', 'พยาบาลเยี่ยมบ้าน', 'ทำแผล ฉีดยา เฝ้าไข้', 'h-check'],
+  's-health': ['shop', 'heart', 'ร้านเครื่องวัดสุขภาพ', 'ความดัน น้ำตาล ปรอท', 's-health'],
+  's-mobility': ['shop', 'walk', 'ร้านอุปกรณ์ช่วยเดิน', 'ไม้เท้า วอล์กเกอร์ รถเข็น', 's-mobility'],
+  's-daily': ['shop', 'bag', 'ร้านของใช้ประจำวัน', 'ผ้าอ้อม แผ่นรองซับ', 's-daily'],
+  's-medical': ['shop', 'bed', 'ร้านอุปกรณ์การแพทย์', 'เตียง ที่นอนลม', 's-medical'],
+  's-delivery': ['shop', 'truck', 'ส่งยาและของถึงบ้าน', 'รับยาจาก รพ. ฝากซื้อ', 's-daily'],
+  'c-events': ['fun', 'cal', 'กิจกรรมและคลาส', 'ชมรม จักสาน สอนมือถือ', 'c-events'],
+};
+export const DEMO_GROUPS = G;
+export const demoSvc = sid => { const d = DS[sid]; if (!d) return null; const [g, icon, name, short, photo] = d;
+  return { id: sid, group: g, icon, name, short, photo: `assets/photos/${photo}.jpg`, tint: G[g][1], ink: G[g][2], groupName: G[g][0] }; };
+export const demoSvcs = () => Object.keys(DS).map(demoSvc);

@@ -9,6 +9,7 @@ import { speechSupported, startListening } from './voice.js';
 import { listenTask } from './listen.js';
 import { app, S, subj, task, today, dueInfo, fullTitle, notesOf, urlOf, visibleSubjects } from './shared.js';
 import { badge } from '../ui/kit.js';
+import { careTargets, curPerson } from './common.js';
 import { addDaysYMD, fromYMD, relDay, DOW_SHORT } from '../domain/dates.js';
 
 const typeOptions = sel => Object.entries(TYPES).map(([k, v]) => h('option', { value: k, selected: k === sel }, v));
@@ -45,12 +46,14 @@ export const dueText = d => {
 export const sane = ymd => !ymd || (ymd >= addDaysYMD(today(), -366) && ymd <= addDaysYMD(today(), 3 * 366)) ? ymd : null;
 
 /** เพิ่มการเตือนแบบเร็ว: พิมพ์ → เห็นผลทันที → แตะชิปแก้ → บันทึก (ไม่มีหน้าตรวจสอบแยก) · kind: text · photo · camera · voice (→ listen.js) */
-export async function addTask(kind = 'text', preset = '') {
-  if (kind === 'voice') return listenTask(); // ฟังไม่ได้ก็ยังเปิด — พิมพ์/วางแทนได้ในหน้าเดียวกัน
+export async function addTask(kind = 'text', preset = '', opts = {}) {
+  if (kind === 'voice') return listenTask();
+  const people = careTargets().filter(x => x.id !== 'me');
+  let forId = opts.for_id || (people.length === 1 ? people[0].id : curPerson()?.id) || null; // ฟังไม่ได้ก็ยังเปิด — พิมพ์/วางแทนได้ในหน้าเดียวกัน
   let img = null;
   if (kind === 'photo' || kind === 'camera') { img = await getImage(kind === 'camera'); if (!img) return; }
   const ta = h('textarea.field.quick', { id: 'add-text', rows: 2, 'aria-label': 'งานที่ต้องทำ',
-    placeholder: img ? 'งานในรูปคืออะไร? เช่น "ฟิสิกส์ แบบฝึก 4.1 ส่งศ."' : 'เช่น "คณิต ใบงาน 7 ส่งพน."' });
+    placeholder: img ? 'ในรูปคืออะไร? เช่น "นัดหมอตา 3 ธ.ค. 9 โมง"' : 'เช่น "ให้ยาความดัน 8 โมง ทุกวัน" หรือ "นัดหมอพฤหัส 9 โมง"' });
   ta.value = preset;
   const ov = { subject_id: undefined, due_date: undefined }; // ที่ผู้ใช้แตะชิปเลือกเอง (ใช้กับงานเดียว)
   const preview = h('div.qpreview', { 'aria-live': 'polite' });
@@ -67,6 +70,7 @@ export async function addTask(kind = 'text', preset = '') {
     const list = current();
     preview.replaceChildren(...list.map(d => h('div.qrow', badge(subj(d.subject_id)),
       h('div', h('b', d.title), h('small', dueText(d))))));
+    if (people.length > 1) preview.append(h('div.qchips', { role: 'group', 'aria-label': 'ของใคร' }, people.map(p => h('button.qchip', { type: 'button', 'aria-pressed': String(p.id === forId), onclick: () => { forId = p.id; paint(); } }, p.name))));
     if (list.length === 1) preview.append(
       subjChips(list[0].subject_id, id => { ov.subject_id = id; paint(); }),
       dayChips(list[0].due_date, d => { ov.due_date = d; paint(); }));
@@ -74,7 +78,7 @@ export async function addTask(kind = 'text', preset = '') {
     saveBtn.textContent = list.length > 1 ? `บันทึก ${list.length} รายการ` : 'บันทึก';
   }
   async function save() {
-    const items = current().filter(d => d.title).map((d, i) => ({ title: d.title, subject_id: d.subject_id || null, type: d.type || 'homework',
+    const items = current().filter(d => d.title).map((d, i) => ({ title: d.title, subject_id: d.subject_id || null, type: opts.type && (!d.type || d.type === 'homework' || d.type === 'reminder') ? opts.type : d.type || 'reminder', for_id: forId,
       due_date: sane(d.due_date), due_time: d.due_time || null, source: img ? 'photo' : 'text', draft_key: `${key}-${i}` }));
     if (!items.length || saving) return;
     saving = true; saveBtn.disabled = true;
@@ -88,7 +92,7 @@ export async function addTask(kind = 'text', preset = '') {
   ta.addEventListener('input', paint);
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); save(); } });
   openModal({
-    title: img ? 'งานจากรูป' : 'พิมพ์งาน',
+    title: img ? 'งานดูแลจากรูป' : 'เพิ่มงานดูแล',
     body: h('div', img ? h('img.preview.small', { src: img.url, alt: 'รูปที่เลือก' }) : '', ta, preview),
     foot: saveBtn,
     isDirty: () => !saving && (!!ta.value.trim() || !!img),

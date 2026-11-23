@@ -1,8 +1,8 @@
 // ที่เก็บข้อมูลในเครื่อง — IndexedDB เป็นหลัก ถ้าเบราว์เซอร์ไม่ให้ใช้ (โหมดส่วนตัวบางตัว) ตกไปใช้หน่วยความจำ
 // แล้วแจ้งผู้ใช้ตรง ๆ ว่าปิดแอปแล้วข้อมูลจะหาย
 export const DB_NAME = 'sabaii';
-export const DB_VERSION = 2;
-export const STORES = ['tasks', 'subjects', 'attachments', 'prefs', 'requests', 'family', 'notices'];
+export const DB_VERSION = 3;
+export const STORES = ['tasks', 'subjects', 'attachments', 'prefs', 'requests', 'family', 'notices', 'vitals'];
 
 function req(r) {
   return new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
@@ -25,7 +25,8 @@ export async function openIDB(idb = globalThis.indexedDB) {
     }
     if (!db.objectStoreNames.contains('prefs')) db.createObjectStore('prefs', { keyPath: 'key' });
     // 2: ศูนย์รวมบริการ — คำขอบริการ · สมาชิกครอบครัว · การแจ้งเตือน
-    for (const n of ['requests', 'family', 'notices']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' });
+    // 3: บันทึกสุขภาพของผู้รับการดูแล (ความดัน น้ำตาล ไข้ ออกซิเจน น้ำหนัก)
+    for (const n of ['requests', 'family', 'notices', 'vitals']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' });
   };
   const db = await req(r);
   return {
