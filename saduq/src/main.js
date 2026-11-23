@@ -11,10 +11,11 @@ import { subjectView } from './features/tasks.js';
 import { openReminder } from './features/remind.js';
 import { avatar } from './features/common.js';
 import { providerView, compareView, startOrderSim } from './features/market.js';
+import { openAI } from './features/aibot.js';
 import { needsOnboarding } from './features/onboard.js';
 import { seedCaregiver } from './features/family.js';
 
-globalThis.SABAII_VERSION = '1.4.1';
+globalThis.SABAII_VERSION = '1.5.0';
 const VIEWS = {
   home: ['หน้าหลัก', homeView], services: ['บริการ', servicesView], cat: ['บริการ', categoryView], svc: ['บริการ', serviceView],
   activity: ['กิจกรรม', activityView], req: ['คำขอบริการ', requestView], notif: ['การแจ้งเตือน', notifView], subject: ['หมวดการเตือน', subjectView],
@@ -75,6 +76,8 @@ async function boot() {
   // รุ่นก่อนที่ยังใช้ข้อมูลตัวอย่างเดิม (ไม่ได้แก้ชื่อเอง) → เปลี่ยนเป็นชุดใหม่ให้
   if (needsOnboarding() || (store.state.prefs.name_sample && !store.state.prefs.seed_v2)) await seedCaregiver();
   startOrderSim();
+  $('#aifab').addEventListener('click', () => openAI());
+  app.openAI = openAI;
   addEventListener('offline', () => toast('ออฟไลน์อยู่ — ใช้การเตือนและข้อมูลในเครื่องได้ตามปกติ'));
   globalThis.__sabaii = store;
 }

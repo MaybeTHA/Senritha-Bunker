@@ -12,6 +12,8 @@ import { isActiveReq } from '../domain/catalog.js';
 import { photoOf } from '../domain/photos.js';
 import { hasMarket, marketStats, baht } from '../domain/providers.js';
 import { marketView } from './market.js';
+import { openAI } from './aibot.js';
+import { EXAMPLES } from '../domain/understand.js';
 import { members } from './common.js';
 
 const DOWL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'], MON = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
@@ -49,9 +51,11 @@ export function homeView(root, keepFocus = false) {
       h('h1.htitle', h('span.sr', `วันนี้อยากให้เราช่วยอะไรดี${PQ()}`), h('span', { 'aria-hidden': 'true' }, role() === 'family' ? 'ดูแลคนที่คุณรัก ให้เราช่วย..' : 'ให้เราช่วย..'), keepTyped || typedLine()),
       h('label.hsearch.big', h('span', { html: ic('search') }), input, hs.q ? h('button.clr', { type: 'button', onclick: () => { hs.q = ''; homeView(root); }, 'aria-label': 'ล้างคำค้น' }, 'ล้าง') : ''),
       h('div.popular', { role: 'group', 'aria-label': 'คำค้นยอดนิยม' }, h('span', 'ค้นหาบ่อย'),
-        POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k)))),
+        POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k))),
+      h('button.aihero', { type: 'button', onclick: () => openAI() }, h('span', { html: ic('bot') }), 'ไม่รู้จะเลือกอะไร? เล่าปัญหาให้ AI ช่วยเลือก 3 ตัวเลือก')),
     hs.q.trim() ? h('div.panel', searchResults(hs.q)) : [
       catPanel(root),
+      aiSection(),
       caredFor(),
       banner(),
       whySabaii(),
@@ -74,6 +78,17 @@ function catPanel(root) {
     h('div.tiles2', { role: 'tabpanel', 'aria-label': c.name }, list.map(s => h('a.ptile' + (photoOf(s) ? '.photo' : ''), { href: '#svc/' + s.id, style: { '--ci': c.ink, '--ct': c.tint, backgroundImage: photoOf(s) ? `url("${photoOf(s).src}")` : null } },
       h('span.pt-art', { html: ic(s.icon) }), marketStats(s.id) ? h('span.pt-badge', `${marketStats(s.id).count} เจ้า · ★ ${marketStats(s.id).rating.toFixed(1)}`) : '', h('b', s.name), h('small', s.provider?.phone ? `โทร ${s.provider.phone}` : marketStats(s.id) ? `เริ่มต้น ${baht(marketStats(s.id).min)} ${marketStats(s.id).unit}` : s.short)))),
     h('div.panelfoot', h('span', c.sub), h('a.morearrow', { href: cur === 'emergency' ? '#emergency' : '#cat/' + cur }, 'ดูเพิ่มเติม', h('span', { html: ic('arrow') }))));
+}
+
+/** เล่าปัญหา แล้วได้ 3 ตัวเลือก (ผู้ช่วย AI จำลอง) — 4 ขั้นแบบสไลด์ + ช่องพิมพ์ */
+function aiSection() {
+  const ta = h('textarea.field', { id: 'ai-home', rows: 2, maxlength: 400, placeholder: EXAMPLES[0], 'aria-label': 'เล่าปัญหาให้ AI' });
+  const steps = [['bot', 'Chat Bot', `“${EXAMPLES[0]}”`], ['spark', 'AI เข้าใจโจทย์', 'จับว่าต้องการบริการพาไปโรงพยาบาล'], ['search', 'ค้นบริการ', 'กรองตามประเภทบริการและพื้นที่'], ['star', 'AI จัดอันดับ', 'เรียงตามความเหมาะสมกับโจทย์']];
+  return h('section.aisec',
+    h('div.ais-head', h('span.ais-badge', 'AI automation'), h('h2', 'เล่าปัญหา แล้วได้ 3 ตัวเลือก')),
+    h('ol.aiflow', steps.map(([i, t, d]) => h('li', h('span.af-dot', { html: ic(i) }), h('b', t), h('small', d)))),
+    h('div.ais-out', [['handheart', 'ผู้ช่วยพาไป รพ.'], ['car', 'รถรับส่ง'], ['wheel', 'รถตู้วีลแชร์']].map(([i, t]) => h('span', h('i', { html: ic(i) }), t))),
+    h('div.ais-in', ta, h('button.btn.primary', { onclick: () => openAI(ta.value.trim() || EXAMPLES[0]), html: ic('send') + '<span>ให้ AI ช่วยเลือก</span>' })));
 }
 
 /** ผู้ที่คุณดูแล (มุมผู้ดูแล): การ์ดต่อคน · คำขอที่กำลังดำเนินการ · ทางลัดสั่งของ/จองบริการให้คนนั้น */

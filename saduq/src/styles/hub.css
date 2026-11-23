@@ -535,3 +535,69 @@ h1[tabindex="-1"]:focus { outline: none; }
 
 #demobar .ds { display: none; }
 @media (max-width: 520px) { :root { --demo-h: 34px; } #demobar .dl { display: none; } #demobar .ds { display: inline; } .typed { font-size: 29px; } }
+
+/* ================= 1.5 ผู้ช่วย AI (จำลอง) ================= */
+:root { --ai1: #F45B69; --ai2: #8B5CF6; }
+#aifab { position: fixed; z-index: 29; right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(100px + var(--safe-b)); height: 54px; padding: 0 18px 0 14px; border-radius: 27px; color: #fff; display: flex; align-items: center; gap: 8px; font: 700 16px var(--disp);
+  background: linear-gradient(120deg, var(--ai1), var(--ai2)); box-shadow: 0 12px 26px -10px rgba(139,92,246,.75); }
+#aifab svg { width: 26px; height: 26px; }
+#sos { bottom: calc(166px + var(--safe-b)); }
+@media (min-width: 900px) { #aifab { bottom: 24px; right: max(24px, calc((100vw - 1240px) / 2)); height: 60px; font-size: 17px; } }
+.aihero { display: inline-flex; align-items: center; gap: 10px; margin-top: 16px; min-height: 54px; padding: 0 20px 0 14px; border-radius: 27px; background: #fff; font: 600 16px var(--disp); color: #5B3FD0; box-shadow: inset 0 0 0 2px #DCCFFF, 0 12px 26px -20px rgba(91,63,208,.6); text-align: left; }
+.aihero span { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: linear-gradient(120deg, var(--ai1), var(--ai2)); flex: none; } .aihero svg { width: 20px; height: 20px; }
+/* ส่วนบนหน้าแรก (แบบสไลด์) */
+.aisec { margin-top: 26px; padding: 20px 16px; border-radius: 28px; background: #F3EEF6; }
+.ais-head { text-align: center; } .ais-badge { display: inline-block; padding: 3px 12px; border-radius: 10px; color: #fff; font: 700 13px var(--disp); background: linear-gradient(90deg, var(--ai1), var(--ai2)); }
+.ais-head h2 { font: 700 26px/1.3 var(--disp); margin-top: 8px; text-wrap: balance; }
+.aiflow { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 10px; margin-top: 18px; counter-reset: s; }
+.aiflow li { display: grid; justify-items: center; text-align: center; gap: 4px; position: relative; }
+.af-dot { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: linear-gradient(120deg, var(--ai1), var(--ai2)); box-shadow: 0 10px 20px -12px rgba(139,92,246,.8); } .af-dot svg { width: 28px; height: 28px; }
+.aiflow b { font: 700 17px var(--disp); margin-top: 4px; } .aiflow small { font-size: 14px; color: #3A4766; line-height: 1.35; }
+.ais-out { display: flex; justify-content: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.ais-out span { display: grid; justify-items: center; gap: 6px; width: 104px; padding: 14px 6px; border-radius: 22px; background: #fff; font: 600 13.5px var(--disp); text-align: center; }
+.ais-out i { color: var(--ink); } .ais-out svg { width: 40px; height: 40px; stroke-width: 1.6; }
+.ais-in { display: grid; gap: 10px; margin-top: 18px; } .ais-in textarea { min-height: 70px; background: #fff; }
+@media (min-width: 900px) {
+  .aisec { margin-top: 40px; padding: 32px; } .ais-head h2 { font-size: 36px; }
+  .aiflow { grid-template-columns: repeat(4, 1fr); }
+  .aiflow li:not(:last-child)::after { content: ""; position: absolute; top: 28px; left: calc(50% + 40px); right: calc(-50% + 40px); height: 6px; border-radius: 3px; background: #111; }
+  .ais-in { grid-template-columns: 1fr auto; align-items: stretch; max-width: 860px; margin: 22px auto 0; }
+}
+/* หน้าต่างแชท */
+.modal.aimodal { max-height: 94dvh; }
+@media (min-width: 900px) { .modal.aimodal { width: min(760px, calc(100vw - 48px)); height: 86vh; } }
+.aiwrap { display: flex; flex-direction: column; gap: 10px; }
+.aibar { position: sticky; top: -4px; z-index: 2; background: #fff; padding: 4px 0 8px; }
+.aisteps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.aisteps li { display: grid; justify-items: center; gap: 4px; text-align: center; position: relative; color: #8A93A8; }
+.aisteps li:not(:last-child)::after { content: ""; position: absolute; top: 17px; left: calc(50% + 22px); right: calc(-50% + 22px); height: 3px; border-radius: 2px; background: #E3E7EF; }
+.aisteps li.done:not(:last-child)::after { background: linear-gradient(90deg, var(--ai1), var(--ai2)); }
+.aisteps span { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: #EEF0F5; } .aisteps svg { width: 18px; height: 18px; }
+.aisteps li.done span, .aisteps li.now span { color: #fff; background: linear-gradient(120deg, var(--ai1), var(--ai2)); }
+.aisteps li.now span { box-shadow: 0 0 0 5px #EFE7FF; } .aisteps li.done, .aisteps li.now { color: var(--ink); }
+.aisteps small { font: 600 12.5px/1.2 var(--disp); }
+.ailog { display: grid; gap: 10px; }
+.aimsg { display: flex; gap: 8px; align-items: flex-end; } .aimsg.me { justify-content: flex-end; }
+.aiav { width: 34px; height: 34px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; background: linear-gradient(120deg, var(--ai1), var(--ai2)); } .aiav svg { width: 20px; height: 20px; }
+.aibub { max-width: min(560px, 88%); padding: 12px 14px; border-radius: 20px 20px 20px 6px; background: #F3F1F9; font-size: 16px; line-height: 1.5; display: grid; gap: 8px; }
+.aimsg.me .aibub { background: var(--blue); color: #fff; border-radius: 20px 20px 6px 20px; }
+.aimsg.bot .aibub:has(.aipicks) { max-width: 100%; flex: 1; }
+.aiex { display: flex; flex-wrap: wrap; gap: 6px; } .aiex .qchip { height: auto; min-height: 44px; padding: 8px 14px; white-space: normal; text-align: left; background: #fff; }
+.aistep b { font: 700 15px var(--disp); color: #6D3FD8; }
+.aineeds { list-style: none; display: grid; gap: 4px; } .aineeds li { display: flex; gap: 8px; align-items: center; font-weight: 600; } .aineeds span { color: #0E7F52; } .aineeds svg { width: 18px; height: 18px; }
+.aisub { font-size: 14.5px; color: var(--text-2); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.aitag { background: #fff; border-radius: 8px; padding: 2px 9px; font: 600 13.5px var(--disp); color: #5B3FD0; box-shadow: inset 0 0 0 1px #E2D8FF; }
+.dots3 { display: inline-flex; gap: 4px; padding: 4px 2px; } .dots3 i { width: 8px; height: 8px; border-radius: 50%; background: #9A8FC4; animation: aibounce 1s infinite; } .dots3 i:nth-child(2) { animation-delay: .15s; } .dots3 i:nth-child(3) { animation-delay: .3s; }
+@keyframes aibounce { 50% { transform: translateY(-4px); opacity: .5; } }
+.aipicks { display: grid; gap: 10px; }
+.aipick { background: #fff; border-radius: 18px; padding: 12px; box-shadow: 0 0 0 1.5px #E8E2F7; display: grid; gap: 8px; }
+.ap-top { display: flex; gap: 10px; align-items: center; } .ap-top > div { flex: 1; min-width: 0; } .ap-top b { display: block; font: 600 16.5px/1.3 var(--disp); } .ap-top small { font-size: 13.5px; color: var(--text-2); }
+.ap-rank { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font: 700 14px Inter, sans-serif; flex: none; }
+.ap-ic { width: 46px; height: 46px; border-radius: 15px; display: grid; place-items: center; background: #F3EEF6; color: var(--ink); flex: none; } .ap-ic svg { width: 26px; height: 26px; }
+.ap-fit { display: grid; justify-items: center; font: 800 20px/1 Inter, sans-serif; color: #6D3FD8; flex: none; } .ap-fit small { font: 600 11.5px var(--disp); color: var(--text-2); margin-top: 2px; }
+.ap-bar { height: 6px; border-radius: 3px; background: #EEE9F8; overflow: hidden; } .ap-bar em { display: block; height: 100%; background: linear-gradient(90deg, var(--ai1), var(--ai2)); }
+.ap-why { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; } .ap-why .ok { color: #0E6B46; } .ap-why .no { color: #A0503A; }
+.ap-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--text-2); } .ap-foot b { font: 800 18px Inter, sans-serif; color: var(--ink); }
+.aiacts { display: flex; gap: 8px; flex-wrap: wrap; } .aiacts .btn span { display: inline-flex; } .aiacts svg { width: 18px; height: 18px; }
+.ainote { font-size: 12.5px; color: var(--text-2); text-align: center; }
+.aisend { display: flex; gap: 8px; width: 100%; align-items: flex-end; } .aisend textarea { flex: 1; min-height: 54px; resize: none; } .aisend .btn { flex: none; }
