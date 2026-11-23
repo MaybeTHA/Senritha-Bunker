@@ -162,3 +162,5 @@ export function startOrderSim() {
   tick(); setInterval(tick, 3000);
 }
 export const PKG_OF = MARKET;
+/** ตั้งรายการเปรียบเทียบจากภายนอก (เช่น ผู้ช่วย AI เลือก 3 เจ้า) */
+export function setCompare(ids) { ms.cmp = ids.slice(0, 3); }
