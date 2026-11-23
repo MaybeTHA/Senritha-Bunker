@@ -133,7 +133,7 @@ export function profileView(root) {
 function aboutModal() {
   openModal({ title: 'เกี่ยวกับ Saduq', body: h('div',
     h('p', 'ศูนย์รวมบริการสำหรับผู้สูงอายุและครอบครัว: สุขภาพ ช่วยงานบ้าน ซื้อของ กิจกรรม สิทธิรัฐ และเหตุฉุกเฉิน ในแอปเดียว'),
-    h('p.muted', 'รุ่นนี้ทำงานในเครื่องเท่านั้น ยังไม่มีผู้ให้บริการที่ยืนยันแล้ว การจองและคำขอเป็นโหมดตัวอย่าง ส่วนการเตือน ข้อมูลครอบครัว และเบอร์สายด่วนใช้ได้จริง'),
+    h('p.muted', 'รุ่นนี้เป็นต้นแบบ: ร้าน ผู้ให้บริการ ราคา รีวิว และสถานะออเดอร์ทั้งหมดเป็นข้อมูลจำลอง ไม่มีการเก็บเงินหรือส่งคำสั่งจริง ส่วนการเตือน ข้อมูลครอบครัว และเบอร์สายด่วนของหน่วยงานรัฐใช้ได้จริง'),
     h('p.muted', 'ข้อมูลสิทธิและสายด่วนเป็นข้อมูลทั่วไปจากหน่วยงานรัฐ โปรดตรวจสอบเงื่อนไขล่าสุดกับหน่วยงานโดยตรง'),
     allPhotos().length ? [h('h3.credh', 'เครดิตภาพ (Wikimedia Commons)'), h('ul.credits', allPhotos().map(([, p]) => h('li', h('a', { href: p.page, target: '_blank', rel: 'noopener' }, p.title.replace(/^File:/, '')), ` — ${p.artist || 'ไม่ระบุผู้สร้าง'} · ${p.license}`)))] : '') });
 }
@@ -154,8 +154,24 @@ export async function toggleHubSamples(remove) {
 export async function addHubSamples() {
   const st = app.store, d = n => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
   if (!S().tasks.some(t => t.source === 'sample')) await st.addSamples();
-  const sr = role() === 'family';
-  const a = await st.saveMember({ name: sr ? 'คุณแม่' : 'ลูกสาว', relation: sr ? 'อื่น ๆ' : 'ลูก', role: sr ? 'senior' : 'family', phone: '', sample: true, perms: { appts: true, requests: true, health: true, emergency: true, manage: true } });
-  await st.saveMember({ name: 'หลานชาย', relation: 'หลาน', role: 'family', phone: '', sample: true, perms: { appts: true, requests: false, health: false, emergency: true, manage: false } });
-  await st.addRequest({ service_id: 'l-ride', cat: 'living', title: 'รถรับส่ง', for_id: sr ? a.id : 'me', by_id: 'me', date: d(3), slot: 'morning', note: 'ไปนัดหมอตรวจเบาหวาน ต้องการรถเข็น', sample: true });
+  const mom = await st.saveMember({ name: 'คุณแม่สมศรี', relation: 'แม่', role: 'senior', phone: '', sample: true, perms: { appts: true, requests: true, health: true, emergency: true, manage: false } });
+  const dad = await st.saveMember({ name: 'คุณพ่อประยูร', relation: 'พ่อ', role: 'senior', phone: '', sample: true, perms: { appts: true, requests: true, health: true, emergency: true, manage: false } });
+  await st.saveMember({ name: 'พี่ต้น', relation: 'พี่น้อง', role: 'family', phone: '', sample: true, perms: { appts: true, requests: true, health: false, emergency: true, manage: true } });
+  // ออเดอร์อาหารที่เพิ่งสั่ง (สถานะเดินเองภายใน 1 นาที) + รถรับส่งที่เสร็จแล้ว (ให้ลองรีวิว)
+  await st.addRequest({ service_id: 'l-meal', cat: 'living', title: 'อาหารสำหรับผู้สูงอายุ · ครัวบ้านยาย อาหารอ่อน', provider_id: 'l-meal.0', pkg: 'ข้าวต้มปลา + ผักลวก', price: 80, for_id: mom.id, by_id: 'me', date: d(0), note: 'ไม่ใส่ผักชี', addr: 'บ้านคุณแม่ (ตัวอย่าง)', auto: true, sample: true });
+  const ride = await st.addRequest({ service_id: 'l-ride', cat: 'living', title: 'รถรับส่ง · พาไปหาหมอ ทรานสปอร์ต', provider_id: 'l-ride.0', pkg: 'เหมารถพาไปหาหมอ', price: 880, for_id: dad.id, by_id: 'me', date: d(-2), slot: 'morning', note: 'นัดตรวจเบาหวาน', addr: 'บ้านคุณพ่อ (ตัวอย่าง)', sample: true });
+  await st.patchRequest(ride.id, { status: 'done', by: 'l-ride.0' });
+}
+/** ชุดข้อมูลตัวอย่างมุมผู้ดูแล — ล้างตัวอย่างเดิมก่อน */
+export async function seedCaregiver() {
+  const st = app.store;
+  await st.removeSamples();
+  for (const m of S().family.filter(m => m.sample)) await st.removeMember(m.id);
+  for (const r of S().requests.filter(r => r.sample)) await st.removeRequest(r.id);
+  await st.setPref('display_name', 'นิด', false); await st.setPref('name_sample', true, false);
+  await st.setPref('role', 'family', false); await st.setPref('polite', 'ka', false);
+  await st.setPref('medinfo', { blood: 'O (ตัวอย่าง)', conditions: 'ความดันสูง เบาหวาน (ตัวอย่าง)', allergies: 'ไม่มี (ตัวอย่าง)', meds: 'ยาความดัน เช้า 1 เม็ด (ตัวอย่าง)', hospital: '', address: '' }, false);
+  await st.setPref('my_addr', '88/8 ซอยสุขใจ แขวงบางนา กรุงเทพฯ (ตัวอย่าง)', false);
+  await st.setPref('hub_onboarded', true, false); await st.setPref('seed_v2', true);
+  await addHubSamples();
 }

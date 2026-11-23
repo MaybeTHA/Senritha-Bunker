@@ -182,7 +182,7 @@ export function createStore(db, { now = () => new Date() } = {}) {
     const req = { id: newId('r'), created_at: at, updated_at: at, status: 'requested', review: null, demo: true, ...r,
       history: [{ status: 'requested', at, by: r.by_id || 'me' }] };
     await putIn('requests', req, false);
-    await notify({ kind: 'request', ref: req.id, title: `ส่งคำขอ: ${req.title}`, body: 'บันทึกไว้ในเครื่องแล้ว (โหมดตัวอย่าง)', by: req.by_id }, false);
+    await notify({ kind: 'request', ref: req.id, title: `${req.provider_id ? 'สั่ง/จอง' : 'ส่งคำขอ'}: ${req.title}`, body: req.provider_id ? 'รอผู้ให้บริการยืนยัน' : 'บันทึกไว้ในเครื่องแล้ว', by: req.by_id }, false);
     emit();
     return req;
   }
