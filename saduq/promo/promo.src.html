@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saduq MVP Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Nunito:wght@900&display=swap" rel="stylesheet">
+<!--
+  Saduq — แอนิเมชันแนะนำแอป (สำหรับอัดคลิปใส่สไลด์ MVP Demo)
+  เวที 1600×1000 (16:10) ย่อขยายให้พอดีจอ · เล่นวน 30 วินาที
+  ปุ่มลัด: Space หยุด/เล่น · R เริ่มใหม่ · F เต็มจอ · H ซ่อน/แสดงแถบช่วยเหลือ
+  ทุกแอนิเมชันอิงเวลาเดียวกัน (window.__seek(t)) จึงอัดเป็นวิดีโอแบบเฟรมต่อเฟรมได้
+-->
+<style>
+:root{
+  --blue:#0A6CF1; --logo:#0B4FC4; --ink:#0B1B4D; --text2:#4E5B75; --mint:#3CC489; --orange:#F08A24;
+  --surface:#F1F4FA; --line:#E6EAF1; --sos:#D9443A;
+  --disp:"Anuphan","Noto Sans Thai Looped",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#0B3FA8}
+body{font-family:var(--disp);color:var(--ink);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform-origin:0 0;overflow:hidden;background:#fff}
+section,.layer{position:absolute;inset:0}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- intro / outro ---------- */
+.brandbg{background:radial-gradient(1200px 800px at 20% 10%,#2C86FF 0%,transparent 60%),radial-gradient(900px 700px at 90% 100%,#22B37A 0%,transparent 60%),linear-gradient(135deg,#0B4FC4,#0A3A9A);}
+.blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.18;background:#fff}
+#intro .center,#outro .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center}
+.appicon{width:220px;height:220px;border-radius:56px;background:#fff;display:grid;place-items:center;box-shadow:0 40px 80px -30px rgba(0,0,0,.55),0 0 0 10px rgba(255,255,255,.14)}
+.appicon img{width:176px;height:176px}
+.bigword{font:900 150px/1 Nunito,sans-serif;letter-spacing:.04em;margin-top:44px;display:flex}
+.bigword span{display:inline-block}
+.bigword .q{color:#5BE3A6}
+.tagline{font:600 44px/1.3 var(--disp);margin-top:22px;letter-spacing:-.01em}
+.tagline small{display:block;font:500 28px var(--disp);opacity:.85;margin-top:8px}
+
+/* ---------- app shell ---------- */
+#app{background:#fff}
+.top{position:absolute;left:0;right:0;top:0;height:88px;display:flex;align-items:center;gap:18px;padding:0 40px;background:#fff;border-bottom:1px solid var(--line);z-index:20}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:56px;height:56px}
+.wm{font:900 36px/1 Nunito,sans-serif;letter-spacing:.02em;color:var(--logo)}
+.wm i{font-style:normal;color:var(--mint)}
+.tnav{display:flex;gap:6px;margin-left:30px}
+.tnav a{font:600 20px var(--disp);color:var(--text2);padding:10px 20px;border-radius:14px}
+.tnav a.on{background:#E7F0FE;color:var(--blue)}
+.sp{flex:1}
+#locChip{position:relative;height:56px;min-width:250px;border-radius:28px;background:#E7F0FE;color:var(--blue);display:flex;align-items:center;gap:10px;padding:0 22px 0 16px;font:600 21px var(--disp)}
+#locChip svg{font-size:28px}
+#locChip .lc{position:relative;display:block;height:30px;flex:1}
+#locChip .lc span{position:absolute;left:0;top:0;white-space:nowrap}
+#locChip .ring{position:absolute;inset:-6px;border-radius:34px;border:3px solid var(--blue);opacity:0}
+.sosb{height:56px;border-radius:18px;border:2px solid #F3C4C0;color:var(--sos);font:700 20px var(--disp);display:flex;align-items:center;padding:0 18px}
+.av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7B5CFF,#0A6CF1 60%,#F08A24);color:#fff;display:grid;place-items:center;font:700 24px var(--disp)}
+
+/* home */
+#home{position:absolute;left:0;right:0;top:88px;bottom:0;background:linear-gradient(180deg,#DCE9FF 0%,#F4F8FF 45%,#fff 70%)}
+.hero{text-align:center;padding-top:56px}
+.hero .hi{font:500 24px var(--disp);color:var(--text2)}
+.hero .l1{font:600 38px var(--disp);color:#3B4A6B;margin-top:6px}
+.hero .l2{font:700 76px/1.25 var(--disp);letter-spacing:-.02em;color:var(--ink);height:100px;margin-top:2px}
+.hero .l2 .caret{display:inline-block;width:4px;height:70px;background:var(--blue);vertical-align:-8px;margin-left:6px}
+.search{margin:22px auto 0;width:860px;height:76px;border-radius:38px;background:#fff;box-shadow:0 10px 30px -10px rgba(11,27,77,.2),0 0 0 1.5px #D7E2F3;display:flex;align-items:center;gap:14px;padding:0 30px;font:500 23px var(--disp);color:#7A87A0}
+.search svg{font-size:30px;color:var(--ink)}
+.cats{display:flex;justify-content:center;gap:34px;margin-top:44px}
+.cat{width:140px;text-align:center;font:600 21px var(--disp)}
+.cat .ic{width:86px;height:86px;border-radius:24px;margin:0 auto 10px;display:grid;place-items:center;font-size:40px}
+.cards{display:flex;gap:22px;justify-content:center;margin-top:36px}
+.pc{width:340px;height:220px;border-radius:24px;overflow:hidden;position:relative;box-shadow:0 12px 30px -16px rgba(11,27,77,.5)}
+.pc img{width:100%;height:100%;object-fit:cover}
+.pc:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(5,15,40,.78))}
+.pc b{position:absolute;left:20px;bottom:44px;color:#fff;font:700 26px var(--disp);z-index:1}
+.pc small{position:absolute;left:20px;bottom:16px;color:#E5ECF8;font:500 18px var(--disp);z-index:1}
+
+/* picker */
+#picker{z-index:30}
+#picker .scrim{position:absolute;inset:0;background:rgba(11,27,77,.45)}
+.modal{position:absolute;left:110px;top:100px;width:1380px;height:760px;border-radius:36px;background:#fff;box-shadow:0 50px 100px -40px rgba(0,0,0,.6);padding:44px 52px;display:flex;gap:48px}
+.modal h2{font:700 46px/1.2 var(--disp);letter-spacing:-.02em}
+.modal .sub{font:500 22px var(--disp);color:var(--text2);margin-top:6px}
+.hexmap{position:relative;width:680px;height:470px;margin-top:30px;flex:none}
+.hex{position:absolute;width:118px;height:136px}
+.hex .hx{position:absolute;inset:0;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:#EEF3FB;display:grid;place-items:center;text-align:center;font:600 19px/1.2 var(--disp);color:#3B4A6B;padding:0 8px}
+.hex .hx.alt{background:#E4ECF8}
+.hex.bn .hx{color:var(--ink)}
+.pin{position:absolute;width:64px;height:80px;margin:-74px 0 0 -32px;color:var(--sos)}
+.pin svg{width:100%;height:100%;filter:drop-shadow(0 8px 8px rgba(0,0,0,.25))}
+.mright{flex:1;padding-top:6px;display:flex;flex-direction:column}
+.field{height:74px;border-radius:20px;border:2.5px solid #D5DFEF;display:flex;align-items:center;gap:14px;padding:0 22px;font:600 28px var(--disp);color:var(--ink);margin-top:34px;position:relative}
+.field svg{font-size:30px;color:#7A87A0}
+.field .ph{position:absolute;left:66px;color:#9AA5BB;font-weight:500;font-size:22px}
+.field .typed .caret{display:inline-block;width:3px;height:32px;background:var(--blue);vertical-align:-5px;margin-left:3px}
+.lbl{font:600 20px var(--disp);color:var(--text2);margin:30px 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:12px}
+.chip{height:54px;border-radius:27px;background:var(--surface);display:flex;align-items:center;padding:0 22px;font:600 21px var(--disp);color:var(--ink)}
+.sumcard{margin-top:30px;border-radius:24px;background:#EAF8F1;border:2px solid #BDEBD4;padding:22px 26px;display:flex;gap:18px;align-items:center}
+.sumcard .ck{width:60px;height:60px;border-radius:50%;background:var(--mint);color:#fff;display:grid;place-items:center;font-size:34px;flex:none}
+.sumcard b{font:700 28px var(--disp);display:block}
+.sumcard span{font:500 20px var(--disp);color:#2C6B4F}
+.cta{margin-top:auto;height:84px;border-radius:42px;background:var(--blue);color:#fff;font:700 28px var(--disp);display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 20px 34px -16px rgba(10,108,241,.8)}
+.cta svg{font-size:30px}
+
+/* nearby */
+#nearby{position:absolute;left:0;right:0;top:88px;bottom:0;background:#fff}
+.mapbox{position:absolute;left:0;top:0;width:940px;height:912px;overflow:hidden;background:#EAF1FA}
+.map{position:absolute;inset:0;transform-origin:470px 470px}
+.map svg.base{position:absolute;inset:0;width:940px;height:912px}
+.mring{position:absolute;left:470px;top:470px;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;border:3px dashed rgba(10,108,241,.55);background:rgba(10,108,241,.07)}
+.ringp{position:absolute;left:470px;top:470px;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:rgba(10,108,241,.25);opacity:0}
+.home{position:absolute;left:470px;top:470px;width:0;height:0}
+.home .hb{position:absolute;left:-40px;top:-92px;width:80px;height:92px}
+.home .hb svg{width:100%;height:100%;filter:drop-shadow(0 10px 10px rgba(0,0,0,.28))}
+.home .hl{position:absolute;left:-110px;top:8px;width:220px;text-align:center;font:700 19px var(--disp);background:var(--ink);color:#fff;border-radius:14px;padding:6px 0}
+.sp-pin{position:absolute;width:0;height:0}
+.sp-pin .pb{position:absolute;left:-29px;top:-70px;width:58px;height:70px}
+.sp-pin .pb .bub{position:absolute;left:0;top:0;width:58px;height:58px;border-radius:50% 50% 50% 8px;transform:rotate(-45deg);box-shadow:0 8px 14px -6px rgba(0,0,0,.4);border:3px solid #fff}
+.sp-pin .pb .ico{position:absolute;left:0;top:0;width:58px;height:58px;display:grid;place-items:center;font-size:28px;color:#fff}
+.tip{position:absolute;width:300px;border-radius:18px;background:#fff;box-shadow:0 18px 40px -14px rgba(11,27,77,.45);padding:14px 18px;font:500 17px var(--disp);color:var(--text2)}
+.tip b{display:block;font:700 21px var(--disp);color:var(--ink)}
+.route{fill:none;stroke:var(--blue);stroke-width:8;stroke-linecap:round;stroke-dasharray:640;stroke-dashoffset:640}
+.moto{position:absolute;left:0;top:0;width:58px;height:58px;margin:0;border-radius:50%;background:var(--orange);color:#fff;display:grid;place-items:center;font-size:30px;border:4px solid #fff;box-shadow:0 10px 18px -6px rgba(0,0,0,.45);offset-path:path('M 690 250 C 640 330, 600 330, 560 380 S 500 440, 470 470');offset-rotate:0deg;offset-anchor:50% 50%}
+
+.panel{position:absolute;left:940px;top:0;width:660px;height:912px;background:#fff;box-shadow:-20px 0 40px -30px rgba(11,27,77,.4);padding:34px 40px;overflow:hidden}
+.panel h3{font:700 40px/1.2 var(--disp);letter-spacing:-.02em}
+.panel .meta{font:500 21px var(--disp);color:var(--text2);margin-top:6px}
+.panel .meta b{color:var(--blue)}
+.fchips{display:flex;gap:10px;margin:22px 0 22px}
+.fchips .chip{height:48px;font-size:19px;padding:0 18px}
+.fchips .chip.on{background:var(--blue);color:#fff}
+.lcard{position:relative;display:flex;gap:18px;align-items:center;padding:14px;border-radius:24px;background:#fff;box-shadow:0 0 0 1.5px var(--line);margin-bottom:14px}
+.lcard img{width:132px;height:112px;border-radius:18px;object-fit:cover;flex:none}
+.lcard .tx{flex:1;min-width:0}
+.lcard .tg{display:inline-block;font:600 15px var(--disp);padding:3px 10px;border-radius:8px}
+.lcard b{display:block;font:700 23px/1.3 var(--disp);margin-top:4px;white-space:nowrap}
+.lcard .rt{font:500 18px var(--disp);color:var(--text2);margin-top:2px;display:flex;gap:12px;align-items:center}
+.lcard .rt .st{color:#F2A60C}
+.lcard .km{flex:none;text-align:right;font:700 24px var(--disp);color:var(--blue)}
+.lcard .km small{display:block;font:500 15px var(--disp);color:var(--text2)}
+.lcard .hl{position:absolute;inset:0;border-radius:24px;box-shadow:0 0 0 3px var(--blue),0 18px 34px -16px rgba(10,108,241,.55);opacity:0}
+
+.dpanel{position:absolute;left:940px;top:0;width:660px;height:912px;background:#fff;padding:0;overflow:hidden;box-shadow:-20px 0 40px -30px rgba(11,27,77,.4)}
+.dban{height:250px;position:relative}
+.dban img{width:100%;height:100%;object-fit:cover}
+.dban:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(5,15,40,.6))}
+.dban .back{position:absolute;left:24px;top:22px;z-index:1;height:48px;border-radius:24px;background:rgba(255,255,255,.92);display:flex;align-items:center;gap:8px;padding:0 18px;font:600 19px var(--disp)}
+.dbody{padding:26px 40px}
+.dbody h3{font:700 38px/1.2 var(--disp)}
+.dbody .meta{font:500 20px var(--disp);color:var(--text2);margin-top:6px;display:flex;gap:16px;flex-wrap:wrap}
+.dbody .meta .st{color:#F2A60C;font-weight:700}
+.pkg{position:relative;display:flex;align-items:center;gap:16px;border-radius:20px;padding:16px 20px;margin-top:14px;box-shadow:0 0 0 2px var(--line)}
+.pkg .rd{width:28px;height:28px;border-radius:50%;border:3px solid #C4CEDF;flex:none;position:relative}
+.pkg .rd i{position:absolute;inset:4px;border-radius:50%;background:var(--blue);opacity:0}
+.pkg .pt{flex:1}
+.pkg .pt b{display:block;font:700 22px var(--disp)}
+.pkg .pt span{font:500 17px var(--disp);color:var(--text2)}
+.pkg .pr{font:700 24px var(--disp)}
+.pkg .sel{position:absolute;inset:0;border-radius:20px;box-shadow:0 0 0 3px var(--blue);background:rgba(10,108,241,.05);opacity:0}
+.order{position:absolute;left:40px;right:40px;bottom:34px;height:84px;border-radius:42px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;gap:14px;font:700 28px var(--disp);box-shadow:0 20px 34px -16px rgba(10,108,241,.8)}
+.order .pv{position:relative;display:inline-block;width:100px;height:36px}
+.order .pv span{position:absolute;left:0;top:0}
+
+.tpanel{position:absolute;left:940px;top:0;width:660px;height:912px;background:#fff;padding:40px;box-shadow:-20px 0 40px -30px rgba(11,27,77,.4)}
+.tpanel .okb{display:inline-flex;align-items:center;gap:8px;height:44px;border-radius:22px;background:#EAF8F1;color:#16875A;font:700 19px var(--disp);padding:0 16px}
+.tpanel h3{font:700 40px/1.2 var(--disp);margin-top:16px}
+.tpanel .meta{font:500 21px var(--disp);color:var(--text2);margin-top:6px}
+.steps{position:relative;margin-top:36px;padding-left:4px}
+.steps .bar{position:absolute;left:31px;top:30px;width:6px;height:396px;border-radius:3px;background:#E6EAF1}
+.steps .bar i{position:absolute;left:0;top:0;width:6px;height:100%;border-radius:3px;background:var(--mint);transform-origin:top;transform:scaleY(0)}
+.stp{position:relative;display:flex;gap:22px;align-items:center;height:132px}
+.stp .dot{position:relative;width:62px;height:62px;border-radius:50%;background:#EEF2F8;color:#A9B4C8;display:grid;place-items:center;font-size:30px;flex:none;border:4px solid #fff}
+.stp .dot .on{position:absolute;inset:-4px;border-radius:50%;background:var(--mint);color:#fff;display:grid;place-items:center;opacity:0;border:4px solid #fff}
+.stp b{display:block;font:700 26px var(--disp)}
+.stp span{font:500 19px var(--disp);color:var(--text2)}
+.stp .tx{opacity:.45}
+
+#toast{position:absolute;left:110px;top:112px;width:720px;z-index:40;border-radius:24px;background:var(--ink);color:#fff;display:flex;align-items:center;gap:18px;padding:18px 24px;box-shadow:0 30px 60px -20px rgba(11,27,77,.7)}
+#toast .bi{width:56px;height:56px;border-radius:16px;background:var(--mint);display:grid;place-items:center;font-size:30px;flex:none}
+#toast b{display:block;font:700 23px var(--disp)}
+#toast span{font:500 19px var(--disp);color:#C9D4EA}
+
+/* captions */
+.cap{position:absolute;left:470px;bottom:40px;z-index:50;transform:translateX(-50%);white-space:nowrap}
+.cap .in{display:flex;align-items:center;gap:16px;height:76px;border-radius:38px;padding:0 34px 0 12px;background:rgba(11,27,77,.92);color:#fff;font:700 30px var(--disp);box-shadow:0 20px 40px -16px rgba(0,0,0,.6)}
+.cap .n{width:54px;height:54px;border-radius:50%;background:var(--mint);display:grid;place-items:center;font:800 28px Nunito,sans-serif;color:var(--ink)}
+
+/* outro */
+#outro{z-index:60}
+#outro .wipe{position:absolute;inset:0}
+#outro .row{display:flex;gap:22px;margin-top:46px}
+#outro .st3{display:flex;align-items:center;gap:14px;height:78px;border-radius:39px;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.28);padding:0 30px 0 12px;font:600 27px var(--disp)}
+#outro .st3 .n{width:54px;height:54px;border-radius:50%;background:#fff;color:var(--logo);display:grid;place-items:center;font:900 26px Nunito,sans-serif}
+#outro .oline{display:flex;align-items:center;gap:30px}
+#outro .oline .appicon{width:150px;height:150px;border-radius:40px}
+#outro .oline .appicon img{width:120px;height:120px}
+#outro .oline .bigword{margin:0;font-size:120px}
+#outro .ot{font:700 50px/1.25 var(--disp);margin-top:36px;letter-spacing:-.01em}
+#outro .url{margin-top:40px;height:64px;border-radius:32px;background:#fff;color:var(--logo);display:flex;align-items:center;gap:10px;padding:0 30px;font:700 24px var(--disp)}
+
+/* cursor */
+#cursor{position:absolute;left:0;top:0;width:46px;height:46px;z-index:100;pointer-events:none;opacity:0}
+#cursor svg{width:46px;height:46px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+.ripple{position:absolute;width:80px;height:80px;margin:-40px 0 0 -40px;border-radius:50%;border:4px solid var(--blue);background:rgba(10,108,241,.15);z-index:99;pointer-events:none;opacity:0}
+
+/* help bar (hidden by default; not part of the recording) */
+#help{position:fixed;left:12px;bottom:12px;z-index:200;font:500 13px var(--disp);color:#fff;background:rgba(0,0,0,.55);padding:8px 12px;border-radius:10px;display:none}
+body.showhelp #help{display:block}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ========== 1 · INTRO ========== -->
+  <section id="intro" class="brandbg" data-a="fadeOut@3.25/.5">
+    <div class="blob" style="width:420px;height:420px;left:-120px;top:600px" data-a="floatY@0/6"></div>
+    <div class="blob" style="width:260px;height:260px;left:1320px;top:80px" data-a="floatY@0/5"></div>
+    <div class="center" data-a="zoomOut@3.25/.5">
+      <div class="appicon" data-a="popBig@.15/.8"><img src="{{mark}}" alt=""></div>
+      <div class="bigword">
+        <span data-a="riseIn@.55/.5">S</span><span data-a="riseIn@.62/.5">A</span><span data-a="riseIn@.69/.5">D</span><span data-a="riseIn@.76/.5">U</span><span class="q" data-a="riseIn@.83/.5">Q</span>
+      </div>
+      <div class="tagline" data-a="fadeUp@1.25/.6">ทุกบริการสำหรับผู้สูงวัย ใกล้บ้านคุณ<small>สุขภาพ · ช่วยงานบ้าน · ซื้อของ · ครอบครัว · สิทธิรัฐ · ฉุกเฉิน</small></div>
+    </div>
+  </section>
+
+  <!-- ========== 2–5 · APP ========== -->
+  <section id="app" data-a="appIn@3.3/.7; fadeOut@23.45/.45">
+    <header class="top">
+      <div class="brand"><img src="{{mark}}" alt=""><span class="wm">SADU<i>Q</i></span></div>
+      <nav class="tnav"><a class="on">หน้าหลัก</a><a>กิจกรรม</a><a>ฉัน</a></nav>
+      <div class="sp"></div>
+      <div id="locChip">
+        <div class="ring" data-a="ringPulse@5.7/.9/2"></div>
+        <svg class="i" viewBox="0 0 24 24"><path d="M12 21s-6-5.6-6-11a6 6 0 0112 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.3"/></svg>
+        <span class="lc"><span data-a="fadeOut@10.6/.25">เลือกเขตบ้านคุณแม่</span><span data-a="fadeUp@10.75/.35">เขตบางนา · กรุงเทพฯ</span></span>
+      </div>
+      <div class="sosb">ฉุกเฉิน 1669</div>
+      <div class="av">น</div>
+    </header>
+
+    <!-- home -->
+    <div id="home" data-a="fadeOut@10.8/.4">
+      <div class="hero">
+        <div class="hi" data-a="fadeUp@3.7/.5">สวัสดีค่ะ คุณนิด · วันนี้ให้เราช่วยอะไรดี</div>
+        <div class="l1" data-a="fadeUp@3.85/.5">ดูแลคนที่คุณรัก ให้เราช่วย..</div>
+        <div class="l2"><span data-type="4.3/1.3">หาบริการใกล้บ้านคุณแม่</span><i class="caret" data-a="blink@3.9/1/9"></i></div>
+        <div class="search" data-a="fadeUp@4.1/.5"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>ค้นหาบริการ เช่น อาหารอ่อน ผู้ดูแล รถรับส่ง</div>
+      </div>
+      <div class="cats">
+        <div class="cat" data-a="pop@4.6/.5"><div class="ic" style="background:#E7F0FE;color:#0A5BD1"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg></div>สุขภาพ</div>
+        <div class="cat" data-a="pop@4.67/.5"><div class="ic" style="background:#E2F6EB;color:#0E7F52"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9.5 15.5l2 2 3.5-4"/></svg></div>ช่วยงานบ้าน</div>
+        <div class="cat" data-a="pop@4.74/.5"><div class="ic" style="background:#FFEADB;color:#B4561A"><svg class="i" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg></div>ซื้อของ</div>
+        <div class="cat" data-a="pop@4.81/.5"><div class="ic" style="background:#EDE5FF;color:#5B3FD0"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg></div>กิจกรรม</div>
+        <div class="cat" data-a="pop@4.88/.5"><div class="ic" style="background:#FFE6EE;color:#B23463"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 19a5.5 5.5 0 0111 0M15 15.5a4.5 4.5 0 016 3.5"/></svg></div>ครอบครัว</div>
+        <div class="cat" data-a="pop@4.95/.5"><div class="ic" style="background:#FFF4D2;color:#8A6200"><svg class="i" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5z"/><path d="M5 9v9M9.5 9v9M14.5 9v9M19 9v9M3 20h18"/></svg></div>สิทธิรัฐ</div>
+        <div class="cat" data-a="pop@5.02/.5"><div class="ic" style="background:#FDECEE;color:#C2362D"><svg class="i" viewBox="0 0 24 24"><path d="M7 18v-6a5 5 0 0110 0v6"/><path d="M5 18h14v3H5zM12 3v2M4.2 6.2l1.4 1.4M19.8 6.2l-1.4 1.4"/></svg></div>ฉุกเฉิน</div>
+      </div>
+      <div class="cards">
+        <div class="pc" data-a="fadeUp@5.1/.6"><img src="{{l-meal}}" alt=""><b>อาหารอ่อนส่งถึงบ้าน</b><small>4 เจ้า · ★ 4.7</small></div>
+        <div class="pc" data-a="fadeUp@5.18/.6"><img src="{{h-appt}}" alt=""><b>นัดพบแพทย์</b><small>3 เจ้า · ★ 4.7</small></div>
+        <div class="pc" data-a="fadeUp@5.26/.6"><img src="{{l-care}}" alt=""><b>ผู้ดูแลผู้สูงอายุ</b><small>3 เจ้า · ★ 4.8</small></div>
+        <div class="pc" data-a="fadeUp@5.34/.6"><img src="{{l-ride}}" alt=""><b>รถรับส่งไปหาหมอ</b><small>3 เจ้า · ★ 4.6</small></div>
+      </div>
+    </div>
+
+    <!-- nearby: map + list -->
+    <div id="nearby" data-a="fadeIn@10.75/.4">
+      <div class="mapbox">
+        <div class="map" data-a="mapZoom@10.75/1.4">
+          <svg class="base" viewBox="0 0 940 912">
+            <path d="M-20 700 C 160 640, 220 760, 380 720 S 640 840, 960 780" stroke="#BFD9F6" stroke-width="46" fill="none"/>
+            <ellipse cx="180" cy="230" rx="120" ry="80" fill="#D6F0E0"/>
+            <ellipse cx="760" cy="640" rx="100" ry="70" fill="#D6F0E0"/>
+            <circle cx="300" cy="480" r="46" fill="#D6F0E0"/>
+            <g stroke="#fff" fill="none" stroke-linecap="round">
+              <path d="M0 470 H940" stroke-width="22"/>
+              <path d="M470 0 V912" stroke-width="22"/>
+              <path d="M0 140 L940 360" stroke-width="16"/>
+              <path d="M120 912 L360 0" stroke-width="14"/>
+              <path d="M690 0 C 640 330, 600 330, 560 380 S 500 440, 470 470" stroke-width="12"/>
+              <path d="M940 120 L620 912" stroke-width="14"/>
+              <path d="M0 330 H940 M0 610 H940 M240 0 V912 M720 0 V912" stroke-width="7"/>
+              <path d="M0 220 H940 M0 820 H940 M590 0 V912 M120 0 V912 M840 0 V912" stroke-width="4" stroke="#F7FAFE"/>
+            </g>
+            <text x="44" y="456" font-family="Anuphan" font-size="17" font-weight="600" fill="#8C9AB4">ถ.บางนา-ตราด</text>
+            <text x="486" y="140" font-family="Anuphan" font-size="17" font-weight="600" fill="#8C9AB4" transform="rotate(90 486 140)">ถ.สุขุมวิท</text>
+            <path class="route" d="M 690 250 C 640 330, 600 330, 560 380 S 500 440, 470 470" data-a="draw@18.25/.8"/>
+          </svg>
+          <div class="mring" data-a="ringGrow@11.3/.8"></div>
+          <div class="ringp" data-a="pulseOut@11.9/1.6/7"></div>
+          <!-- service pins: x,y in map coords -->
+          <div class="sp-pin" style="left:690px;top:250px"><div class="pb" data-a="pinPop@11.7/.5"><div data-a="bounce@14.7/.6/2" style="position:absolute;inset:0"><div class="bub" style="background:#0E7F52"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 01-18 0z"/><path d="M8 7c0-1.5 1-2 1-3M12 7c0-1.5 1-2 1-3M16 7c0-1.5 1-2 1-3"/></svg></div></div></div></div>
+          <div class="sp-pin" style="left:300px;top:330px"><div class="pb" data-a="pinPop@11.8/.5"><div class="bub" style="background:#0A5BD1"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M6 3v6a4 4 0 008 0V3"/><path d="M10 13v2a5 5 0 0010 0v-2"/><circle cx="20" cy="11" r="2"/></svg></div></div></div>
+          <div class="sp-pin" style="left:620px;top:640px"><div class="pb" data-a="pinPop@11.9/.5"><div class="bub" style="background:#0E7F52"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 00-4 0v5M14 10V4a2 2 0 00-4 0v6M10 10.5V6a2 2 0 00-4 0v8"/><path d="M18 8a2 2 0 114 0v6a8 8 0 01-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 012.8-2.8L7 15"/></svg></div></div></div>
+          <div class="sp-pin" style="left:330px;top:640px"><div class="pb" data-a="pinPop@12.0/.5"><div class="bub" style="background:#0E7F52"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 16v-4l2-5h12l2 5v4z"/><path d="M4 12h16"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/></svg></div></div></div>
+          <div class="sp-pin" style="left:560px;top:180px"><div class="pb" data-a="pinPop@12.1/.5"><div class="bub" style="background:#B4561A"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg></div></div></div>
+          <div class="sp-pin" style="left:240px;top:520px"><div class="pb" data-a="pinPop@12.2/.5"><div class="bub" style="background:#5B3FD0"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg></div></div></div>
+          <div class="sp-pin" style="left:720px;top:470px"><div class="pb" data-a="pinPop@12.3/.5"><div class="bub" style="background:#0A5BD1"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><g transform="rotate(-45 12 12)"><rect x="3" y="8.5" width="18" height="7" rx="3.5"/><path d="M12 8.5v7"/></g></svg></div></div></div>
+          <div class="sp-pin" style="left:420px;top:250px"><div class="pb" data-a="pinPop@12.4/.5"><div class="bub" style="background:#0E7F52"></div><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9.5 15.5l2 2 3.5-4"/></svg></div></div></div>
+          <!-- home -->
+          <div class="home"><div class="hb" data-a="drop@11.15/.6"><svg viewBox="0 0 40 46"><path d="M20 45C20 45 3 30 3 18a17 17 0 0134 0c0 12-17 27-17 27z" fill="#D9443A" stroke="#fff" stroke-width="2.5"/><path d="M12 19l8-7 8 7v8H12z" fill="#fff"/><path d="M18 27v-5h4v5" fill="#D9443A"/></svg></div><div class="hl" data-a="fadeUp@11.5/.4">บ้านคุณแม่ · บางนา</div></div>
+          <!-- tooltip for clinic pin -->
+          <div class="tip" id="tipClinic" style="left:40px;top:160px" data-a="tipIn@13.3/.35; fadeOut@14.35/.3"><b>คลินิกผู้สูงวัยใจดี</b>★ 4.8 · 1.5 กม. · นัดได้ใน 1–3 วัน</div>
+          <div class="moto" data-a="popIn@20.0/.3; ride@20.25/1.45; fadeOut@21.75/.35"><svg class="i" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 01-18 0z"/><path d="M8 7c0-1.5 1-2 1-3M12 7c0-1.5 1-2 1-3M16 7c0-1.5 1-2 1-3"/></svg></div>
+        </div>
+      </div>
+
+      <!-- list panel -->
+      <div class="panel" data-a="slideInR@10.9/.6">
+        <h3 data-a="fadeUp@11.1/.45">บริการใกล้บ้านคุณแม่</h3>
+        <div class="meta" data-a="fadeUp@11.2/.45">เขตบางนา · พบ <b><span data-count="12@11.3/.9">12</span> บริการ</b> ในระยะ 3 กม.</div>
+        <div class="fchips" data-a="fadeUp@11.35/.45"><div class="chip on">ใกล้สุด</div><div class="chip">สุขภาพ</div><div class="chip">ช่วยงานบ้าน</div><div class="chip">ซื้อของ</div></div>
+        <div class="lcard" id="card1" data-a="slideUpSm@11.6/.5"><div class="hl" data-a="fadeIn@14.65/.25"></div><img src="{{l-meal}}" alt=""><div class="tx"><span class="tg" style="background:#E2F6EB;color:#0E7F52">อาหารอ่อน</span><b>ครัวบ้านยาย อาหารอ่อน</b><div class="rt"><span class="st">★ 4.9</span>412 รีวิว · ส่งใน 30 นาที</div></div><div class="km">0.8<small>กม.</small></div></div>
+        <div class="lcard" data-a="slideUpSm@11.72/.5"><img src="{{h-appt}}" alt=""><div class="tx"><span class="tg" style="background:#E7F0FE;color:#0A5BD1">นัดหมอ</span><b>คลินิกผู้สูงวัยใจดี</b><div class="rt"><span class="st">★ 4.8</span>356 รีวิว · เริ่ม ฿500</div></div><div class="km">1.5<small>กม.</small></div></div>
+        <div class="lcard" data-a="slideUpSm@11.84/.5"><img src="{{l-care}}" alt=""><div class="tx"><span class="tg" style="background:#E2F6EB;color:#0E7F52">ผู้ดูแล</span><b>ใจดีแคร์ ศูนย์ผู้ดูแล</b><div class="rt"><span class="st">★ 4.8</span>521 รีวิว · ฿900/วัน</div></div><div class="km">2.1<small>กม.</small></div></div>
+        <div class="lcard" data-a="slideUpSm@11.96/.5"><img src="{{l-ride}}" alt=""><div class="tx"><span class="tg" style="background:#E2F6EB;color:#0E7F52">รถรับส่ง</span><b>พาไปหาหมอ ทรานสปอร์ต</b><div class="rt"><span class="st">★ 4.9</span>388 รีวิว · ฿350/เที่ยว</div></div><div class="km">2.4<small>กม.</small></div></div>
+        <div class="lcard" data-a="slideUpSm@12.08/.5"><img src="{{l-house}}" alt=""><div class="tx"><span class="tg" style="background:#E2F6EB;color:#0E7F52">แม่บ้าน</span><b>บ้านสะอาดสบายใจ</b><div class="rt"><span class="st">★ 4.7</span>644 รีวิว · ฿450/ครั้ง</div></div><div class="km">2.9<small>กม.</small></div></div>
+      </div>
+
+      <!-- detail panel -->
+      <div class="dpanel" data-a="slideInRFull@15.7/.55; fadeOut@18.05/.3">
+        <div class="dban"><img src="{{l-meal}}" alt=""><div class="back">← ย้อนกลับ</div></div>
+        <div class="dbody">
+          <h3>ครัวบ้านยาย อาหารอ่อน</h3>
+          <div class="meta"><span class="st">★ 4.9</span><span>412 รีวิว</span><span>· 0.8 กม. จากบ้านคุณแม่</span><span>· ส่งใน 30–45 นาที</span></div>
+          <div class="pkg" id="pkg1"><div class="sel" data-a="fadeIn@16.2/.2; fadeOut@16.95/.2"></div><div class="rd"><i data-a="fadeIn@16.2/.2; fadeOut@16.95/.2"></i></div><div class="pt"><b>ข้าวต้มปลา + ผักลวก</b><span>อาหารอ่อน ลดเค็ม 1 มื้อ</span></div><div class="pr">฿79</div></div>
+          <div class="pkg" id="pkg2"><div class="sel" data-a="fadeIn@16.95/.25"></div><div class="rd"><i data-a="popIn@16.95/.3"></i></div><div class="pt"><b>ชุดอาหารอ่อน 3 มื้อ</b><span>เช้า กลางวัน เย็น ส่งรอบเดียว</span></div><div class="pr">฿205</div></div>
+          <div class="pkg"><div class="rd"></div><div class="pt"><b>อาหารเบาหวาน 7 วัน</b><span>คุมน้ำตาล ส่งทุกวันตอน 11 โมง</span></div><div class="pr">฿1,185</div></div>
+        </div>
+        <div class="order" id="orderBtn" data-a="press@17.8/.3">สั่งอาหาร · <span class="pv"><span data-a="fadeOut@16.95/.2">฿79</span><span data-a="fadeUp@17.0/.3">฿205</span></span></div>
+      </div>
+
+      <!-- tracking panel -->
+      <div class="tpanel" data-a="slideInRFull@18.05/.5">
+        <span class="okb"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>สั่งเรียบร้อย</span>
+        <h3>ติดตามออเดอร์</h3>
+        <div class="meta">ชุดอาหารอ่อน 3 มื้อ · ส่งถึงบ้านคุณแม่ เขตบางนา</div>
+        <div class="steps">
+          <div class="bar"><i data-a="fill@18.3/3.3"></i></div>
+          <div class="stp"><div class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><div class="on" data-a="popIn@18.3/.35"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div></div><div class="tx" data-a="brighten@18.3/.3"><b>สั่งแล้ว</b><span>10:02 · ร้านได้รับคำสั่งซื้อ</span></div></div>
+          <div class="stp"><div class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 01-18 0z"/></svg><div class="on" data-a="popIn@19.3/.35"><svg class="i" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 01-18 0z"/><path d="M8 7c0-1.5 1-2 1-3M12 7c0-1.5 1-2 1-3M16 7c0-1.5 1-2 1-3"/></svg></div></div><div class="tx" data-a="brighten@19.3/.3"><b>ร้านรับออเดอร์</b><span>10:05 · กำลังทำอาหารสด</span></div></div>
+          <div class="stp"><div class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/></svg><div class="on" data-a="popIn@20.3/.35"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></div></div><div class="tx" data-a="brighten@20.3/.3"><b>กำลังจัดส่ง</b><span>10:28 · ไรเดอร์ใกล้ถึงแล้ว</span></div></div>
+          <div class="stp"><div class="dot"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><div class="on" data-a="popIn@21.6/.35"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9.5 15.5l2 2 3.5-4"/></svg></div></div><div class="tx" data-a="brighten@21.6/.3"><b>ส่งถึงแล้ว</b><span>10:36 · ถึงบ้านคุณแม่</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- district picker -->
+    <div id="picker" data-a="fadeIn@7.15/.3; fadeOut@10.65/.35">
+      <div class="scrim"></div>
+      <div class="modal" data-a="modalIn@7.2/.55">
+        <div style="flex:none">
+          <h2>บ้านคุณแม่อยู่เขตไหน?</h2>
+          <div class="sub">เลือกเขต แล้วเราจะหาบริการที่ใกล้บ้านที่สุดให้</div>
+          <div class="hexmap" id="hexmap"></div>
+        </div>
+        <div class="mright">
+          <div class="field" id="dsearch"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="ph" data-a="fadeOut@8.15/.1">พิมพ์ชื่อเขต หรือใช้ตำแหน่งปัจจุบัน</span><span class="typed"><span data-type="8.2/.6">บางนา</span><i class="caret" data-a="blink@8.0/.8/4"></i></span></div>
+          <div class="lbl">เขตที่ค้นหาบ่อย</div>
+          <div class="chips"><div class="chip">จตุจักร</div><div class="chip">ลาดพร้าว</div><div class="chip">บางกะปิ</div><div class="chip">บางแค</div><div class="chip">สาทร</div></div>
+          <div class="sumcard" data-a="fadeUp@9.8/.4"><div class="ck"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></div><div><b>เขตบางนา · กรุงเทพฯ</b><span>พบ <span data-count="12@9.9/.6">12</span> บริการในระยะ 3 กม. จากบ้าน</span></div></div>
+          <div class="cta" id="ctaBtn" data-a="ctaReady@9.8/.4; press@10.4/.3">ดูบริการใกล้บ้าน <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" data-a="toastIn@21.75/.5; fadeOut@23.0/.35"><div class="bi"><svg class="i" viewBox="0 0 24 24" style="color:#fff"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></svg></div><div><b>อาหารถึงบ้านคุณแม่แล้ว</b><span>แจ้งคุณนิดและครอบครัวเรียบร้อย · เขตบางนา</span></div></div>
+  </section>
+
+  <!-- captions -->
+  <div class="cap"><div class="in" data-a="capIn@7.35/.45; capOut@10.6/.3"><span class="n">1</span>เลือกเขตบ้าน</div></div>
+  <div class="cap"><div class="in" data-a="capIn@12.5/.45; capOut@15.5/.3"><span class="n">2</span>ดูบริการใกล้บ้าน เรียงตามระยะทาง</div></div>
+  <div class="cap"><div class="in" data-a="capIn@16.0/.45; capOut@23.1/.3"><span class="n">3</span>สั่ง / จอง แล้วติดตามได้ทันที</div></div>
+
+  <!-- ========== 6 · OUTRO ========== -->
+  <section id="outro" data-a="hideUntil@23.5">
+    <div class="wipe brandbg" data-a="wipe@23.5/.75"></div>
+    <div class="blob" style="width:420px;height:420px;left:-120px;top:600px" data-a="blobIn@23.9/.6"></div>
+    <div class="blob" style="width:260px;height:260px;left:1320px;top:80px" data-a="blobIn@23.9/.6"></div>
+    <div class="center" data-a="fadeOut@29.35/.6">
+      <div class="oline" data-a="popBig@24.1/.7">
+        <div class="appicon"><img src="{{mark}}" alt=""></div>
+        <div class="bigword">SADU<span class="q">Q</span></div>
+      </div>
+      <div class="ot" data-a="fadeUp@24.55/.55">เลือกเขต แล้วดูบริการใกล้บ้าน</div>
+      <div class="row">
+        <div class="st3" data-a="fadeUp@25.0/.5"><span class="n">1</span>เลือกเขตบ้าน</div>
+        <div class="st3" data-a="fadeUp@25.25/.5"><span class="n">2</span>เทียบบริการใกล้บ้าน</div>
+        <div class="st3" data-a="fadeUp@25.5/.5"><span class="n">3</span>สั่ง จอง ติดตาม</div>
+      </div>
+      <div class="url" data-a="fadeUp@26.0/.5"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>สแกน QR เพื่อทดลองใช้ SADUQ</div>
+    </div>
+  </section>
+
+  <div id="cursor"><svg viewBox="0 0 24 24"><path d="M4 2.5l15 9.2-6.6 1.4 3.9 7.1-2.9 1.5-3.8-7.2L4.6 19z" fill="#fff" stroke="#0B1B4D" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+</div>
+<div id="help">Space หยุด/เล่น · R เริ่มใหม่ · F เต็มจอ · H ซ่อนแถบนี้ · <span id="clock">0.0</span>s</div>
+
+<script>
+(() => {
+'use strict';
+const T = 30;                       // ความยาวรอบ (วินาที)
+const stage = document.getElementById('stage');
+
+/* ---------- hex district map ---------- */
+const DIST = [
+  ['ดอนเมือง','บางเขน','จตุจักร','ลาดพร้าว','บึงกุ่ม'],
+  ['บางซื่อ','พญาไท','ห้วยขวาง','บางกะปิ','มีนบุรี'],
+  ['ธนบุรี','ปทุมวัน','วัฒนา','สวนหลวง','ลาดกระบัง'],
+  ['บางแค','สาทร','คลองเตย','บางนา','ประเวศ'],
+];
+const hexmap = document.getElementById('hexmap');
+let k = 0;
+DIST.forEach((row, r) => row.forEach((name, c) => {
+  const x = 10 + c * 120 + (r % 2) * 60, y = 6 + r * 104;
+  const isB = name === 'บางนา';
+  const d = document.createElement('div');
+  d.className = 'hex' + (isB ? ' bn' : '');
+  d.style.left = x + 'px'; d.style.top = y + 'px';
+  if (isB) d.id = 'hexBangna';
+  const pop = 'pop@' + (7.45 + k * 0.025).toFixed(3) + '/.4';
+  d.dataset.a = pop;
+  d.innerHTML = '<div class="hx' + ((r + c) % 2 ? ' alt' : '') + '" data-a="' + (isB ? 'hexOn@8.85/.35' : 'dim@8.85/.35') + '">' + name + '</div>';
+  hexmap.appendChild(d);
+  if (isB) {
+    const p = document.createElement('div');
+    p.className = 'pin';
+    p.style.left = (x + 59) + 'px'; p.style.top = (y + 52) + 'px';
+    p.dataset.a = 'drop@9.65/.55';
+    p.innerHTML = '<svg viewBox="0 0 40 50"><path d="M20 48C20 48 3 31 3 19a17 17 0 0134 0c0 12-17 29-17 29z" fill="#D9443A" stroke="#fff" stroke-width="2.5"/><circle cx="20" cy="19" r="6.5" fill="#fff"/></svg>';
+    hexmap.appendChild(p);
+  }
+  k++;
+}));
+
+/* ---------- animation presets ---------- */
+const E = { out: 'cubic-bezier(.2,.8,.2,1)', back: 'cubic-bezier(.34,1.56,.64,1)', io: 'cubic-bezier(.65,0,.35,1)', lin: 'linear' };
+const P = {
+  fadeIn:   [[{opacity:0},{opacity:1}], E.out],
+  fadeOut:  [[{opacity:1},{opacity:0}], E.out, 'out'],
+  hideUntil:[[{visibility:'hidden'},{visibility:'visible'}], 'step-end', 'gate'],
+  fadeUp:   [[{opacity:0,transform:'translateY(26px)'},{opacity:1,transform:'none'}], E.out],
+  riseIn:   [[{opacity:0,transform:'translateY(60px) scale(.9)'},{opacity:1,transform:'none'}], E.back],
+  pop:      [[{opacity:0,transform:'scale(.6)'},{opacity:1,transform:'none'}], E.back],
+  popIn:    [[{opacity:0,transform:'scale(.3)'},{opacity:1,transform:'none'}], E.back],
+  popBig:   [[{opacity:0,transform:'scale(.4) rotate(-8deg)'},{opacity:1,transform:'none'}], E.back],
+  zoomOut:  [[{opacity:1,transform:'none'},{opacity:0,transform:'scale(1.15)'}], E.io, 'out'],
+  appIn:    [[{opacity:0,transform:'scale(1.06)'},{opacity:1,transform:'none'}], E.out],
+  floatY:   [[{transform:'translateY(0)'},{transform:'translateY(-40px)'},{transform:'translateY(0)'}], 'ease-in-out', 'loop'],
+  blink:    [[{opacity:1},{opacity:1,offset:.5},{opacity:0,offset:.51},{opacity:0}], E.lin, 'loop'],
+  ringPulse:[[{opacity:.9,transform:'scale(1)'},{opacity:0,transform:'scale(1.25)'}], E.out, 'loop'],
+  modalIn:  [[{opacity:0,transform:'translateY(80px) scale(.96)'},{opacity:1,transform:'none'}], E.out],
+  dim:      [[{opacity:1},{opacity:.35}], E.out],
+  hexOn:    [[{background:'#EEF3FB',color:'#0B1B4D'},{background:'#0A6CF1',color:'#fff'}], E.out],
+  drop:     [[{opacity:0,transform:'translateY(-120px)'},{opacity:1,transform:'translateY(0)',offset:.6},{transform:'translateY(-14px)',offset:.8},{opacity:1,transform:'none'}], 'ease-in'],
+  ctaReady: [[{filter:'grayscale(1) opacity(.45)'},{filter:'none'}], E.out],
+  press:    [[{transform:'none'},{transform:'scale(.94)'},{transform:'none'}], E.io, 'out'],
+  mapZoom:  [[{transform:'scale(1.35)',filter:'blur(6px)'},{transform:'none',filter:'none'}], E.out],
+  slideInR: [[{opacity:0,transform:'translateX(120px)'},{opacity:1,transform:'none'}], E.out],
+  slideInRFull:[[{transform:'translateX(100%)'},{transform:'none'}], E.out],
+  slideUpSm:[[{opacity:0,transform:'translateY(40px)'},{opacity:1,transform:'none'}], E.out],
+  ringGrow: [[{opacity:0,transform:'scale(.1)'},{opacity:1,transform:'none'}], E.out],
+  pulseOut: [[{opacity:.8,transform:'scale(.5)'},{opacity:0,transform:'scale(4.5)'}], E.out, 'loop'],
+  pinPop:   [[{opacity:0,transform:'translateY(-30px) scale(.4)'},{opacity:1,transform:'none'}], E.back],
+  bounce:   [[{transform:'none'},{transform:'translateY(-22px)',offset:.4},{transform:'none'}], E.io, 'loop'],
+  tipIn:    [[{opacity:0,transform:'translateY(12px) scale(.95)'},{opacity:1,transform:'none'}], E.out],
+  draw:     [[{strokeDashoffset:640},{strokeDashoffset:0}], E.io],
+  ride:     [[{offsetDistance:'0%'},{offsetDistance:'100%'}], E.io],
+  fill:     [[{transform:'scaleY(0)'},{transform:'scaleY(.33)',offset:.30},{transform:'scaleY(.66)',offset:.61},{transform:'scaleY(1)'}], E.lin],
+  brighten: [[{opacity:.45},{opacity:1}], E.out],
+  toastIn:  [[{opacity:0,transform:'translateY(-40px) scale(.95)'},{opacity:1,transform:'none'}], E.back],
+  capIn:    [[{opacity:0,transform:'translateY(30px)'},{opacity:1,transform:'none'}], E.out],
+  capOut:   [[{opacity:1},{opacity:0,transform:'translateY(10px)'}], E.out, 'out'],
+  wipe:     [[{clipPath:'circle(0% at 30% 60%)'},{clipPath:'circle(120% at 30% 60%)'}], E.io],
+  blobIn:   [[{opacity:0},{opacity:.18}], E.out],
+};
+
+const anims = [];
+document.querySelectorAll('[data-a]').forEach(el => {
+  el.dataset.a.split(';').map(s => s.trim()).filter(Boolean).forEach(spec => {
+    const [name, rest] = spec.split('@');
+    const [start, dur = '0.01', iters] = rest.split('/');
+    const p = P[name]; if (!p) { console.warn('no preset', name); return; }
+    const [kf, easing, kind] = p;
+    const loop = kind === 'loop';
+    const a = el.animate(kf, {
+      delay: +start * 1000, duration: +dur * 1000,
+      iterations: loop ? (iters ? +iters : Infinity) : 1,
+      easing, fill: kind === 'out' ? 'forwards' : loop ? 'none' : 'both',
+    });
+    a.pause();
+    anims.push(a);
+  });
+});
+
+/* typed text and counters */
+const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('th', { granularity: 'grapheme' }) : null;
+const typers = [...document.querySelectorAll('[data-type]')].map(el => {
+  const [s, d] = el.dataset.type.split('/').map(Number);
+  const full = el.textContent;
+  const g = seg ? [...seg.segment(full)].map(x => x.segment) : [...full];
+  return { el, s, d, g, last: -1 };
+});
+const counters = [...document.querySelectorAll('[data-count]')].map(el => {
+  const [n, rest] = el.dataset.count.split('@'); const [s, d] = rest.split('/').map(Number);
+  return { el, n: +n, s, d, last: -1 };
+});
+
+/* ---------- cursor path ---------- */
+const cur = document.getElementById('cursor');
+// [time, target(selector or [x,y]), click?]
+const PATH = [
+  [5.6, [1180, 760]],
+  [6.95, '#locChip', 1],
+  [7.6, '#locChip'],
+  [7.95, '#dsearch', 1],
+  [8.9, [900, 520]],
+  [9.55, '#hexBangna', 1],
+  [10.25, '#ctaBtn'],
+  [10.4, '#ctaBtn', 1],
+  [11.2, [1240, 330]],
+  [13.15, [300, 385]],
+  [14.2, [322, 400]],
+  [14.65, '#card1'],
+  [15.45, '#card1', 1],
+  [16.1, [1260, 560]],
+  [16.85, '#pkg2', 1],
+  [17.6, '#orderBtn'],
+  [17.78, '#orderBtn', 1],
+  [18.3, [1320, 760]],
+];
+const SHOW = [5.6, 18.4];
+let pts = [];
+const ripples = [];
+
+function seekAnims(t) {
+  const ms = t * 1000;
+  for (const a of anims) a.currentTime = ms;
+}
+function stageXY(el) {
+  const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+  const k = s.width / 1600;
+  return [(r.left - s.left + r.width / 2) / k, (r.top - s.top + r.height / 2) / k];
+}
+function measure() {
+  pts = PATH.map(([t, tg, click]) => {
+    let xy;
+    if (typeof tg === 'string') { seekAnims(t); xy = stageXY(document.querySelector(tg)); }
+    else xy = tg;
+    return { t, x: xy[0], y: xy[1], click: !!click };
+  });
+  // ripples
+  ripples.forEach(r => r.el.remove()); ripples.length = 0;
+  pts.filter(p => p.click).forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'ripple'; el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+    stage.appendChild(el);
+    const a = el.animate([{ opacity: .9, transform: 'scale(.3)' }, { opacity: 0, transform: 'scale(1.4)' }],
+      { delay: p.t * 1000, duration: 550, easing: E.out, fill: 'forwards' });
+    a.pause();
+    ripples.push({ el, a });
+  });
+}
+const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+function cursorAt(t) {
+  if (!pts.length) return;
+  const vis = t >= SHOW[0] && t <= SHOW[1];
+  const fade = Math.min(1, (t - SHOW[0]) / .25, (SHOW[1] - t) / .25);
+  cur.style.opacity = vis ? Math.max(0, fade) : 0;
+  let x = pts[0].x, y = pts[0].y;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i], n = pts[i + 1];
+    if (t <= p.t) { if (i === 0) { x = p.x; y = p.y; } break; }
+    if (!n) { x = p.x; y = p.y; break; }
+    if (t < n.t) { const u = ease((t - p.t) / (n.t - p.t)); x = p.x + (n.x - p.x) * u; y = p.y + (n.y - p.y) * u; break; }
+  }
+  // press-down scale around clicks
+  let sc = 1;
+  for (const p of pts) if (p.click) { const d = t - p.t; if (d > -0.08 && d < 0.18) sc = .82; }
+  cur.style.transform = `translate(${x - 8}px, ${y - 6}px) scale(${sc})`;
+}
+
+function render(t) {
+  seekAnims(t);
+  for (const r of ripples) r.a.currentTime = t * 1000;
+  for (const ty of typers) {
+    const n = Math.max(0, Math.min(ty.g.length, Math.round((t - ty.s) / ty.d * ty.g.length)));
+    if (n !== ty.last) { ty.el.textContent = ty.g.slice(0, n).join(''); ty.last = n; }
+  }
+  for (const c of counters) {
+    const u = Math.max(0, Math.min(1, (t - c.s) / c.d));
+    const v = Math.round(c.n * (1 - Math.pow(1 - u, 3)));
+    if (v !== c.last) { c.el.textContent = v; c.last = v; }
+  }
+  cursorAt(t);
+}
+
+/* ---------- fit stage ---------- */
+function fit() {
+  const k = Math.min(innerWidth / 1600, innerHeight / 1000);
+  stage.style.transform = `translate(-50%,-50%) scale(${k})`;
+  stage.style.transformOrigin = '50% 50%';
+  stage.style.left = '50%'; stage.style.top = '50%';
+  stage.style.marginLeft = '0'; stage.style.marginTop = '0';
+}
+// use centered transform
+stage.style.transform = 'translate(-50%,-50%)';
+
+/* ---------- clock ---------- */
+const qs = new URLSearchParams(location.search);
+const STILL = qs.has('still');           // สำหรับอัดเฟรมต่อเฟรม
+let t0 = performance.now(), paused = false, pausedAt = 0, now = +(qs.get('t') || 0);
+const clockEl = document.getElementById('clock');
+function frame(ts) {
+  if (!paused) now = ((ts - t0) / 1000) % T;
+  render(now);
+  clockEl.textContent = now.toFixed(1);
+  requestAnimationFrame(frame);
+}
+function restart() { t0 = performance.now(); now = 0; paused = false; }
+
+window.__seek = t => { render(t); return true; };
+window.__ready = false;
+
+addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); if (paused) { t0 = performance.now() - now * 1000; paused = false; } else paused = true; }
+  else if (e.key === 'r' || e.key === 'R') restart();
+  else if (e.key === 'f' || e.key === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}); }
+  else if (e.key === 'h' || e.key === 'H') document.body.classList.toggle('showhelp');
+  else if (e.key === 'ArrowRight') { now = (now + 1) % T; t0 = performance.now() - now * 1000; }
+  else if (e.key === 'ArrowLeft') { now = (now - 1 + T) % T; t0 = performance.now() - now * 1000; }
+});
+addEventListener('resize', () => { fit(); measure(); });
+
+const go = () => {
+  fit(); measure(); render(now);
+  window.__ready = true;
+  if (!STILL) { t0 = performance.now() - now * 1000; requestAnimationFrame(frame); }
+};
+const fontsOk = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+Promise.race([fontsOk, new Promise(r => setTimeout(r, 2500))]).then(() => {
+  const imgs = [...document.images].filter(i => !i.complete).map(i => new Promise(r => { i.onload = i.onerror = r; }));
+  Promise.all(imgs).then(go);
+});
+})();
+</script>
+</body>
+</html>
