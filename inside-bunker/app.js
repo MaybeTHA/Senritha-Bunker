@@ -5,7 +5,7 @@
 'use strict';
 
 /* ---------- Apps ---------- */
-const CATS=['Productivity','System','Music','3D Worlds','Games'];
+const CATS=['Productivity','System','Music','3D Worlds','Games','Health & Care'];
 const G={ /* two-tone glyphs: white strokes + one blue accent (.a) */
   workspace:'<path d="M4 7.5A1.5 1.5 0 0 1 5.5 6H10l2 2h6.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path class="a" d="M8 12.5h8M8 15.5h5"/>',
   os:'<rect x="7" y="3" width="10" height="18" rx="2.6"/><path class="a" d="M10 7.5h.01M14 7.5h.01M10 11h.01M14 11h.01"/><path d="M11 18h2"/>',
@@ -16,6 +16,7 @@ const G={ /* two-tone glyphs: white strokes + one blue accent (.a) */
   perf:'<path d="M4 17.5a8 8 0 1 1 16 0"/><path d="M7 17.5h.01M17 17.5h.01M12 9.5v.01" opacity=".6"/><path class="a" d="m12 17.5 4.2-5.2"/>',
   clips:'<rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M9 20h6"/><circle class="a" cx="12" cy="10.75" r="2.6"/>',
   steelforge:'<rect x="3" y="13" width="18" height="5.5" rx="2.75"/><path d="M6 13v-2.5A1.5 1.5 0 0 1 7.5 9H14l2 4"/><path class="a" d="M12 9V7.5h9"/>',
+  saduq:'<path d="M9.5 3h5v4.5H19v5h-4.5V17h-5v-4.5H5v-5h4.5z"/><path class="a" d="M3 19.2c4.5 2.4 12.5 2.4 18-2.4"/>',
 };
 const APPS=[
   {id:'workspace',href:'senritha-workspace/',name:"Senritha's Work Space",desc:'Channels, sub-channels, messages and images. Saved on this device.',cat:'Productivity'},
@@ -27,6 +28,7 @@ const APPS=[
   {id:'perf',href:'senritha-perf/',name:"Senritha's Test Performance",desc:'WebGL2 graphics benchmark: GPU, CPU and frame pacing, measured.',cat:'System'},
   {id:'clips',href:'senritha-clips/',name:"Senritha's Random Clips",desc:'Long screen-recording sessions that save short clips at random moments. Every timing is yours to set.',cat:'Productivity'},
   {id:'steelforge',href:'steelforge-requiem/',name:'Steelforge Requiem',desc:'Top-down tank battles: Frontline, duels, capture, and endless waves. Build your tank part by part. PC and phone.',cat:'Games'},
+  {id:'saduq',href:'saduq/',name:'Saduq',desc:'All-in-one hub for seniors and families: health, daily help, family care, government benefits and emergency. Thai.',cat:'Health & Care'},
 ];
 const byId=Object.fromEntries(APPS.map(a=>[a.id,a]));
 const slug=c=>c.toLowerCase().replace(/[^a-z0-9]+/g,'-');
