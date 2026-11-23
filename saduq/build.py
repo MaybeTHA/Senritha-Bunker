@@ -7,7 +7,7 @@ r = subprocess.run(['npx', '-y', 'esbuild@0.28.2', 'src/main.js', '--bundle', '-
 if r.returncode: sys.exit(1)
 b64 = lambda p: 'data:image/png;base64,' + base64.b64encode(open(p, 'rb').read()).decode()
 MARK, FAV = b64('assets/brand/saduq-mark.png'), b64('assets/brand/favicon.png')
-css = open('src/styles/app.css', encoding='utf8').read() + '\n' + open('src/styles/hub.css', encoding='utf8').read()
+css = '\n'.join(open(f'src/styles/{n}.css', encoding='utf8').read() for n in ('app', 'hub', 'ai'))
 js = open('dist/app.js', encoding='utf8').read().replace('</script', '<\\/script').replace('__MARK__', MARK)
 os.remove('dist/app.js')
 body = open('body.html', encoding='utf8').read().replace('__MARK__', MARK)

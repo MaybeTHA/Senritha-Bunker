@@ -17,6 +17,8 @@ export const stars = (r, cls = '') => h('span.stars5' + cls, { role: 'img', 'ari
   h('i', { style: { '--p': `${(r / 5) * 100}%` }, 'aria-hidden': 'true' }, '★★★★★'));
 const pAvatar = (p, big = false) => h('span.pav' + (big ? '.big' : ''), { style: { background: avatarColor(p.id) }, 'aria-hidden': 'true' }, p.name.replace(/^(ร้าน|ศูนย์|คลินิก)/, '').trim()[0]);
 const inCmp = id => ms.cmp.includes(id);
+/** ตั้งรายการเทียบจากที่อื่น (เช่น 3 ตัวเลือกของผู้ช่วย AI) */
+export const setCompare = ids => { ms.cmp = ids.slice(0, 3); };
 function toggleCmp(id, rerender) {
   if (inCmp(id)) ms.cmp = ms.cmp.filter(x => x !== id);
   else if (ms.cmp.length >= 3) return toast('เปรียบเทียบได้ครั้งละ 3 เจ้า เอาออกก่อน 1 เจ้า');

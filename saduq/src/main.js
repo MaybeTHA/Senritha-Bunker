@@ -12,16 +12,17 @@ import { openReminder } from './features/remind.js';
 import { avatar } from './features/common.js';
 import { providerView, compareView, startOrderSim } from './features/market.js';
 import { needsOnboarding } from './features/onboard.js';
+import { assistView } from './features/assist.js';
 import { seedCaregiver } from './features/family.js';
 
-globalThis.SABAII_VERSION = '1.4.1';
+globalThis.SABAII_VERSION = '1.5.0';
 const VIEWS = {
   home: ['หน้าหลัก', homeView], services: ['บริการ', servicesView], cat: ['บริการ', categoryView], svc: ['บริการ', serviceView],
   activity: ['กิจกรรม', activityView], req: ['คำขอบริการ', requestView], notif: ['การแจ้งเตือน', notifView], subject: ['หมวดการเตือน', subjectView],
-  family: ['ครอบครัว', familyView], prov: ['ผู้ให้บริการ', providerView], compare: ['เปรียบเทียบ', compareView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
+  family: ['ครอบครัว', familyView], prov: ['ผู้ให้บริการ', providerView], compare: ['เปรียบเทียบ', compareView], ai: ['ผู้ช่วย AI', assistView], emergency: ['ฉุกเฉิน', emergencyView], me: ['ฉัน', profileView],
 };
 const ALIAS = { tasks: 'activity' }; // ลิงก์รุ่นนักเรียนเดิม
-const NAV_OF = { services: 'home', cat: 'home', svc: 'home', prov: 'home', compare: 'home', emergency: 'home', req: 'activity', notif: 'activity', subject: 'activity', family: 'me' };
+const NAV_OF = { services: 'home', cat: 'home', svc: 'home', prov: 'home', compare: 'home', ai: 'home', emergency: 'home', req: 'activity', notif: 'activity', subject: 'activity', family: 'me' };
 const NAV = [['home', 'home', 'หน้าหลัก'], ['activity', 'activity', 'กิจกรรม'], ['me', 'me', 'ฉัน']];
 
 /** รับทั้ง #home และ #/home และ #svc/h-appt */

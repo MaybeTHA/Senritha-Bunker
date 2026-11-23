@@ -13,6 +13,7 @@ import { photoOf } from '../domain/photos.js';
 import { hasMarket, marketStats, baht } from '../domain/providers.js';
 import { marketView } from './market.js';
 import { members } from './common.js';
+import { askAI } from './assist.js';
 
 const DOWL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'], MON = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 const hs = { q: '', cat: 'health' };
@@ -49,7 +50,8 @@ export function homeView(root, keepFocus = false) {
       h('h1.htitle', h('span.sr', `วันนี้อยากให้เราช่วยอะไรดี${PQ()}`), h('span', { 'aria-hidden': 'true' }, role() === 'family' ? 'ดูแลคนที่คุณรัก ให้เราช่วย..' : 'ให้เราช่วย..'), keepTyped || typedLine()),
       h('label.hsearch.big', h('span', { html: ic('search') }), input, hs.q ? h('button.clr', { type: 'button', onclick: () => { hs.q = ''; homeView(root); }, 'aria-label': 'ล้างคำค้น' }, 'ล้าง') : ''),
       h('div.popular', { role: 'group', 'aria-label': 'คำค้นยอดนิยม' }, h('span', 'ค้นหาบ่อย'),
-        POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k)))),
+        POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k))),
+      h('a.aicta', { href: '#ai' }, h('span.aicta-ic', { html: ic('spark') }), h('span', h('b', 'เล่าปัญหาให้ AI ช่วยเลือก'), h('small', 'พิมพ์หรือพูดเป็นประโยค ได้ 3 ตัวเลือกพร้อมเหตุผล')), h('span', { html: ic('right') }))),
     hs.q.trim() ? h('div.panel', searchResults(hs.q)) : [
       catPanel(root),
       caredFor(),
@@ -167,6 +169,7 @@ function searchResults(q) {
   const reqs = S().requests.filter(r => hit(`${r.title} ${r.note || ''}`)).slice(0, 5);
   const n = svcs.length + rems.length + reqs.length;
   return h('section.results', { 'aria-live': 'polite' },
+    q.trim().length >= 6 ? h('button.aiask', { type: 'button', onclick: () => askAI(q) }, h('span', { html: ic('spark') }), h('span', 'ให้ AI ช่วยคิดจาก ', h('q', q)), h('span', { html: ic('right') })) : '',
     h('p.rcount', n ? `พบ ${n} รายการ` : `ไม่พบ "${q}" ลองคำที่สั้นลง เช่น หมอ ยา รถ`),
     svcs.length ? [h('h2.rh', 'บริการ'), h('div.svclist', svcs.map(svcRow))] : '',
     rems.length ? [h('h2.rh', 'การเตือนของฉัน'), h('div.actlist', rems.map(t => h('button.actrow', { onclick: () => openReminder(t.id) }, h('span.ar-ic', { html: ic('bell') }), h('span.ar-tx', h('b', t.title), h('small', dueLine(t))))))] : '',
