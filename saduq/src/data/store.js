@@ -15,13 +15,13 @@ export const DEFAULT_SUBJECTS = [
 ];
 
 export function createStore(db, { now = () => new Date() } = {}) {
-  const state = { tasks: [], subjects: [], attachments: [], prefs: {}, requests: [], family: [], notices: [], dbKind: db.kind };
+  const state = { tasks: [], subjects: [], attachments: [], prefs: {}, requests: [], family: [], notices: [], vitals: [], dbKind: db.kind };
   const listeners = new Set();
   const iso = () => now().toISOString();
   const emit = () => listeners.forEach(fn => fn(state));
 
   async function load() {
-    [state.tasks, state.subjects, state.attachments, state.requests, state.family, state.notices] = await Promise.all(['tasks', 'subjects', 'attachments', 'requests', 'family', 'notices'].map(n => db.all(n)));
+    [state.tasks, state.subjects, state.attachments, state.requests, state.family, state.notices, state.vitals] = await Promise.all(['tasks', 'subjects', 'attachments', 'requests', 'family', 'notices', 'vitals'].map(n => db.all(n)));
     state.prefs = Object.fromEntries((await db.all('prefs')).map(p => [p.key, p.value]));
     if (!state.prefs.seeded) {
       for (const [i, [name, aliases]] of DEFAULT_SUBJECTS.entries()) {
@@ -118,25 +118,25 @@ export function createStore(db, { now = () => new Date() } = {}) {
     return JSON.stringify({
       app: 'SABAii.com', version: 1, exported_at: iso(),
       tasks: state.tasks, subjects: state.subjects, prefs: state.prefs,
-      requests: state.requests, family: state.family,
+      requests: state.requests, family: state.family, vitals: state.vitals,
       notes: state.attachments.filter(a => a.kind === 'text').map(({ blob, ...a }) => a),
     }, null, 2);
   }
 
   /** งานตัวอย่างให้ลองใช้ — ติดป้าย "ตัวอย่าง" ทุกชิ้น และลบทิ้งได้ทั้งหมดในครั้งเดียว */
-  async function addSamples() {
+  async function addSamples(for_id = null) {
     const day = n => { const d = new Date(now()); d.setDate(d.getDate() + n); return toYMD(d); };
     const sid = name => state.subjects.find(x => x.name === name)?.id || null;
     const rows = [
-      ['กินยาความดันหลังอาหารเช้า', 'ยาและสุขภาพ', 'medicine', day(0), '08:00', '1 เม็ด หลังอาหาร'],
-      ['นัดหมอตรวจเบาหวาน', 'นัดหมอ', 'appointment', day(3), '09:30', 'งดอาหารก่อนเจาะเลือด 8 ชั่วโมง · นำสมุดนัดไปด้วย'],
-      ['รำไม้พลองที่ชมรม', 'กิจกรรม', 'activity', day(1), '17:00', ''],
-      ['วิดีโอคอลกับหลาน', 'ครอบครัว', 'reminder', day(2), '19:00', ''],
-      ['ซื้อแผ่นวัดน้ำตาลเพิ่ม', 'ธุระและเอกสาร', 'errand', day(4), null, ''],
+      ['ให้ยาความดันหลังอาหารเช้า', 'ยาและสุขภาพ', 'medicine', day(0), '08:00', 'Amlodipine 5 mg 1 เม็ด หลังอาหาร (ตัวอย่าง)'],
+      ['ให้ยาเบาหวานก่อนนอน', 'ยาและสุขภาพ', 'medicine', day(0), '20:00', ''],
+      ['พาไปนัดหมอตรวจเบาหวาน', 'นัดหมอ', 'appointment', day(3), '09:30', 'งดอาหารก่อนเจาะเลือด 8 ชั่วโมง · นำสมุดนัดและยาเดิมไปด้วย'],
+      ['พาเดินออกกำลังรอบบ้าน 15 นาที', 'กิจกรรม', 'activity', day(1), '17:00', ''],
+      ['ซื้อแผ่นตรวจน้ำตาลเพิ่ม', 'ธุระและเอกสาร', 'errand', day(4), null, 'ดูรุ่นให้ตรงกับเครื่อง'],
     ];
     const saved = [];
     for (const [title, subj, type, due_date, due_time, note] of rows) {
-      const t = makeTask({ title, subject_id: sid(subj), type, due_date, due_time, source: 'sample' }, iso());
+      const t = makeTask({ title, subject_id: sid(subj), type, due_date, due_time, source: 'sample', for_id }, iso());
       await putTask(t, false);
       if (note) { const a = { id: newId('a'), task_id: t.id, kind: 'text', blob: null, text: note, mime_type: '', size: 0, created_at: iso() }; await db.put('attachments', a); state.attachments.push(a); }
       saved.push(t);
@@ -147,6 +147,8 @@ export function createStore(db, { now = () => new Date() } = {}) {
   async function removeSamples() {
     const ids = state.tasks.filter(t => t.source === 'sample').map(t => t.id);
     for (const id of ids) await purgeTask(id, false);
+    for (const v of state.vitals.filter(v => v.sample)) await db.del('vitals', v.id);
+    state.vitals = state.vitals.filter(v => !v.sample);
     emit();
     return ids.length;
   }
@@ -162,6 +164,8 @@ export function createStore(db, { now = () => new Date() } = {}) {
       if (!t?.id || !t.title || state.tasks.some(x => x.id === t.id)) { skipped++; continue; }
       await putTask(t, false); added++;
     }
+    for (const v of data.vitals || []) if (v?.id && !state.vitals.some(x => x.id === v.id)) await putIn('vitals', v, false);
+    for (const m of data.family || []) if (m?.id && !state.family.some(x => x.id === m.id)) await putIn('family', m, false);
     for (const n of data.notes || []) if (n?.id && n.task_id && !state.attachments.some(a => a.id === n.id)) { await db.put('attachments', n); state.attachments.push(n); }
     emit();
     return { added, skipped };
@@ -182,7 +186,7 @@ export function createStore(db, { now = () => new Date() } = {}) {
     const req = { id: newId('r'), created_at: at, updated_at: at, status: 'requested', review: null, demo: true, ...r,
       history: [{ status: 'requested', at, by: r.by_id || 'me' }] };
     await putIn('requests', req, false);
-    await notify({ kind: 'request', ref: req.id, title: `${req.provider_id ? 'สั่ง/จอง' : 'ส่งคำขอ'}: ${req.title}`, body: req.provider_id ? 'รอผู้ให้บริการยืนยัน' : 'บันทึกไว้ในเครื่องแล้ว', by: req.by_id }, false);
+    await notify({ kind: 'request', ref: req.id, title: req.assignee_id ? `แบ่งงาน: ${req.title}` : `เริ่มติดตาม: ${req.title}`, body: 'บันทึกไว้ในเครื่องนี้', by: req.by_id }, false);
     emit();
     return req;
   }
@@ -195,6 +199,9 @@ export function createStore(db, { now = () => new Date() } = {}) {
     emit();
     return next;
   }
+  /** บันทึกค่าสุขภาพ: { for_id, kind: bp|sugar|temp|spo2|weight, v1, v2, note, at } */
+  const addVital = v => putIn('vitals', { id: newId('v'), at: iso(), by: 'me', ...v });
+  const removeVital = id => delIn('vitals', id);
   const saveMember = m => putIn('family', { created_at: iso(), ...m, id: m.id || newId('f') });
   const removeMember = id => delIn('family', id);
   async function readAll() { for (const n of state.notices.filter(n => !n.read)) await putIn('notices', { ...n, read: true }, false); emit(); }
@@ -203,7 +210,7 @@ export function createStore(db, { now = () => new Date() } = {}) {
   return {
     state, load,
     addRequest, patchRequest, removeRequest: id => delIn('requests', id),
-    saveMember, removeMember, notify: n => notify(n), readAll, clearNotices, subscribe: fn => (listeners.add(fn), () => listeners.delete(fn)),
+    saveMember, removeMember, addVital, removeVital, notify: n => notify(n), readAll, clearNotices, subscribe: fn => (listeners.add(fn), () => listeners.delete(fn)),
     addTasks, patchTask, removeTask, restoreTask, purgeTask,
     addAttachment, removeAttachment, attachmentsOf: id => state.attachments.filter(a => a.task_id === id),
     ensureSubject, updateSubject, deleteSubject, setPref, exportJSON, restoreBackup, addSamples, removeSamples,

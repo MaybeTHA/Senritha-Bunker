@@ -2,7 +2,6 @@
 import { h, ic, toast } from '../ui/kit.js';
 import { catOf, REQ_LABEL } from '../domain/catalog.js';
 import { photoOf } from '../domain/photos.js';
-import { providerOf, marketStats, baht } from '../domain/providers.js';
 import { app, S } from './shared.js';
 import { fromYMD, DOW_SHORT, MONTH_SHORT } from '../domain/dates.js';
 
@@ -10,7 +9,8 @@ import { fromYMD, DOW_SHORT, MONTH_SHORT } from '../domain/dates.js';
 export const tone = () => S().prefs.polite || 'none';
 export const P = () => ({ krub: 'ครับ', ka: 'ค่ะ' })[tone()] || '';
 export const PQ = () => ({ krub: 'ครับ', ka: 'คะ' })[tone()] || '';
-export const role = () => S().prefs.role === 'family' ? 'family' : 'senior';
+/** แอปนี้ใช้โดย "ผู้ดูแล" เสมอ — ผู้สูงอายุเป็นโปรไฟล์ผู้รับการดูแล ไม่ได้เป็นผู้ใช้ */
+export const role = () => 'family';
 export const myName = () => S().prefs.display_name || '';
 export function greeting() {
   const hr = new Date().getHours(), n = myName();
@@ -22,17 +22,21 @@ export function greeting() {
 export const members = () => [...S().family].sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
 export const member = id => S().family.find(m => m.id === id);
 export function whoName(id) {
-  if (id && providerOf(id)) return providerOf(id).name;
   if (!id || id === 'me') return myName() ? `${myName()} (ฉัน)` : 'ฉัน';
   return member(id)?.name || 'สมาชิกที่ถูกลบ';
 }
-/** คนที่รับบริการได้: ตัวฉัน + สมาชิกที่เป็นผู้สูงอายุ */
-/** คนที่รับบริการ — ผู้ดูแล: ผู้สูงอายุในความดูแลขึ้นก่อน (ค่าเริ่มต้น) */
-export const careTargets = () => {
-  const sr = members().filter(m => m.role === 'senior').map(m => ({ id: m.id, name: m.name })), me = { id: 'me', name: whoName('me') };
-  return role() === 'family' && sr.length ? [...sr, me] : [me, ...sr];
-};
-export const initial = s => (String(s || '?').trim()[0] || '?');
+/** ผู้รับการดูแล (ผู้สูงอายุ) · ทีมดูแล (คนช่วยดูแล) */
+export const recipients = () => members().filter(m => m.role === 'senior');
+export const team = () => members().filter(m => m.role !== 'senior');
+/** ผู้รับการดูแลที่กำลังดูอยู่ (เลือกได้ถ้ามีหลายคน) */
+export const curPerson = () => recipients().find(m => m.id === S().prefs.cur_person) || recipients()[0] || null;
+export const personName = id => member(id)?.name || '';
+/** คนที่งาน/เรื่องเป็นของ: ผู้รับการดูแลทุกคน (ไม่มีเลย = ตัวผู้ดูแลเอง) */
+export const careTargets = () => recipients().length ? recipients().map(m => ({ id: m.id, name: m.name })) : [{ id: 'me', name: whoName('me') }];
+/** งานของคนนี้: ผูกกับคนนี้ หรือไม่ได้ผูกกับใคร */
+export const forPerson = (t, id) => !t.for_id || t.for_id === id || !member(t.for_id);
+/** ตัวอักษรแรกที่อ่านเป็นชื่อได้: ข้ามคำนำหน้า (คุณ ป้า ลุง) และสระหน้า (เ แ โ ใ ไ) */
+export const initial = s => (String(s || '?').trim().replace(/^(คุณ|ป้า|ลุง|ยาย|ตา|พี่|น้อง)(?=.)/, '').replace(/^[เแโใไ]+/, '')[0] || '?');
 const AV = ['#0A6CF1', '#16A06A', '#E07A2E', '#7C4DFF', '#D9468F', '#0E8FA3'];
 export const avatarColor = id => AV[[...String(id)].reduce((a, c) => a + c.charCodeAt(0), 0) % AV.length];
 export const avatar = (id, name, cls = '') => h('span.avatar.av' + (id === 'me' ? '.grad' : '') + cls, { style: id === 'me' ? null : { background: avatarColor(id) }, 'aria-hidden': 'true' }, initial(name));
@@ -49,10 +53,7 @@ export function ago(iso) {
 
 /* ---------- ป้าย ---------- */
 export const demoTag = (txt = 'ตัวอย่าง') => h('span.dtag', txt);
-const KSTEP = { requested: 0, confirmed: 1, in_progress: 2, done: 3 };
-export const statusPill = (st, r) => { const pv = r?.provider_id && providerOf(r.provider_id);
-  const lbl = pv && KSTEP[st] != null ? ({ food: ['สั่งแล้ว', 'ร้านรับออเดอร์', 'กำลังจัดส่ง', 'ส่งถึงแล้ว'], goods: ['สั่งแล้ว', 'ร้านยืนยัน', 'กำลังจัดส่ง', 'ได้รับของแล้ว'], ride: ['จองแล้ว', 'คนขับรับงาน', 'กำลังเดินทาง', 'ถึงที่หมาย'] }[pv.kind] || [])[KSTEP[st]] : null;
-  return h('span.spill.st-' + st, lbl || REQ_LABEL[st] || st); };
+export const statusPill = st => h('span.spill.st-' + st, REQ_LABEL[st] || st);
 export const go = hash => { location.hash = '#' + hash; };
 /** ปิดกล่องแล้วค่อยเปลี่ยนหน้า — ปิดกล่องจะถอยประวัติ 1 ก้าว (ทำงานทีหลัง) ต้องรอให้เสร็จก่อน ไม่งั้นหน้าจะเด้งกลับ */
 export function goAfterModal(hash) {
@@ -78,24 +79,20 @@ export function svcRow(s) {
   return h('a.svcrow', { href: '#svc/' + s.id, style: { '--ct': c.tint, '--ci': c.ink } },
     photoOf(s) ? h('span.sr-ic.ph', { style: { backgroundImage: `url("${photoOf(s).src}")` }, 'aria-hidden': 'true' }) : h('span.sr-ic', { html: ic(s.icon) }),
     h('span.sr-tx', h('b', s.name), h('small', s.short)),
-    s.provider?.phone ? h('span.sr-num', s.provider.phone) : marketStats(s.id) ? h('span.sr-mk', `${marketStats(s.id).count} เจ้า`, h('small', `★ ${marketStats(s.id).rating.toFixed(1)}`)) : h('span.sr-go', { html: ic('right') }));
+    s.provider?.phone ? h('span.sr-num', s.provider.phone) : h('span.sr-go', { html: ic('right') }));
 }
 /** การ์ดแนะนำ (เลื่อนข้าง): ภาพ · ชื่อ · คำอธิบาย · ผู้ให้บริการ · ราคา · รีวิว · ปุ่มดูรายละเอียด — ไม่มีข้อมูลก็บอกว่าไม่มี */
 export function recCard(s) {
-  const c = catOf(s.cat), mine = myReviews(s.id), ms = marketStats(s.id);
+  const c = catOf(s.cat), mine = myReviews(s.id);
   return h('article.reccard', { style: { '--ct': c.tint, '--ci': c.ink } },
     h('div.rc-art' + (photoOf(s) ? '.photo' : ''), { style: photoOf(s) ? { backgroundImage: `url("${photoOf(s).src}")` } : null }, h('span.rc-ic', { html: ic(s.icon) }), h('span.rc-cat', c.short)),
     h('div.rc-body',
       h('b', s.name), h('p', s.short),
-      ms ? h('dl.rc-meta',
-        h('div', h('dt', 'ผู้ให้บริการ'), h('dd', `${ms.count} เจ้าให้เลือก`)),
-        h('div', h('dt', 'ราคา'), h('dd', `เริ่มต้น ${baht(ms.min)}`)),
-        h('div', h('dt', 'รีวิว'), h('dd', `${ms.rating.toFixed(1)} ★ (${ms.reviews.toLocaleString('th-TH')})`)))
-      : h('dl.rc-meta',
-        h('div', h('dt', 'ผู้ให้บริการ'), h('dd', s.provider?.name || (s.ready ? 'Saduq' : 'ยังไม่มีในระบบ'))),
+      h('dl.rc-meta',
+        h('div', h('dt', 'ผู้ให้บริการ'), h('dd', s.provider?.name || (s.ready ? 'Saduq (ในเครื่องนี้)' : 'ยังไม่มีในระบบ'))),
         h('div', h('dt', 'ราคา'), h('dd', s.price || (s.ready ? 'ไม่มีค่าใช้จ่าย' : 'ยังไม่มีข้อมูล'))),
         h('div', h('dt', 'รีวิว'), h('dd', mine.length ? `${avgStars(mine).toFixed(1)} ★ (${mine.length} ของคุณ)` : 'ยังไม่มีรีวิว'))),
-      h('a.btn.primary.sm', { href: '#svc/' + s.id }, ms ? 'เลือกเจ้าและเปรียบเทียบ' : 'ดูรายละเอียด')));
+      h('a.btn.primary.sm', { href: '#svc/' + s.id }, 'ดูรายละเอียด')));
 }
 export const myReviews = sid => S().requests.filter(r => r.service_id === sid && r.review);
 export const avgStars = rs => rs.reduce((a, r) => a + r.review.stars, 0) / rs.length;
