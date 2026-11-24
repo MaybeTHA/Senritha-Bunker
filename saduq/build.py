@@ -21,6 +21,12 @@ html = f'''<!doctype html>
 <meta name="description" content="Saduq ศูนย์รวมบริการสำหรับผู้สูงอายุและครอบครัว">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Saduq">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="assets/brand/icon-180.png">
 <link rel="icon" href="{FAV}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,4 +48,8 @@ open('dist/index.html', 'w', encoding='utf8').write(html)
 # สำเนาที่ saduq/index.html สำหรับ GitHub Pages (ใช้ assets/photos ในโฟลเดอร์นี้) → https://<user>.github.io/<repo>/saduq/
 open('index.html', 'w', encoding='utf8').write(html)
 shutil.copytree('assets/photos', 'dist/assets/photos', dirs_exist_ok=True)
+# เพิ่มลงหน้าจอโฮม → เปิดเต็มจอแบบแอป (ไม่มีแถบเบราว์เซอร์)
+os.makedirs('dist/assets/brand', exist_ok=True)
+for n in (180, 192, 512): shutil.copy(f'assets/brand/icon-{n}.png', 'dist/assets/brand/')
+shutil.copy('manifest.webmanifest', 'dist/')
 print('dist/index.html', len(html), 'bytes')

@@ -126,13 +126,13 @@ function reviewBox(r) {
 
 /* ================= กิจกรรมของฉัน ================= */
 const av = { tab: 'reminders' };
-const TABS = { reminders: 'ยา นัด และงานดูแล', requests: 'เรื่องที่ติดตาม', history: 'ประวัติ' };
+const TABS = { reminders: 'ยาและนัด', requests: 'ติดตาม', history: 'ประวัติ' };
 export function activityView(root, tab) {
   if (tab && TABS[tab]) av.tab = tab;
   const reqs = [...S().requests].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
   const active = reqs.filter(isActiveReq), past = reqs.filter(r => !isActiveReq(r));
   const body = h('div');
-  put(root, pageHead('งานดูแล', { sub: 'ตารางยา นัดหมอ งานที่แบ่งให้ทีม และเรื่องที่กำลังยื่น' }),
+  put(root, pageHead('งานดูแล'),
     h('div.tabs', { role: 'tablist' }, Object.entries(TABS).map(([k, v]) => h('button', { role: 'tab', 'aria-selected': String(av.tab === k), onclick: () => { av.tab = k; activityView(root); } }, v,
       k === 'requests' && active.length ? h('em', String(active.length)) : ''))),
     body);
@@ -149,7 +149,7 @@ export function activityView(root, tab) {
 /* ================= การแจ้งเตือน / อัปเดต ================= */
 export function notifView(root) {
   const list = [...S().notices].sort((a, b) => b.at.localeCompare(a.at));
-  put(root, pageHead('การแจ้งเตือน', { back: 'home', sub: 'ความเคลื่อนไหวของงานดูแล ค่าสุขภาพที่ผิดปกติ และทีมดูแล' }),
+  put(root, pageHead('การแจ้งเตือน', { back: 'home' }),
     list.length ? [h('div.row2.notibar', h('button.btn.ghost', { onclick: async () => { await app.store.readAll(); toast('อ่านทั้งหมดแล้ว'); } }, 'อ่านทั้งหมดแล้ว'),
       h('button.btn.ghost', { onclick: async () => { if (await confirmBox({ title: 'ล้างการแจ้งเตือนทั้งหมด?', ok: 'ล้าง', danger: true })) app.store.clearNotices(); } }, 'ล้างทั้งหมด')),
       h('ul.feed.big', list.map(n => h('li.fitem' + (n.read ? '' : '.unread'), avatar(n.by || 'me', whoName(n.by)),

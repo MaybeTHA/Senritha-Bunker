@@ -55,9 +55,9 @@ export function todayCare() {
     list.length ? h('div.actlist', list.map(careRow))
       : h('div.emptybox', h('b', done ? `ทำครบแล้ววันนี้ ${done} รายการ` : 'วันนี้ยังไม่มีงานดูแล'), h('p', 'เพิ่มยาหรือนัดหมอให้ผู้ที่คุณดูแล แอปจะรวมไว้ที่นี่')),
     h('div.quickadd', { role: 'group', 'aria-label': 'เพิ่มงานดูแลด่วน' },
-      h('button.qa', { onclick: () => addTask('voice'), html: ic('mic') + '<span>พูดเพื่อเพิ่ม</span>' }),
-      h('button.qa', { onclick: () => addTask('text'), html: ic('edit') + '<span>พิมพ์งาน</span>' }),
-      h('button.qa', { onclick: () => addTask('camera'), html: ic('camera') + '<span>ถ่ายใบนัด/ซองยา</span>' })));
+      h('button.qa', { onclick: () => addTask('voice'), html: ic('mic') + '<span>พูด</span>' }),
+      h('button.qa', { onclick: () => addTask('text'), html: ic('edit') + '<span>พิมพ์</span>' }),
+      h('button.qa', { onclick: () => addTask('camera'), html: ic('camera') + '<span>ถ่ายใบนัด</span>' })));
 }
 export function careRow(t) {
   const who = t.for_id && member(t.for_id) && recipients().length > 1 ? member(t.for_id).name : '';
@@ -75,7 +75,7 @@ export function benefitsBlock(m, { limit = 6, head = true } = {}) {
     h('div.svclist', list.map(({ id, why }) => { const s = svcOf(id), c = catOf(s.cat);
       return h('a.svcrow.ben', { href: '#svc/' + id, style: { '--ct': c.tint, '--ci': c.ink } }, h('span.sr-ic', { html: ic(s.icon) }),
         h('span.sr-tx', h('b', s.name), h('small', why)), h('span.sr-go', { html: ic('right') })); })),
-    h('p.srcnote', `คัดจากข้อมูลที่คุณใส่ด้วยกฎทั่วไป — เงื่อนไขจริงขึ้นกับหน่วยงานและปีงบประมาณ · ข้อมูลตรวจ ${CHECKED}`));
+    h('p.srcnote', `เงื่อนไขจริงขึ้นกับหน่วยงาน · ตรวจ ${CHECKED}`));
 }
 
 /* ================= หน้าผู้รับการดูแล ================= */
