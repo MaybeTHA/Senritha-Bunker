@@ -3786,7 +3786,7 @@ function commonStart(mode){
  $('hResp').classList.remove('on');closeBigMap();closeModal();
  G.mode=mode;buildMap(G.map);
  tanks=[];shots=[];parts=[];trails=[];debris=[];smokes=[];aps=[];arty=[];logs=[];
- $('hLog').innerHTML='';specReset();infReset();cineReset();G.cmdM=null;G.cmdPick=null;
+ $('hLog').innerHTML='';$('hLog').style.top='';$('hLog')._t=0;G._lgT=0;specReset();infReset();cineReset();G.cmdM=null;G.cmdPick=null;
  G.score=[0,0];G.caps=[];G.lwsDir=null;G.alert=0;G.deaths=0;
  runBuff={dmg:1,pen:1,armor:1,hp:1,rel:1,spd:1,acc:1,cvg:1,regen:0,life:0,crew:0,scan:1,stealth:1};
  var ps=calc();
@@ -3893,7 +3893,9 @@ function flHUD(){
   if(FL.capT[z]===1)lb='=';
   else if(o===-1&&Math.abs(FL.prog[z])>1)lb=Math.round(Math.abs(FL.prog[z]))+'';
   h+='<div class="fz" style="background:'+bg+'">'+lb+'</div>';}
- $('flBar').innerHTML=h;flRoleHUD();}
+ $('flBar').innerHTML=h;flRoleHUD();hudLogPos();}
+/* มือถือ: ให้ข้อความแจ้งเตือนอยู่ใต้กล่องสถานะ Frontline เสมอ (กล่องสูงขึ้นตามแถบกำลังพล) */
+function hudLogPos(){if(!document.body.classList.contains('mbl')||(G._lgT||0)>G.t)return;G._lgT=G.t+.5;var lg=$('hLog'),b=Math.round($('hScore').getBoundingClientRect().bottom)+4;if(b>40&&lg._t!==b){lg._t=b;lg.style.top=b+'px';}}
 function flEnd(victory,hq){
  if(G.over||(CINE.end&&!CINE.end.done))return;
  if(victory&&!SPEC.on)SV.stat.flWins++;
@@ -5017,7 +5019,7 @@ function drawMobSet(){var el=$('mobSet');if(!el)return;var L=[['assist','🎯 �
    · ฝ่ายป้องกัน: ห้ามออกนอกโซนของทีม — ออกไปได้ 5 วิ ครบแล้วรถระเบิด
    ═══════════════════════════════════════════════════════════ */
 var FLR={prep:30,swap:120,warn:10,limit:10*60,grace:12,lossGrace:10,oob:5,siege:30,ot:30,bonus:45,
- tkBase:240,tkPer:25,drain:.45,capSpd:7/4.5,btWin:90,btDur:60,breachT:6,breachS:1.2};
+ tkBase:240,tkPer:22,drain:.45,capSpd:7/4.5,btWin:90,btDur:60,breachT:6,breachS:1.2};
 function flRolesInit(){FL.rt=0;FL.prep=true;FL.to=false;tkInit();FL.phaseT=FLR.prep;FL.atk=Math.random()<.5?0:1;FL.warned=false;FL.swapN=0;
  FL.sgA={};addLog('⏳ เตรียมพร้อม 30 วิ — ยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้','b');}
 function flRole(side){if(!FL.on||FL.rt===undefined)return 'free';if(FL.prep)return 'prep';if(FL.to)return 'atk';
