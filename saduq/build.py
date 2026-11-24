@@ -1,6 +1,6 @@
 """Build Saduq into one HTML page: dist/index.html (+ dist/assets/photos) and index.html (for GitHub Pages).
 Usage (from this folder):  python3 build.py      needs Node (npx esbuild)"""
-import subprocess, sys, os, shutil, base64
+import subprocess, sys, os, shutil, base64, time
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 os.makedirs('dist', exist_ok=True)
 r = subprocess.run(['npx', '-y', 'esbuild@0.28.2', 'src/main.js', '--bundle', '--format=esm', '--minify', '--outfile=dist/app.js', '--log-level=warning'])
@@ -12,6 +12,7 @@ js = open('dist/app.js', encoding='utf8').read().replace('</script', '<\\/script
 os.remove('dist/app.js')
 body = open('body.html', encoding='utf8').read().replace('__MARK__', MARK)
 fonts = 'https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai+Looped:wght@400;500;600;700&family=Mali:wght@500;600;700&family=Nunito:wght@900&display=swap'
+BUILD = time.strftime('%Y%m%d%H%M%S', time.gmtime())  # รหัสรุ่น: แอปเช็คกับไฟล์บนเว็บ ถ้าไม่ตรง = มีรุ่นใหม่ → โหลดใหม่เอง
 html = f'''<!doctype html>
 <html lang="th">
 <head>
@@ -21,6 +22,7 @@ html = f'''<!doctype html>
 <meta name="description" content="Saduq ศูนย์รวมบริการสำหรับผู้สูงอายุและครอบครัว">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="color-scheme" content="light">
+<meta name="saduq-build" content="{BUILD}">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
