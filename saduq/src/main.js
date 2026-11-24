@@ -17,7 +17,7 @@ import { personView } from './features/people.js';
 import { productsView, productView } from './features/shop.js';
 import { assistantView } from './features/assistant.js';
 
-globalThis.SABAII_VERSION = '2.1.0';
+globalThis.SABAII_VERSION = '2.2.0';
 const VIEWS = {
   home: ['หน้าหลัก', homeView], services: ['บริการ', servicesView], cat: ['บริการ', categoryView], svc: ['บริการ', serviceView],
   activity: ['งานดูแล', activityView], req: ['เรื่องที่ติดตาม', requestView], notif: ['การแจ้งเตือน', notifView], subject: ['หมวดการเตือน', subjectView],
@@ -104,3 +104,19 @@ async function migrateToCaregiver(store) {
   await store.setPref('cg_v2', true);
 }
 boot();
+
+/* อัปเดตเอง: GitHub Pages ให้เบราว์เซอร์จำหน้าได้ ~10 นาที และแอปบนหน้าจอโฮมของ iPhone มักเปิดหน้าเดิมค้างไว้
+   → ตอนเปิดแอปและทุกครั้งที่สลับกลับมา เช็ครหัสรุ่น (saduq-build) ในไฟล์บนเว็บแบบไม่ใช้ของที่จำไว้ ถ้าไม่ตรงก็โหลดหน้าใหม่ */
+const BUILD = document.querySelector('meta[name="saduq-build"]')?.content;
+let lastCheck = 0;
+async function checkUpdate() {
+  if (!BUILD || location.protocol === 'file:' || Date.now() - lastCheck < 60e3) return;
+  lastCheck = Date.now();
+  try {
+    const html = await (await fetch(location.pathname + '?check=' + Date.now(), { cache: 'no-store' })).text();
+    const live = html.match(/name="saduq-build" content="(\d+)"/)?.[1];
+    if (live && live > BUILD && !document.querySelector('.modal.show, textarea:focus, input:focus')) location.replace(location.pathname + '?v=' + live + location.hash);
+  } catch { /* ออฟไลน์ → ใช้รุ่นที่มีอยู่ */ }
+}
+addEventListener('load', () => setTimeout(checkUpdate, 1500));
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(); });
