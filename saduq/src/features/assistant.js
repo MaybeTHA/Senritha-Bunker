@@ -21,8 +21,8 @@ export function assistantView(root, preset) {
   const mic = speechSupported() ? h('button.iconbtn.aimic', { type: 'button', 'aria-label': 'พูดแทนพิมพ์', html: ic('mic'), onclick: () => {
     toast('กำลังฟัง… พูดได้เลย'); startListening({ onText: v => { input.value = v; }, onEnd: () => { if (input.value.trim()) send(); } }); } }) : '';
   put(root,
-    pageHead('ผู้ช่วย AI', { sub: 'เล่าปัญหาของผู้ที่คุณดูแล แล้วได้ 3 ตัวเลือกจากบริการและสินค้าจริง' }),
-    h('ol.aiflow', { 'aria-label': 'ขั้นตอนของ AI' }, STEPS.map(([, t, d], i) => h('li', h('i', String(i + 1)), h('b', t), h('small', d)))),
+    pageHead('ผู้ช่วย AI', { sub: 'เล่าปัญหา แล้วได้ 3 ตัวเลือก' }),
+    h('ol.aiflow', { 'aria-label': 'ขั้นตอนของ AI' }, STEPS.map(([, t], i) => h('li', h('i', String(i + 1)), h('b', t)))),
     h('div.aithread', { 'aria-live': 'polite' }, st.thread.length ? st.thread.map(turnEl) : intro(root)),
     h('div.aibar', mic, input, h('button.btn.primary.aisend', { onclick: send, 'aria-label': 'ส่ง', html: ic('arrow') })));
   root.querySelector('.aithread .aiturn:last-child')?.scrollIntoView({ block: 'start' });
@@ -110,7 +110,7 @@ function answer(r) {
   return h('div.aians',
     h('p.aih', `${picks.length} ตัวเลือกสำหรับปัญหานี้`),
     h('div.aicards', picks.map((p, i) => optionCard(p, i))),
-    h('p.srcnote', `AI เลือกจากบริการและสินค้าจริงในแค็ตตาล็อก (ตรวจ ${CHECKED}) ไม่ได้แต่งขึ้นเอง · คะแนนคือความเหมาะสมกับเรื่องที่เล่า ไม่ใช่รีวิว · เงื่อนไขจริงให้ตรวจกับหน่วยงาน/ร้าน`));
+    h('p.srcnote', `เลือกจากบริการและสินค้าจริง (ตรวจ ${CHECKED}) · คะแนน = ความเหมาะสม ไม่ใช่รีวิว`));
 }
 function optionCard(p, i) {
   const it = p.item, isP = p.x.kind === 'product', href = isP ? '#product/' + p.x.id : '#svc/' + p.x.id;

@@ -41,16 +41,16 @@ export function homeView(root, keepFocus = false) {
   const keepTyped = keepFocus && root.querySelector('.typed');
   put(root,
     h('header.hubtop',
-      h('div.brandline', h('span.brandrow2', h('img.bmark', { src: MARK, alt: '' }), h('span.wordmark', 'SADU', h('i', 'Q'))), h('span.hdate', 'ผู้ช่วยของผู้ดูแลผู้สูงอายุ')),
+      h('div.brandline', h('span.brandrow2', h('img.bmark', { src: MARK, alt: '' }), h('span.wordmark', 'SADU', h('i', 'Q')))),
       h('a.bellbtn', { href: '#notif', 'aria-label': `การแจ้งเตือน${unread ? ` ยังไม่อ่าน ${unread}` : ''}` }, h('span', { html: ic('bell') }), unread ? h('em', String(Math.min(unread, 99))) : '', h('small', 'แจ้งเตือน')),
       h('a.mebtn', { href: '#me', 'aria-label': 'หน้าฉัน' }, avatar('me', myName() || 'ฉ'))),
     h('section.hero',
       h('p.hgreet', greeting(), h('span.hg-date', ` · ${DOWL[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`)),
       h('h1.htitle', h('span.sr', `ผู้ช่วยของผู้ดูแลผู้สูงอายุ ค้นหาอะไรดี${PQ()}`), h('span', { 'aria-hidden': 'true' }, cp ? `ดูแล${cp.name}วันนี้ ต้องหา..` : 'ผู้ดูแลต้องหา..'), keepTyped || typedLine()),
       h('label.hsearch.big', h('span', { html: ic('search') }), input, hs.q ? h('button.clr', { type: 'button', onclick: () => { hs.q = ''; homeView(root); }, 'aria-label': 'ล้างคำค้น' }, 'ล้าง') : ''),
-      h('div.popular', { role: 'group', 'aria-label': 'คำค้นยอดนิยม' }, h('span', 'ค้นหาบ่อย'),
+      h('div.popular', { role: 'group', 'aria-label': 'คำค้นยอดนิยม' },
         POPULAR.map(k => h('button.pchip', { type: 'button', onclick: () => { hs.q = k; homeView(root); } }, k))),
-      h('a.aicta', { href: '#ai' }, h('span.aicta-ic', { html: ic('spark') }), h('span', h('b', 'ไม่รู้จะค้นอะไร? เล่าปัญหาให้ AI ฟัง'), h('small', 'เช่น "แม่เดินไม่สะดวก ต้องไปหาหมอทุกเดือน" → ได้ 3 ตัวเลือก')), h('span.aicta-go', { html: ic('arrow') }))),
+      h('a.aicta', { href: '#ai' }, h('span.aicta-ic', { html: ic('spark') }), h('span', h('b', 'ไม่รู้จะค้นอะไร? เล่าปัญหาให้ AI ฟัง'), h('small', 'ได้ 3 ตัวเลือกที่เหมาะ')), h('span.aicta-go', { html: ic('arrow') }))),
     hs.q.trim() ? h('div.panel', searchResults(hs.q)) : [
       h('div.panel.board', h('div.boardcols', h('div.col', careBoard()), h('div.col', todayCare()))),
       catPanel(root),
@@ -75,14 +75,13 @@ function catPanel(root) {
   return h('section.panel.catpanel',
     h('div.ctabwrap', tabs),
     h('div.tiles2', { role: 'tabpanel', 'aria-label': c.name }, list.map(s => h('a.ptile' + (photoOf(s) ? '.photo' : ''), { href: href(s), style: { '--ci': c.ink, '--ct': c.tint, backgroundImage: photoOf(s) ? `url("${photoOf(s).src}")` : null } },
-      h('span.pt-art', { html: ic(s.icon) }), h('b', s.name), h('small', s.provider?.phone && s.action === 'call' ? `โทร ${s.provider.phone} · ${s.short}` : s.short)))),
-    h('div.panelfoot', h('span', c.sub), h('a.morearrow', { href: cur === 'emergency' ? '#emergency' : cur === 'shop' ? '#shop' : '#cat/' + cur }, 'ดูเพิ่มเติม', h('span', { html: ic('arrow') }))));
+      h('span.pt-art', { html: ic(s.icon) }), h('b', s.name), s.provider?.phone && s.action === 'call' ? h('small', `โทร ${s.provider.phone}`) : ''))),
+    h('div.panelfoot', h('a.morearrow', { href: cur === 'emergency' ? '#emergency' : cur === 'shop' ? '#shop' : '#cat/' + cur }, 'ดูเพิ่มเติม', h('span', { html: ic('arrow') }))));
 }
 
 function banner() {
   return h('a.banner', { href: '#emergency' },
     h('div.bn-l', h('small', 'ผู้สูงอายุเจ็บป่วยฉุกเฉิน'), h('b', 'โทร 1669'), h('span', 'ฟรี 24 ชั่วโมง · ทั่วประเทศ')),
-    h('div.bn-m', h('p', 'ผู้ดูแลบอก 4 อย่างให้ชัด'), h('ul', ['อาการ', 'ที่อยู่ + จุดสังเกต', 'อายุและโรคประจำตัว', 'เบอร์ติดต่อกลับ'].map(x => h('li', x)))),
     h('span.bn-cta', 'เปิดหน้าฉุกเฉิน', h('span', { html: ic('arrow') })));
 }
 
@@ -104,14 +103,13 @@ const ago2 = iso => { const s = (Date.now() - Date.parse(iso)) / 1000; return s 
 /** ใกล้ฉัน: ไม่มีฐานข้อมูลสถานที่ในแอป จึงไม่แสดงรายการปลอม — เปิด Google Maps ให้ค้นจากตำแหน่งจริงแทน */
 function nearby() {
   const kinds = [['โรงพยาบาล', 'steth'], ['ร้านยาคุณภาพของฉัน', 'pill'], ['ร้านอุปกรณ์การแพทย์', 'bag'], ['ศูนย์ดูแลผู้สูงอายุ', 'hand']];
-  return h('section', secHead('ค้นหาใกล้บ้าน'),
+  return h('section', secHead('ค้นหาใกล้บ้าน (Google Maps)'),
     h('div.nearbox',
-      h('p', 'แตะเพื่อค้นหาใน Google Maps แผนที่จะถามก่อนใช้ตำแหน่งของคุณ'),
       h('div.nearbtns', kinds.map(([k, i]) => h('a.nearbtn', { href: mapsUrl(k), target: '_blank', rel: 'noopener', html: ic(i) + `<span>${k}</span>` + ic('ext') })))));
 }
 function trustNote() {
   const pts = [['shield', 'ข้อมูลจริง มีแหล่งอ้างอิง', `ทุกสิทธิ สินค้า และราคา มีลิงก์ที่มา · ตรวจ ${CHECKED}`], ['coin', 'ไม่มีโฆษณาแฝง', 'ไม่ได้รับค่าตอบแทนจากร้านหรือผู้ให้บริการ'], ['lock', 'ข้อมูลอยู่ในเครื่องคุณ', 'ข้อมูลการแพทย์และบันทึกสุขภาพไม่ถูกส่งออกไปไหน']];
-  return h('section.trust', h('h2', 'ทำไมผู้ดูแลไว้ใจ Saduq ได้'), h('ul', pts.map(([i, t, d]) => h('li', h('span', { html: ic(i) }), h('div', h('b', t), h('small', d))))));
+  return h('section.trust', h('h2', 'ทำไมผู้ดูแลไว้ใจ Saduq ได้'), h('ul', pts.map(([i, t]) => h('li', h('span', { html: ic(i) }), h('div', h('b', t))))));
 }
 
 /* ---------- ผลการค้นหา: สินค้า · บริการ · งานดูแล · เรื่องที่ติดตาม ---------- */
@@ -135,7 +133,7 @@ const SF = { all: ['ทั้งหมด', () => true], free: ['ฟรี/ต�
 let sf = 'all';
 export function servicesView(root) {
   const test = SF[sf][1];
-  put(root, pageHead('บริการและสิทธิทั้งหมด', { back: 'home', sub: 'บริการจริงจากหน่วยงานรัฐและโครงการ พร้อมวิธียื่นและแหล่งที่มา' }),
+  put(root, pageHead('บริการและสิทธิทั้งหมด', { back: 'home', sub: 'จากหน่วยงานรัฐ พร้อมวิธียื่น' }),
     h('div.qchips.filt', { role: 'group', 'aria-label': 'กรองบริการ' }, Object.entries(SF).map(([k, [v]]) => h('button.qchip', { type: 'button', 'aria-pressed': String(sf === k), onclick: () => { sf = k; servicesView(root); } }, v))),
     h('label.hsearch', h('span', { html: ic('search') }), h('input', { type: 'search', placeholder: 'ค้นหาบริการ…', 'aria-label': 'ค้นหาบริการ', onfocus: () => { go('home'); setTimeout(() => document.getElementById('hub-q')?.focus(), 150); } })),
     CATS.map(c => { const list = svcsIn(c.id).filter(s => s.action !== 'products').filter(test); if (!list.length) return null; const shown = sf === 'all' ? list.slice(0, 4) : list;

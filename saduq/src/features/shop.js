@@ -7,30 +7,29 @@ import { app, today } from './shared.js';
 import { P, pageHead, secHead } from './common.js';
 import { familyAsk } from './care.js';
 
-const priceText = p => p.price ? p.price.text : 'ดูราคาล่าสุดที่ร้าน';
+const priceText = p => p.price ? p.price.text : 'ดูราคาที่ร้าน';
 
 export function productCard(p) {
   return h('a.prodcard', { href: '#product/' + p.id },
     h('div.pd-art', h('span.pd-ic', { html: ic(groupOf(p.group).icon) }), h('span.pd-grp', groupOf(p.group).name)),
     h('div.pd-body',
       h('small.pd-brand', `${p.brand} · ${p.model}`), h('b', p.name),
-      h('p', p.why),
-      h('div.pd-foot', h('span.pd-price' + (p.price ? '' : '.none'), priceText(p)), p.price ? h('small', p.price.where) : h('small', 'มีลิงก์ร้าน'))));
+      h('div.pd-foot', h('span.pd-price' + (p.price ? '' : '.none'), priceText(p)), p.price ? h('small', p.price.where) : '')));
 }
 
 const ps = { g: 'all' };
 export function productsView(root, g) {
   if (g && (g === 'all' || groupOf(g))) ps.g = g;
   const list = ps.g === 'all' ? PRODUCTS : productsIn(ps.g);
-  put(root, pageHead('สินค้าและอุปกรณ์', { sub: 'ยี่ห้อและรุ่นที่ขายจริงในไทย · ราคาที่พบพร้อมชื่อร้าน · ลิงก์ไปร้าน' }),
+  put(root, pageHead('สินค้าและอุปกรณ์', { sub: 'ของที่ขายจริงในไทย พร้อมราคาและร้าน' }),
     h('div.qchips.filt', { role: 'group', 'aria-label': 'กลุ่มสินค้า' },
       [['all', 'ทั้งหมด'], ...GROUPS.map(x => [x.id, x.name])].map(([k, v]) => h('button.qchip', { type: 'button', 'aria-pressed': String(ps.g === k), onclick: () => { ps.g = k; history.replaceState(null, '', '#shop/' + k); productsView(root); } }, v))),
     h('div.freebar',
       h('span', { html: ic('spark') }),
-      h('p', h('b', 'ก่อนซื้อ ลองของฟรีก่อน: '), 'ผ้าอ้อมผู้ใหญ่ฟรีวันละ 3 ชิ้นสำหรับผู้ติดเตียง · ยืมเตียง รถเข็น ออกซิเจนฟรี (กทม.)'),
+      h('p', h('b', 'ขอฟรีหรือยืมได้ก่อนซื้อ')),
       h('div.fb-links', h('a.chipbtn', { href: '#svc/b-diaper' }, 'ผ้าอ้อมฟรี'), h('a.chipbtn', { href: '#svc/l-loan' }, 'ยืมอุปกรณ์'))),
     h('div.prodgrid', list.map(productCard)),
-    h('p.srcnote', `ราคาเปลี่ยนได้ตลอด — แต่ละรายการบอกร้านและช่วงเวลาที่เห็นราคา · ตรวจข้อมูล ${CHECKED} · Saduq ไม่ได้รับค่าตอบแทนจากร้านใด`));
+    h('p.srcnote', `ราคาเปลี่ยนได้ · ตรวจ ${CHECKED} · ไม่รับค่าตอบแทนจากร้าน`));
 }
 
 export function productView(root, id) {

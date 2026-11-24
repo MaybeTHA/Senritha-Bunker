@@ -756,3 +756,10 @@ h1[tabindex="-1"]:focus { outline: none; }
 @media (display-mode: standalone) and (max-width: 899px) {
   #page { padding-top: calc(4px + env(safe-area-inset-top, 0px)); }
 }
+
+/* ================= 2.4 ข้อความน้อยลง: จัดที่ว่างให้ส่วนที่ตัดคำอธิบายออก ================= */
+.panelfoot { justify-content: flex-end; margin-top: 6px; }
+.pd-foot { margin-top: auto; }
+.pd-body { gap: 2px; }
+.trust li { align-items: center; }
+.hero .popular { margin-top: 10px; }
