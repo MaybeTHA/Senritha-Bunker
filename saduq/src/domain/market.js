@@ -101,7 +101,7 @@ export const PRODUCTS = [
     kw: 'ที่นอนลม แผลกดทับ ติดเตียง' },
 
   // ---------- หายใจ ----------
-  { id: 'p-o2-yuwell3', group: 'resp', brand: 'Yuwell', model: '7F-3DW', name: 'เครื่องผลิตออกซิเจน 3 ลิตร',
+  { id: 'p-o2-yuwell3', photo: 'p-o2', group: 'resp', brand: 'Yuwell', model: '7F-3DW', name: 'เครื่องผลิตออกซิเจน 3 ลิตร',
     why: 'สำหรับผู้ป่วยที่แพทย์สั่งให้ใช้ออกซิเจนที่บ้าน',
     specs: ['อัตราสูงสุด 3 ลิตร/นาที', 'เสียงทำงานไม่เกินประมาณ 55 dB'],
     tips: ['ใช้ตามอัตราที่แพทย์สั่งเท่านั้น', 'ห้ามสูบบุหรี่หรือจุดไฟใกล้เครื่อง'],
@@ -109,7 +109,7 @@ export const PRODUCTS = [
     buy: [{ label: 'HomePro', url: HP + '/p/888113500024' }, shopee('Yuwell 7F-3DW'), lazada('Yuwell เครื่องผลิตออกซิเจน 3 ลิตร')],
     src: [{ label: 'HomePro — Yuwell 7F-3DW', url: HP + '/p/888113500024' }],
     free: 'l-loan', kw: 'ออกซิเจน เครื่องผลิตออกซิเจน yuwell' },
-  { id: 'p-o2-yuwell5', group: 'resp', brand: 'Yuwell', model: '9F-5BW', name: 'เครื่องผลิตออกซิเจน 5 ลิตร',
+  { id: 'p-o2-yuwell5', photo: 'p-o2', group: 'resp', brand: 'Yuwell', model: '9F-5BW', name: 'เครื่องผลิตออกซิเจน 5 ลิตร',
     why: 'สำหรับผู้ป่วยที่แพทย์สั่งอัตราออกซิเจนสูงกว่า 3 ลิตร/นาที',
     specs: ['อัตราสูงสุด 5 ลิตร/นาที'],
     tips: ['ถามแพทย์ว่าต้องใช้กี่ลิตรก่อนเลือกรุ่น'],

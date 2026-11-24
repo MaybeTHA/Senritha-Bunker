@@ -3,17 +3,24 @@
 import { h, ic, put, toast } from '../ui/kit.js';
 import { GROUPS, groupOf, PRODUCTS, productOf, productsIn, CHECKED } from '../domain/market.js';
 import { svcOf } from '../domain/catalog.js';
+import { photoById } from '../domain/photos.js';
 import { app, today } from './shared.js';
 import { P, pageHead, secHead } from './common.js';
 import { familyAsk } from './care.js';
+import { reviewSection, ratingOf } from './reviews.js';
 
 const priceText = p => p.price ? p.price.text : 'ดูราคาที่ร้าน';
+/** ภาพจริงจาก Wikimedia Commons: เป็นภาพสินค้าประเภทเดียวกัน ไม่ใช่รุ่นนั้นเป๊ะ จึงติดป้าย "ภาพประกอบ" */
+export const productPhoto = p => photoById(p.photo || p.id);
 
 export function productCard(p) {
   return h('a.prodcard', { href: '#product/' + p.id },
-    h('div.pd-art', h('span.pd-ic', { html: ic(groupOf(p.group).icon) }), h('span.pd-grp', groupOf(p.group).name)),
+    productPhoto(p)
+      ? h('div.pd-art.photo', h('img', { src: productPhoto(p).src, alt: '', loading: 'lazy' }), h('span.pd-grp', groupOf(p.group).name), h('span.pd-ill', 'ภาพประกอบ'))
+      : h('div.pd-art', h('span.pd-ic', { html: ic(groupOf(p.group).icon) }), h('span.pd-grp', groupOf(p.group).name)),
     h('div.pd-body',
       h('small.pd-brand', `${p.brand} · ${p.model}`), h('b', p.name),
+      ratingOf(p.id) ? h('small.pd-rev', `★ ${ratingOf(p.id).avg} รีวิวของคุณ`) : '',
       h('div.pd-foot', h('span.pd-price' + (p.price ? '' : '.none'), priceText(p)), p.price ? h('small', p.price.where) : '')));
 }
 
@@ -36,7 +43,9 @@ export function productView(root, id) {
   const p = productOf(id);
   if (!p) return productsView(root);
   const free = p.free && svcOf(p.free);
+  const ph = productPhoto(p);
   put(root, pageHead(p.name, { back: 'shop/' + p.group, sub: `${p.brand} · ${p.model}` }),
+    ph ? h('figure.svcphoto.prod', h('img', { src: ph.src, alt: '', loading: 'lazy' }), h('figcaption', `ภาพประกอบ ไม่ใช่รุ่นนี้ · ${ph.artist || 'Wikimedia Commons'} · ${ph.license}`)) : '',
     h('section.pricebox',
       h('div', h('small', p.price ? `ราคาที่พบ · ${p.price.where}` : 'ราคา'), h('b', priceText(p)), p.price?.note ? h('p', p.price.note) : h('p', 'ยังไม่มีราคาที่ยืนยันได้ — เปิดลิงก์ร้านด้านล่างเพื่อดูราคาปัจจุบัน')),
       h('div.buylinks', p.buy.map((b, i) => h('a.btn' + (i === 0 ? '.primary' : '.ghost'), { href: b.url, target: '_blank', rel: 'noopener', html: `<span>${b.label}</span>` + ic('ext') })))),
@@ -44,6 +53,7 @@ export function productView(root, id) {
     h('section.dsec', h('h2', 'ผู้ดูแลใช้ทำอะไร'), h('p', p.why)),
     p.specs?.length ? h('section.dsec', h('h2', 'ข้อมูลสินค้า'), h('ul.ticks', p.specs.map(x => h('li', h('span', { html: ic('check') }), x)))) : '',
     p.tips?.length ? h('section.dsec', h('h2', 'เคล็ดลับจากการดูแล'), h('ul.ticks.tip', p.tips.map(x => h('li', h('span', { html: ic('info') }), x)))) : '',
+    reviewSection(p.id, 'สินค้านี้'),
     h('section.dsec', h('h2', 'แหล่งที่มาของข้อมูล'), sources(p.src), h('p.srcnote', `ตรวจข้อมูล ${CHECKED} · ราคาและสต็อกเปลี่ยนได้ ตรวจกับร้านก่อนซื้อ`)),
     h('div.stickycta.two',
       h('button.btn.ghost', { onclick: () => addToList(p) }, 'จดไว้ซื้อ'),

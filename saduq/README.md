@@ -65,3 +65,15 @@ python3 build.py
 | `e-191` | [Royal Thai Police, Toyota Hilux traffic police car..jpg](https://commons.wikimedia.org/wiki/File:Royal_Thai_Police,_Toyota_Hilux_traffic_police_car..jpg) | Manrat Thiusthas | CC BY-SA 4.0 |
 | `e-199` | [Thai fire engine and firefighters during 2010 Thai political protests.jpg](https://commons.wikimedia.org/wiki/File:Thai_fire_engine_and_firefighters_during_2010_Thai_political_protests.jpg) | Roland Dobbins from Singapore, Singapore | CC BY 2.0 |
 | `e-1784` | [2011 flooding in Ayutthaya Province-EO-1 merged.jpg](https://commons.wikimedia.org/wiki/File:2011_flooding_in_Ayutthaya_Province-EO-1_merged.jpg) | NASA Earth Observatory image created by Jesse Allen and Robert Simmon, using EO- | Public domain |
+| `p-bp-omron` | [Close-up of a woman using a blood pressure monitor.jpg](https://commons.wikimedia.org/wiki/File:Close-up_of_a_woman_using_a_blood_pressure_monitor.jpg) | Shixart1985 | CC BY 2.0 |
+| `p-oxi-yuwell` | [Pulse oximeter on a finger.jpg](https://commons.wikimedia.org/wiki/File:Pulse_oximeter_on_a_finger.jpg) | Jakub T. Jankiewicz | CC BY-SA 4.0 |
+| `p-glu-accu` | [Low Blood Sugar - Glucose Monitor - 50191694906.jpg](https://commons.wikimedia.org/wiki/File:Low_Blood_Sugar_-_Glucose_Monitor_-_50191694906.jpg) | formulatehealth | CC BY 2.0 |
+| `p-wheel-soma` | [Blue folding lightweight wheelchair.jpg](https://commons.wikimedia.org/wiki/File:Blue_folding_lightweight_wheelchair.jpg) | Arnold C (User:Buchanan-Hermit) | CC BY 2.0 |
+| `p-diaper-feelfree` | [AdultDiaper1.jpg](https://commons.wikimedia.org/wiki/File:AdultDiaper1.jpg) | Hadifn | CC BY-SA 4.0 |
+| `p-diaper-lifree` | [Adult diapers in Tel Aviv.jpg](https://commons.wikimedia.org/wiki/File:Adult_diapers_in_Tel_Aviv.jpg) | David Shankbone | CC BY 3.0 |
+| `p-bed-allwell` | [Hill-Rom hospital bed.JPG](https://commons.wikimedia.org/wiki/File:Hill-Rom_hospital_bed.JPG) | BrokenSphere | CC BY-SA 3.0 |
+| `p-mattress-air` | [Luftkissen-Dekubitusmatratze.jpg](https://commons.wikimedia.org/wiki/File:Luftkissen-Dekubitusmatratze.jpg) | Tiberius | Public domain |
+| `p-o2` | [Home oxygen concentrator.jpg](https://commons.wikimedia.org/wiki/File:Home_oxygen_concentrator.jpg) | GiollaUidir at English Wikipedia | CC BY-SA 2.0 uk |
+| `p-shower-chair` | [Foldable Shower Seat.jpg](https://commons.wikimedia.org/wiki/File:Foldable_Shower_Seat.jpg) | Pizzatomatojellycattttt | CC BY-SA 4.0 |
+| `p-grab-bar` | [Grabbar.jpg](https://commons.wikimedia.org/wiki/File:Grabbar.jpg) | Oneweekendwebsite | CC BY-SA 3.0 |
+| `p-walker-yamada` | [Deambulateur.jpg](https://commons.wikimedia.org/wiki/File:Deambulateur.jpg) | Choubaca | Public domain |

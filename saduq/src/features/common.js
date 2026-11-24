@@ -91,7 +91,7 @@ export function recCard(s) {
       h('dl.rc-meta',
         h('div', h('dt', 'ผู้ให้บริการ'), h('dd', s.provider?.name || (s.ready ? 'Saduq (ในเครื่องนี้)' : 'ยังไม่มีในระบบ'))),
         h('div', h('dt', 'ราคา'), h('dd', s.price || (s.ready ? 'ไม่มีค่าใช้จ่าย' : 'ยังไม่มีข้อมูล'))),
-        h('div', h('dt', 'รีวิว'), h('dd', mine.length ? `${avgStars(mine).toFixed(1)} ★ (${mine.length} ของคุณ)` : 'ยังไม่มีรีวิว'))),
+        h('div', h('dt', 'รีวิว'), h('dd', mine.length ? `${avgStars(mine).toFixed(1)} ★ (รีวิวของคุณ)` : 'ยังไม่มีรีวิว'))),
       h('a.btn.primary.sm', { href: '#svc/' + s.id }, 'ดูรายละเอียด')));
 }
 export const myReviews = sid => S().requests.filter(r => r.service_id === sid && r.review);
