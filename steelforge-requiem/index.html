@@ -269,6 +269,58 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
  body.mbl #bMain{right:calc(134px + env(safe-area-inset-right));width:72px;height:72px}
  body.mbl #bAlt{right:calc(158px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom));width:42px;height:42px}
 }
+
+/* ── โรงประกอบ + หน้าเลือกโหมด (layout v6) ── */
+#scGarage .wrap{max-width:1440px}
+.gwrap{display:grid;gap:12px;grid-template-columns:minmax(0,1fr);grid-template-areas:"side" "nav" "main"}
+.gNav{grid-area:nav}.gSide{grid-area:side;min-width:0}.gMain{grid-area:main;min-width:0}
+#prev{width:100%;height:auto;display:block;aspect-ratio:2/1}
+.pvCtl{display:flex;gap:6px;justify-content:center;margin-top:6px}.pvCtl .btn{width:auto}
+.gGrp{display:none}
+.gNav.tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;position:sticky;top:56px;z-index:4;margin:0;padding:6px;gap:4px;
+ background:linear-gradient(180deg,#1d2125f2,#121518f2);border:1px solid var(--edge);border-radius:7px;backdrop-filter:blur(6px)}
+.gNav.tabs::-webkit-scrollbar{display:none}
+.gNav .tab{flex:0 0 auto;min-width:0;padding:8px 12px;white-space:nowrap}
+.gNav .tab i{font-style:normal;font-size:11px;opacity:.5;margin-right:6px;font-family:"Teko",monospace;letter-spacing:.5px}
+.gNav .tab.on i{opacity:.9;color:var(--molten)}
+.gQuick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
+.qs{background:linear-gradient(180deg,#191c20,#111316);border:1px solid #33393f;border-radius:6px;padding:6px 8px;min-width:0}
+.qs b{display:block;font-family:"Teko",sans-serif;font-size:21px;line-height:1.05;color:#f2eee6;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qs b small{font-size:.62em;color:#a6acb1;margin-left:2px;font-weight:400}
+.qs span{display:block;font-size:10px;color:#8e959b;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qs.hi b{color:var(--molten)}
+.gGo{margin-top:8px}
+.gMain .pane>h2:first-child,.mMain>h2:first-child{margin-top:2px}
+.mwrap{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+.mMain{min-width:0}.mSide{min-width:0}
+.mSide>div[style]{margin-top:10px!important}
+.lo .loH{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.lo .loH b{font-family:"Teko",sans-serif;font-size:22px;letter-spacing:1px;color:#f2eee6;font-weight:600}
+.lo .loH span{font-size:11px;color:#8e959b}
+.lo .gQuick{margin-top:0}
+.lo .btn{margin-top:8px}
+details.rules{cursor:default;margin-top:10px}
+details.rules summary{cursor:pointer;font-weight:600;color:#f2eee6;font-size:13px;list-style:none}
+details.rules summary::-webkit-details-marker{display:none}
+details.rules summary::after{content:'▾';float:right;color:var(--molten)}
+details.rules[open] summary::after{content:'▴'}
+details.rules .st{font-size:12px!important;line-height:1.85!important;margin-top:8px}
+@media (min-width:760px) and (max-width:1099px){
+ .gwrap{grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"nav nav" "main side";align-items:start}
+ .gSide{position:sticky;top:112px}.gQuick{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1100px){
+ .gwrap{grid-template-columns:186px minmax(0,1fr) 360px;grid-template-areas:"nav main side";align-items:start;gap:14px}
+ .gNav.tabs{flex-direction:column;top:66px;padding:8px;gap:3px;overflow:visible}
+ .gGrp{display:block;font-size:10.5px;color:#7d848a;letter-spacing:1.6px;padding:10px 6px 4px}
+ .gGrp:first-child{padding-top:2px}
+ .gNav .tab{text-align:left;padding:9px 10px;flex:0 0 auto}
+ .gSide{position:sticky;top:66px}
+ .gQuick{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){
+ #scDuel .wrap,#scBattle .wrap,#scInf .wrap,#scFront .wrap{max-width:1240px}
+ .mwrap{grid-template-columns:minmax(0,1fr) 330px;align-items:start;gap:14px}
+ .mSide{position:sticky;top:66px;margin-top:14px}
+ .lo .gQuick{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* ── เมนูแนวนอนบนมือถือ ── */
 @media (orientation:landscape) and (max-height:520px){
  .screen{padding:6px calc(10px + env(safe-area-inset-right)) 6px calc(10px + env(safe-area-inset-left))}
@@ -284,8 +336,12 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
  #scMenu .wrap>div{display:grid;grid-template-columns:44% 1fr;column-gap:12px;align-items:start}
  #scMenu h1{grid-column:1/3}#mTank{grid-column:1;grid-row:2/6;max-width:none!important;margin:2px 0!important}
  #scMenu .topbar,#scMenu .grid,#scMenu .hint{grid-column:2}
- #scGarage .gwrap{display:grid;grid-template-columns:41% 1fr;gap:10px;align-items:start}
- #scGarage .gL{position:sticky;top:46px}#prev{max-width:none!important}
+ #scGarage .gwrap{grid-template-columns:38% minmax(0,1fr);grid-template-areas:"side nav" "side main";gap:8px}
+ .gSide{position:sticky;top:44px}.gNav.tabs{top:44px;padding:4px}.gNav .tab{padding:6px 9px}
+ .gQuick{gap:4px;margin-top:5px;grid-template-columns:repeat(4,minmax(0,1fr))!important}.qs{padding:3px 5px}.qs b{font-size:15px}.qs span{font-size:8.5px}
+ .pvCtl{margin-top:3px}.pvCtl .btn{padding:3px 8px!important;font-size:11px}.gMain .pane>h2:first-child{margin-top:0}
+ .gGo{margin-top:5px;padding:7px!important}
+ .mwrap{grid-template-columns:minmax(0,1fr) 250px;gap:8px}.mSide{position:sticky;top:44px;margin-top:8px}
  #flPrev{max-height:26vh;object-fit:contain}
  #scBoot .grid .st{display:none}
 }
@@ -432,10 +488,12 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <p class="sub">สมรภูมิสแกนดิเนเวีย · แผนที่ยาว 7 โซน × 5 เลน<br>
   เตรียมพร้อม 60 วิ → TOTAL OFFENSIVE ทุกฝ่ายบุกแย่ง Zone 4 → ฝ่ายที่ยึดได้ป้องกัน แล้วสลับบุก/ป้องกันทุก 3 นาที<br>ทำลาย HQ ศัตรู 6,000 หน่วยเพื่อชนะ (หรือครองโซนมากกว่าเมื่อครบ 25 นาที)</p>
   <canvas id="flPrev" width="900" height="230" style="width:100%;border-radius:9px;background:#141a12;border:1px solid #333c29"></canvas>
+<div class="mwrap"><div class="mMain">
   <h2>ขนาดกำลังพล</h2><div class="grid g3" id="fSize"></div>
   <h2>ระดับศัตรู</h2><div class="grid g4" id="fLvl"></div>
   <h2>เวลา & สภาพอากาศ</h2><div class="grid g4" id="fTod"></div>
-  <div class="card" style="cursor:default;margin-top:10px"><div class="st" style="font-size:12px;line-height:1.95">
+</div>
+<aside class="mSide"><div class="lo" id="loF"></div>  <details class="card rules"><summary>📜 กติกาและโครงสร้างแผนที่</summary><div class="st">
    <b style="color:#f0b429">■ กติกาบุก / ป้องกัน</b><br>
    <b>60 วิแรก</b> — เตรียมพร้อม: ทุกคันยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้<br>
    จากนั้นฝ่ายหนึ่ง <b style="color:#ffb347">บุก</b> อีกฝ่าย <b style="color:#7fc8ff">ป้องกัน</b> แล้วสลับกันทุก <b>3 นาที</b><br>
@@ -447,34 +505,41 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
    <b>Zone 2 / 6</b> — แนวป้อมปืน 2 ป้อม ต้องทำลายก่อนจึงยึดโซนได้<br>
    <b>Zone 3 / 5</b> — สถานีวิทยุ กด <b>ใช้งาน</b> เพื่อเปิดแผนที่ข่าวกรอง<br>
    <b>Zone 4</b> — ปั๊มน้ำมันริมทางหลวง จอดนิ่งเพื่อเติมเสบียง<br>
-   ทางหลวงสายหลักตัดยาวกลางแผนที่ตั้งแต่ Zone 1 ถึง Zone 7</div></div>
-  <div style="margin-top:12px"><button class="btn grn" onclick="startFrontline()">🌲 เข้าสู่แนวรบ</button><button class="btn" style="margin-top:6px" onclick="specStart('startFrontline')">👁️ ดู AI สู้กันเอง</button></div>
+   ทางหลวงสายหลักตัดยาวกลางแผนที่ตั้งแต่ Zone 1 ถึง Zone 7</div></details>
+  <div style="margin-top:12px"><button class="btn grn" onclick="startFrontline()">🌲 เข้าสู่แนวรบ</button><button class="btn" style="margin-top:6px" onclick="specStart('startFrontline')">👁️ ดู AI สู้กันเอง</button></div></aside></div>
 </div></div>
 
 <!-- GARAGE -->
 <div class="screen" id="scGarage"><div class="wrap">
   <div class="topbar"><div class="res" id="resG"></div>
     <button class="btn sm" style="width:auto" onclick="show('scMenu')">← กลับ</button></div>
-  <div class="gwrap"><div class="gL">
-  <canvas id="prev" width="1040" height="520" style="width:100%;max-width:560px;display:block;margin:0 auto;border-radius:9px"></canvas>
-  <div class="row" style="justify-content:center;margin-top:5px">
-    <button class="btn sm" style="width:auto" onclick="pvSpin=!pvSpin">🔄 หมุน/หยุด</button>
-    <button class="btn sm" style="width:auto" onclick="pvZoom=pvZoom>=2.7?1.3:pvZoom+0.45">🔍 ซูม</button>
-  </div>
-  </div><div class="gR">
-  <div class="tabs" style="margin-top:8px">
-    <div class="tab on" onclick="gtab('t1',this)">ตัวถัง</div>
-    <div class="tab" onclick="gtab('t2',this)">อำนาจยิง</div>
-    <div class="tab" onclick="gtab('t3',this)">เกราะ</div>
-    <div class="tab" onclick="gtab('tD',this)">ป้องกันเชิงรุก</div>
-    <div class="tab" onclick="gtab('t4',this)">ขับเคลื่อน</div>
-    <div class="tab" onclick="gtab('t5',this)">จูน</div>
-    <div class="tab" onclick="gtab('t6',this)">ลูกเรือ</div>
-    <div class="tab" onclick="gtab('t7',this)">กระสุน</div>
-    <div class="tab" onclick="gtab('t8',this)">จัดวาง</div>
-    <div class="tab" onclick="gtab('t9',this)">สกิน</div>
-    <div class="tab" onclick="gtab('t0',this)">สรุป</div>
-  </div>
+  <div class="gwrap">
+  <nav class="gNav tabs">
+    <div class="gGrp">ประกอบรถ</div>
+    <div class="tab on" onclick="gtab('t1',this)"><i>01</i>ตัวถัง</div>
+    <div class="tab" onclick="gtab('t2',this)"><i>02</i>อำนาจยิง</div>
+    <div class="tab" onclick="gtab('t3',this)"><i>03</i>เกราะ</div>
+    <div class="tab" onclick="gtab('tD',this)"><i>04</i>ป้องกันเชิงรุก</div>
+    <div class="tab" onclick="gtab('t4',this)"><i>05</i>ขับเคลื่อน</div>
+    <div class="gGrp">ปรับแต่ง</div>
+    <div class="tab" onclick="gtab('t5',this)"><i>06</i>จูน</div>
+    <div class="tab" onclick="gtab('t6',this)"><i>07</i>ลูกเรือ</div>
+    <div class="tab" onclick="gtab('t7',this)"><i>08</i>กระสุน</div>
+    <div class="tab" onclick="gtab('t8',this)"><i>09</i>จัดวาง</div>
+    <div class="tab" onclick="gtab('t9',this)"><i>10</i>สกิน</div>
+    <div class="gGrp">ภาพรวม</div>
+    <div class="tab" onclick="gtab('t0',this)"><i>11</i>สรุป</div>
+  </nav>
+  <aside class="gSide"><div class="gL">
+  <canvas id="prev" width="1040" height="520"></canvas>
+  <div class="pvCtl">
+    <button class="btn sm" onclick="pvSpin=!pvSpin">🔄 หมุน/หยุด</button>
+    <button class="btn sm" onclick="pvZoom=pvZoom>=2.7?1.3:pvZoom+0.45">🔍 ซูม</button>
+  </div></div>
+  <div class="gQuick" id="gQuick"></div>
+  <button class="btn pri gGo" onclick="show('scFront')">🌲 ออกรบ</button>
+  </aside>
+  <div class="gMain">
   <div class="pane on" id="t1"><h2>ประเภทรถ</h2><div class="grid g3" id="gCls"></div>
     <h2>ตัวถัง</h2><div class="grid g3" id="gChassis"></div></div>
   <div class="pane" id="t2"><h2 id="hGun">ปืนหลัก</h2><div class="grid g3" id="gGun"></div>
@@ -497,7 +562,6 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="pane" id="t8"><h2>การจัดวาง</h2><div id="gLay"></div></div>
   <div class="pane" id="t9"><h2>สกิน</h2><div class="grid g3" id="gSkin"></div></div>
   <div class="pane" id="t0"><h2>สมรรถนะรวม</h2><div class="card" style="cursor:default" id="gStat"></div></div>
-  <div style="margin-top:12px"><button class="btn pri" onclick="show('scFront')">🌲 ออกรบ</button></div>
   </div></div>
 </div></div>
 
@@ -506,9 +570,11 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="topbar"><div class="res" id="resD"></div>
     <button class="btn sm" style="width:auto" onclick="show('scMenu')">← กลับ</button></div>
   <h1 style="font-size:24px">โหมดดวล</h1>
+<div class="mwrap"><div class="mMain">
   <h2>เลือกด่าน</h2><div class="grid g3" id="dMaps"></div>
   <h2>เลือกคู่ต่อสู้</h2><div class="grid g3" id="dFoes"></div>
-  <div style="margin-top:12px"><button class="btn dan" onclick="startDuel()">⚔️ เริ่มดวล</button><button class="btn" style="margin-top:6px" onclick="specStart('startDuel')">👁️ ดู AI สู้กันเอง</button></div>
+</div>
+<aside class="mSide"><div class="lo" id="loD"></div>  <div style="margin-top:12px"><button class="btn dan" onclick="startDuel()">⚔️ เริ่มดวล</button><button class="btn" style="margin-top:6px" onclick="specStart('startDuel')">👁️ ดู AI สู้กันเอง</button></div></aside></div>
 </div></div>
 
 <!-- BATTLE -->
@@ -516,10 +582,12 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="topbar"><div class="res" id="resBt"></div>
     <button class="btn sm" style="width:auto" onclick="show('scMenu')">← กลับ</button></div>
   <h1 style="font-size:24px">ยึดจุด / เดธแมตช์</h1>
+<div class="mwrap"><div class="mMain">
   <h2>รูปแบบ</h2><div class="grid g3" id="btModes"></div>
   <h2>เลือกด่าน</h2><div class="grid g3" id="btMaps"></div>
   <h2>ระดับความยาก</h2><div class="grid g4" id="btLvl"></div>
-  <div style="margin-top:12px"><button class="btn dan" onclick="startBattle()">⚔️ เข้าสู่สนามรบ</button><button class="btn" style="margin-top:6px" onclick="specStart('startBattle')">👁️ ดู AI สู้กันเอง</button></div>
+</div>
+<aside class="mSide"><div class="lo" id="loB"></div>  <div style="margin-top:12px"><button class="btn dan" onclick="startBattle()">⚔️ เข้าสู่สนามรบ</button><button class="btn" style="margin-top:6px" onclick="specStart('startBattle')">👁️ ดู AI สู้กันเอง</button></div></aside></div>
 </div></div>
 
 <!-- INF -->
@@ -527,9 +595,10 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="topbar"><div class="res" id="resI"></div>
     <button class="btn sm" style="width:auto" onclick="show('scMenu')">← กลับ</button></div>
   <h1 style="font-size:24px">โหมด Infinity</h1>
+<div class="mwrap"><div class="mMain">
   <h2>เลือกด่าน</h2><div class="grid g3" id="iMaps"></div>
-  <div class="card" style="cursor:default;margin-top:10px" id="iRec"></div>
-  <div style="margin-top:12px"><button class="btn blu" onclick="startInf()">♾️ เริ่ม</button><button class="btn" style="margin-top:6px" onclick="specStart('startInf')">👁️ ดู AI สู้กันเอง</button></div>
+</div>
+<aside class="mSide"><div class="lo" id="loI"></div><div class="card" style="cursor:default" id="iRec"></div>  <div style="margin-top:12px"><button class="btn blu" onclick="startInf()">♾️ เริ่ม</button><button class="btn" style="margin-top:6px" onclick="specStart('startInf')">👁️ ดู AI สู้กันเอง</button></div></aside></div>
 </div></div>
 
 <!-- BOX -->
@@ -1165,14 +1234,14 @@ var GUNS={
 
 /* ─────────── ออโต้แคนนอน (type:'auto' — มี mag + rof) ─────────── */
 var IFVGUNS={
- v30:{n:'ออโต้แคนนอน 30mm',type:'auto',cal:30,dmg:78,pen:118,rof:.14,mag:8,rel:3.4,
+ v30:{n:'ออโต้แคนนอน 30mm',type:'auto',cal:30,dmg:78,pen:118,rof:.14,mag:16,rel:3.6,
    dsp:.034,v:1050,w:1.8,cost:0,cls:['ifv','light'],d:'ยิงรัวมาก ตัดตีนตะขาบเก่ง'},
- v45:{n:'ออโต้แคนนอน 45mm',type:'auto',cal:45,dmg:124,pen:172,rof:.20,mag:6,rel:3.9,
+ v45:{n:'ออโต้แคนนอน 45mm',type:'auto',cal:45,dmg:124,pen:172,rof:.20,mag:12,rel:4.1,
    dsp:.031,v:1090,w:2.7,cost:38000,cls:['ifv','light'],d:'สมดุล เจาะข้างรถกลางได้'},
- v57:{n:'ออโต้แคนนอน 57mm',type:'auto',cal:57,dmg:182,pen:228,rof:.28,mag:5,rel:4.5,
+ v57:{n:'ออโต้แคนนอน 57mm',type:'auto',cal:57,dmg:182,pen:228,rof:.28,mag:10,rel:4.8,
    dsp:.029,v:1120,w:3.8,cost:86000,cls:['ifv','light'],d:'แรงระดับปืนรถถังเบา'},
- v75:{n:'ออโต้แคนนอน 75mm',type:'auto',cal:75,dmg:248,pen:286,rof:.38,mag:4,rel:5.2,
-   dsp:.027,v:1150,w:5.0,cost:165000,cls:['ifv'],d:'ชุดละ 4 นัดถล่มได้จริง'}};
+ v75:{n:'ออโต้แคนนอน 75mm',type:'auto',cal:75,dmg:248,pen:286,rof:.38,mag:8,rel:5.6,
+   dsp:.027,v:1150,w:5.0,cost:165000,cls:['ifv'],d:'แม็กละ 8 นัด ยิงรัวถล่มได้จริง'}};
 
 /* รวมปืนทั้งหมด — key ไม่ชนกันเพราะขึ้นต้นต่างกัน (g / v) */
 function ALLGUNS(){
@@ -1201,12 +1270,12 @@ var SECS={
    w:.3,cost:0,cls:[],sup:1.5,d:'รัวเร็ว ตัดตีนตะขาบ · กดดันศัตรู'},
  m127 :{n:'ปืนกล 12.7mm',type:'mg',cal:12.7,dmg:17,pen:26,rof:.075,dsp:.048,burst:1,
    w:.7,cost:6000,cls:[],sup:1.8,d:'เจาะเกราะหลังรถเบาได้ · กดดันแรง'},
- a20  :{n:'Autocannon 20mm',type:'auto',cal:20,dmg:44,pen:74,rof:.115,dsp:.040,burst:3,
-   w:1.3,cost:17000,cls:[],noIFV:1,sup:1.2,d:'ยิงชุด 3 นัด'},
- a30  :{n:'Autocannon 30mm',type:'auto',cal:30,dmg:72,pen:104,rof:.150,dsp:.036,burst:3,
-   w:2.1,cost:33000,cls:[],noIFV:1,sup:1.2,d:'ชุด 3 นัด ทำลายโมดูลเก่ง'},
- a45  :{n:'Autocannon 45mm',type:'auto',cal:45,dmg:112,pen:148,rof:.210,dsp:.032,burst:2,
-   w:3.2,cost:58000,cls:[],noIFV:1,sup:1.0,d:'ชุด 2 นัด เจาะข้างรถกลาง'}};
+ a20  :{n:'Autocannon 20mm',type:'auto',cal:20,dmg:44,pen:74,rof:.115,dsp:.040,mag:30,rel:3.0,
+   w:1.3,cost:17000,cls:[],noIFV:1,sup:1.2,d:'ยิงรัว · แม็กละ 30 นัด'},
+ a30  :{n:'Autocannon 30mm',type:'auto',cal:30,dmg:72,pen:104,rof:.150,dsp:.036,mag:20,rel:3.6,
+   w:2.1,cost:33000,cls:[],noIFV:1,sup:1.2,d:'ยิงรัว · แม็กละ 20 นัด · ทำลายโมดูลเก่ง'},
+ a45  :{n:'Autocannon 45mm',type:'auto',cal:45,dmg:112,pen:148,rof:.210,dsp:.032,mag:12,rel:4.2,
+   w:3.2,cost:58000,cls:[],noIFV:1,sup:1.0,d:'ยิงรัว · แม็กละ 12 นัด · เจาะข้างรถกลาง'}};
 
 /* ─────────── ATGM ─────────── */
 var ATGMS={
@@ -1286,10 +1355,10 @@ var LWSS={
  lw2:{n:'LWS-2 เตือนรอบทิศ + จรวด',lv:2,cost:58000,w:.8,d:'เตือนทั้งการล็อกและ ATGM'}};
 var SMOKES={
  sm0:{n:'ไม่ติดตั้ง',n2:0,cost:0,w:0,d:'—'},
- sm1:{n:'เครื่องยิงควัน Gen1',n2:4,rad:120,dur:7,spread:.8,cd:9,cost:12000,w:.5,d:'4 ลูก ด้านหน้า'},
- sm2:{n:'เครื่องยิงควัน Gen2',n2:8,rad:150,dur:10,spread:1.5,cd:7,cost:34000,w:.9,d:'8 ลูก กระจายกว้าง'},
- sm3:{n:'เครื่องยิงควัน Gen3 อัตโนมัติ',n2:12,rad:175,dur:13,spread:2.4,cd:6,cost:78000,w:1.4,
-   auto:1,d:'12 ลูก รอบตัว · ยิงเองเมื่อ LWS เตือน'}};
+ sm1:{n:'เครื่องยิงควัน Gen1',n2:12,salvo:3,rad:120,dur:7,spread:.8,cd:9,cost:12000,w:.5,d:'12 ลูก ด้านหน้า (ยิงครั้งละ 3)'},
+ sm2:{n:'เครื่องยิงควัน Gen2',n2:24,salvo:4,rad:150,dur:10,spread:1.5,cd:7,cost:34000,w:.9,d:'24 ลูก กระจายกว้าง (ยิงครั้งละ 4)'},
+ sm3:{n:'เครื่องยิงควัน Gen3 อัตโนมัติ',n2:36,salvo:6,rad:175,dur:13,spread:2.4,cd:6,cost:78000,w:1.4,
+   auto:1,d:'36 ลูก รอบตัว (ยิงครั้งละ 6) · ยิงเองเมื่อ LWS เตือน'}};
 var APS_S={
  as0:{n:'ไม่ติดตั้ง',p:0,cost:0,w:0,d:'—'},
  as1:{n:'APS Soft Gen1',p:.35,cost:26000,w:.8,d:'รบกวน ATGM หลุดล็อก 35%'},
@@ -1562,11 +1631,11 @@ function calc(b,tune,crewBonus,crewSrc){
   crew:crewN,alK:b.al,alRack:al.rack,ammoCap:ch.ammo,prof:ch.prof*(en.quiet||1),
   view:Math.round((1250+(rd-1)*900+(cmd-1)*600)*fc.zoom*0.86),
   secN:sc.n,secDmg:sc.dmg||0,secPen:sc.pen||0,secRof:sc.rof||0,secDsp:sc.dsp||0,secCal:sc.cal||0,
-  secBurst:(b.sec==='a20'||b.sec==='a30')?3:(b.sec==='a45'?2:1),
+  secBurst:1,secMag:sc.mag||0,secRel:sc.rel||0,
   atN:at.n,atDmg:at.dmg||0,atPen:at.pen||0,atTurn:at.turn||0,atV:at.v||0,atCd:at.cd||0,
   atSeek:at.seek||0,atEcm:at.ecm||0,
   atGen:b.atgm==='gen1'?1:b.atgm==='gen2'?2:b.atgm==='gen3'?3:0,
-  lwsLv:lw.lv,smkN:sm.n2,smkRad:sm.rad||0,smkDur:sm.dur||0,smkSpread:sm.spread||0,
+  lwsLv:lw.lv,smkN:sm.n2,smkSalvo:sm.salvo||3,smkRad:sm.rad||0,smkDur:sm.dur||0,smkSpread:sm.spread||0,
   smkCd:sm.cd||0,smkAuto:sm.auto||0,
   apsSp:clamp((aS.p||0)*apsT,0,.92),apsHc:aH.ch||0,apsHr:aH.rad||0,
   apsHs:clamp((aH.shell||0)*apsT,0,.9),apsHrate:aH.rate||2,
@@ -1583,6 +1652,7 @@ function show(id){SFX.ui(true);
  $('hud').classList.remove('on');$('mob').classList.remove('on');
  $('hResp').classList.remove('on');closeBigMap();closeModal();
  if(id==='scGarage')drawGarage();
+ if(/^sc(Duel|Battle|Front|Inf)$/.test(id))drawLo();
  if(id==='scDuel')drawDuel();
  if(id==='scBattle')drawBattleSel();
  if(id==='scFront')drawFrontSel();
@@ -1659,8 +1729,20 @@ function cards(host,obj,cat,fn){var h='';
    (bad?'<div class="tag" style="border-color:#a04030;color:#e09080">'+bad+'</div>':'')+
    (own?'':'<div class="tag">💰 '+fmt(o.cost||0)+'</div>')+'</div>';}
  $(host).innerHTML=h;}
+function quickHTML(s,n){
+ var fire=s.mag?[(1/s.rof).toFixed(1),'นัด/วิ','ยิงรัว · แม็ก '+s.mag]:[s.rel,'วิ','บรรจุ'];
+ var q=[['HP',fmt(s.hp),''],['เกราะหน้า',s.ar.hf,'mm'],['เจาะ',s.pen,'mm',1],['ดาเมจ',s.dmg,'',1],
+  [fire[2],fire[0],fire[1]],['ความเร็ว',s.sp,''],['น้ำหนัก',s.W,'t'],['ควัน',s.smkN||'—',s.smkN?'ลูก':'']];
+ if(n)q=n.map(function(i){return q[i];});
+ return q.map(function(r){return '<div class="qs'+(r[3]?' hi':'')+'"><b>'+r[1]+(r[2]?'<small>'+r[2]+'</small>':'')+'</b><span>'+r[0]+'</span></div>';}).join('');}
+function drawLo(){var s=calc(),ls=document.querySelectorAll('.lo');
+ var h='<div class="card" style="cursor:default"><div class="loH"><b>'+esc(s.name)+'</b><span>'+s.W+' t · '+esc(gunOf(SV.build).n)+'</span></div>'+
+  '<div class="gQuick">'+quickHTML(s,[0,2,3,4])+'</div>'+
+  '<button class="btn sm" onclick="show(\'scGarage\')">🔧 แก้ไขรถ</button></div>';
+ for(var i=0;i<ls.length;i++)ls[i].innerHTML=h;}
 function drawGarage(){
  refreshAll();var s=calc(),cls=CHASSIS[SV.build.ch].cls;
+ $('gQuick').innerHTML=quickHTML(s);
  if(curTab==='t1'){
   var cl=[['light','🏃 รถถังเบา','เร็ว คล่อง ตรวจจับยาก เกราะบาง'],
     ['medium','⚖️ รถถังกลาง','สมดุลทุกด้าน ยืดหยุ่นที่สุด'],
@@ -1679,7 +1761,7 @@ function drawGarage(){
   $('hGun').textContent=cls==='ifv'?'ปืนหลัก (ออโต้แคนนอน)':'ปืนใหญ่';
   cards('gGun',cls==='ifv'?IFVGUNS:GUNS,'gun',function(o){
    var t='<span class="tag">ดาเมจ '+o.dmg+'</span><span class="tag">เจาะ '+o.pen+'mm</span>';
-   if(o.mag)t+='<span class="tag">ชุดละ '+o.mag+'</span><span class="tag">'+(1/o.rof).toFixed(1)+' นัด/วิ</span>';
+   if(o.mag)t+='<span class="tag">แม็กละ '+o.mag+'</span><span class="tag">'+(1/o.rof).toFixed(1)+' นัด/วิ</span>';
    else t+='<span class="tag">บรรจุ '+o.rel+'s</span>';
    return (o.d?esc(o.d)+'<br>':'')+t;});
   cards('gAL',AUTOL,'al',function(o){
@@ -1688,7 +1770,8 @@ function drawGarage(){
     (o.rack==='bus'?'<span class="tag" style="border-color:#4a90d0;color:#9fd0f0">แผงระบายแรงระเบิด</span>':'')+
     (o.rack==='car'?'<span class="tag" style="border-color:#a04030;color:#e09080">เสี่ยงระเบิดสูง</span>':'');});
   cards('gSec',SECS,'sec',function(o){if(!o.dmg)return esc(o.d);
-   return esc(o.d)+'<br><span class="tag">ดาเมจ '+o.dmg+'</span><span class="tag">เจาะ '+o.pen+'mm</span>';});
+   return esc(o.d)+'<br><span class="tag">ดาเมจ '+o.dmg+'</span><span class="tag">เจาะ '+o.pen+'mm</span>'+
+    (o.mag?'<span class="tag">แม็กละ '+o.mag+'</span><span class="tag">'+(1/o.rof).toFixed(1)+' นัด/วิ</span>':'');});
   cards('gAtgm',ATGMS,'atgm',function(o){if(!o.dmg)return esc(o.d);
    return esc(o.d)+'<br><span class="tag">ดาเมจ '+o.dmg+'</span><span class="tag">เจาะ '+o.pen+'mm</span>'+
     '<span class="tag">คูลดาวน์ '+o.cd+'s</span>';});
@@ -1796,7 +1879,7 @@ function drawGarage(){
   'LWS '+LWSS[s.b.lws].n+' · ควัน '+SMOKES[s.b.smk].n+'<br>'+
   'APS Soft '+APS_S[s.b.apsS].n+' · APS Hard '+APS_H[s.b.apsH].n+'<br><br>'+
   '<b style="color:#c8b878">■ อำนาจการยิง</b><br>'+esc(gn.n)+' — ดาเมจ <b>'+s.dmg+'</b> · เจาะ <b>'+s.pen+'</b> mm<br>'+
-  (s.mag?'ชุดละ '+s.mag+' นัด · เปลี่ยนชุด '+s.rel+' วิ<br>':'บรรจุ '+s.rel+' วิ ('+AUTOL[s.alK].n+')<br>')+
+  (s.mag?'ยิงรัว '+(1/s.rof).toFixed(1)+' นัด/วิ · แม็กละ '+s.mag+' นัด · เปลี่ยนแม็ก '+s.rel+' วิ<br>':'บรรจุ '+s.rel+' วิ ('+AUTOL[s.alK].n+')<br>')+
   'ทรงตัว '+Math.round(s.stab*100)+'%'+(s.stab<.2?' <span style="color:#e0603c">(ต้องจอดยิง!)</span>':'')+'<br><br>'+
   '<b style="color:#c8b878">■ การขับเคลื่อน</b><br>'+
   'ความเร็ว <b>'+s.sp+'</b> · อัตราเร่ง <b>'+s.acc+'</b> (0→เต็ม '+(s.sp/s.acc).toFixed(1)+' วิ)<br>'+
@@ -2097,7 +2180,7 @@ function drawTankBody(g,t,time,isPrev,lod){
    g.strokeStyle=gen===3?'#6a7ea0':'#5c4c70';g.lineWidth=1.2;
    g.fillRect(-TR*.16,-TR*1.36,TR*.95,TR*.46);g.strokeRect(-TR*.16,-TR*1.36,TR*.95,TR*.46);
    if(gen===3){g.fillStyle='#8fb4e0';g.beginPath();g.arc(TR*.76,-TR*1.13,TR*.12,0,6.2832);g.fill();}}
-  if(s.smkN>0){var sn=s.smkN>=12?6:s.smkN>=8?4:3;
+  if(s.smkN>0){var sn=s.smkSalvo||3;
    g.fillStyle='#4a5240';
    [-1,1].forEach(function(sd){for(var j=0;j<sn;j++)g.fillRect(TR*.28-j*(TR*.2),sd*TR*.92-2,TR*.16,4);});}
   if(s.apsHc>0){g.fillStyle='#2c3a44';g.strokeStyle='#6a8a9a';g.lineWidth=1.2;
@@ -2521,7 +2604,7 @@ var seedN=0;
 function mkTank(x,y,st,team,opt){opt=opt||{};
  var t={x:x,y:y,a:opt.a!==undefined?opt.a:rnd(0,6.28),ta:opt.a||0,st:st,b:st.b,team:team,
   hp:st.hp,mhp:st.hp,spd:0,thr:0,steer:0,dead:false,gone:false,seed:++seedN,
-  rl:0,secCd:0,secCd2:0,atCd:0,burst:0,mag:st.mag||0,trkOff:0,hitFlash:0,fire:0,aim:0,lastTa:opt.a||0,
+  rl:0,secCd:0,secCd2:0,secRl:0,secM:st.secMag||0,atCd:0,burst:0,mag:st.mag||0,trkOff:0,hitFlash:0,fire:0,aim:0,lastTa:opt.a||0,
   eraLeft:st.eraMax,skin:opt.skin||'std',isP:team===0,boss:!!opt.boss,
   mod:{trk:0,eng:0,gun:0},crewHurt:{},aiT:0,aiS:rnd(-1,1),brakeT:0,obj:-1,goal:null,
   ws:pick(WSPOTS),wsShown:false,known:false,marked:false,hunt:null,huntT:0,
@@ -2617,7 +2700,7 @@ function deploySmoke(t,auto){
  var s=t.st;
  if(!s.smkN||t.smkN<=0||t.smkCd>0){if(t.team===0&&!auto){SFX.ui(false);
   toast(t.smkN<=0?'ลูกควันหมด':'ยังคูลดาวน์อยู่');}return;}
- var n=Math.min(t.smkN,s.smkN>=12?6:s.smkN>=8?4:3);
+ var n=Math.min(t.smkN,s.smkSalvo||3);
  t.smkN-=n;t.smkCd=s.smkCd;
  var spread=s.smkSpread,base=t.ta;
  for(var i=0;i<n;i++){
@@ -2670,7 +2753,7 @@ function updAmmoUI(){if(!P)return;
  for(var i=0;i<3;i++)$('ab'+i).classList.toggle('on',i===wSel);
  var tot=ammoTotal(P);
  $('n0').textContent=P.st.mag?(P.mag+'/'+tot):tot;
- $('n1').textContent=P.st.secDmg?Math.round(P.nS):'—';
+ $('n1').textContent=P.st.secDmg?(P.st.secMag?(P.secRl>0?'↻':P.secM)+'/'+Math.round(P.nS):Math.round(P.nS)):'—';
  $('n2').textContent=P.st.atDmg?P.nA:'—';
  $('n3').textContent=AMMOT[aSel]?AMMOT[aSel].n:'—';
  $('n4').textContent=P.st.smkN?P.smkN:'—';
@@ -2716,10 +2799,11 @@ function fire(t,kind){
     (P.st.alK==='al0'||P.st.alK==='al1')?SFX.reload():SFX.autoload();},Math.min(900,s.rel*450));}
  }else if(kind===1){
   if(!s.secDmg||t.secCd>0)return;
-  if(t.burst<=0)t.burst=s.secBurst;
-  t.secCd=s.secRof;t.burst--;
-  if(t.burst<=0)t.secCd=s.secRof+(s.secCal>=20?.6:0);
-  if(t.nS<=0)return;t.nS--;
+  if(s.secMag){if(t.secRl>0)return;
+   if(t.secM<=0){t.secRl=s.secRel*(isP?1/runBuff.rel:1);if(isP)SFX.autoload();return;}}
+  if(t.nS<=0)return;
+  t.secCd=s.secRof;t.nS--;
+  if(s.secMag){t.secM--;if(t.secM<=0){t.secRl=s.secRel*(isP?1/runBuff.rel:1);if(isP)SFX.autoload();}}
   var dsp=s.secDsp*(1+Math.abs(t.spd)/Math.max(s.sp,.05)*.55)/(isP?runBuff.acc:1);
   var a=t.ta+rnd(-dsp,dsp),mz=M.TR*1.3+M.BL*.45;
   shots.push({x:t.x+Math.cos(a)*mz,y:t.y+Math.sin(a)*mz,a:a,
@@ -3301,7 +3385,7 @@ function ai(e,dt){
  if(los){
   if(e.st.mag){if(off<.06&&d<1500&&(canPen||e.penR>.6))fire(e,0);}
   else if(off<acc*(onMove?1.5:1)&&d<2400&&e.rl<=0&&spread<(onMove?85:48)&&(canPen||try2||tgt.st.cls==='light'||chg&&e.penR>.6))fire(e,0);
-  if(off<.10&&d<760&&e.st.secDmg&&(tgt.st.cls==='light'||tgt.st.cls==='ifv'||canPen))fire(e,1);
+  if(off<.10&&d<(e.st.secMag?1050:760)&&e.st.secDmg&&(tgt.st.cls==='light'||tgt.st.cls==='ifv'||canPen))fire(e,1);
   if(off<.035&&d>420&&d<2600&&e.atCd<=0&&e.st.atDmg&&Math.random()<(canPen?.35:.8))fire(e,2);}}
 
 /* ═══════ TURRETS ═══════ */
@@ -3349,6 +3433,7 @@ function moveTank(t,dt){
  if(t.rl>0)t.rl-=dt;
  if(t.secCd>0)t.secCd-=dt;
  if(t.secCd2>0)t.secCd2-=dt;
+ if(t.secRl>0){t.secRl-=dt;if(t.secRl<=0&&t.st.secMag)t.secM=t.st.secMag;}
  if(t.atCd>0)t.atCd-=dt;
  if(t.smkCd>0)t.smkCd-=dt;
  if(t.apsCd>0)t.apsCd-=dt;
@@ -3414,7 +3499,7 @@ function resupply(t,dt){var st=supStation(t);t.supAt=st;
  if(t.st.alRack==='bus')t.blown=false;
  if(t.st.atDmg&&t.nA<t.nAMax)t.nA++;
  if(t.st.secDmg&&t.nS<t.nSMax)t.nS=Math.min(t.nSMax,t.nS+Math.ceil(t.nSMax*.1));
- if(t.st.smkN&&t.smkN<t.st.smkN)t.smkN++;
+ if(t.st.smkN&&t.smkN<t.st.smkN)t.smkN=Math.min(t.st.smkN,t.smkN+3);
  if(t.st.apsHc&&t.apsCh<t.st.apsHc)t.apsCh++;
  if(t.st.eraMax&&t.eraLeft<t.st.eraMax)t.eraLeft++;
  if(t.ext&&t.ext.n<(t.extMax||2))t.ext.n++;
@@ -3764,7 +3849,6 @@ function update(dt){
   else if(PLAT==='mb')mobAim(dt);
   else P.ta+=clamp(angD(P.ta,Math.atan2(mouse.y+cam.y-P.y,mouse.x+cam.x-P.x)),-tv,tv);
   if(mouse.down&&PLAT==='pc'&&!(FL.sup&&FL.sup.mark))fire(P,wSel);
-  if(P.burst>0&&P.secCd<=0&&wSel===1)fire(P,1);
   if(G.scanning){
    G.scan=clamp(G.scan+dt*P.st.scanSp*runBuff.scan*.5,0,1);
    for(var i=0;i<tanks.length;i++){var e=tanks[i];
@@ -3959,7 +4043,7 @@ function update(dt){
   if(P.st.eraMax)md.push('ERA '+P.eraLeft+'/'+P.st.eraMax);
   if(G.lock)md.push('<span style="color:#ffbfae">🔒 ล็อก</span>');
   $('tMod').innerHTML=md.length?md.join(' · '):'ระบบปกติ';
-  if((G.dpT=(G.dpT||0)+dt)>.15){G.dpT=0;drawDmgPanel();supHUD();document.body.classList.toggle('pifv',FL.on&&!P.dead&&paxCap(P)>0);var bp=$('bPax');if(bp)bp.textContent=P.pax&&P.pax.length?'ลงรถ':'เรียกขึ้น';$('bExt').classList.toggle('hot',P.fire>0);}
+  if((G.dpT=(G.dpT||0)+dt)>.15){G.dpT=0;drawDmgPanel();supHUD();if(P.st.mag||P.st.secMag)updAmmoUI();document.body.classList.toggle('pifv',FL.on&&!P.dead&&paxCap(P)>0);var bp=$('bPax');if(bp)bp.textContent=P.pax&&P.pax.length?'ลงรถ':'เรียกขึ้น';$('bExt').classList.toggle('hot',P.fire>0);}
   if(!P.dead&&hr<.3&&hr>0)SFX.warn(hr);}}
 
 /* ═══════ REWARD (INF) ═══════ */
@@ -3997,7 +4081,7 @@ function takeBuff(k){
  if(k==='ammo'){var cap=P.st.ammoCap,tot=0;
   for(var a in SV.ammoMix)if(SV.ammoDev[a])tot+=SV.ammoMix[a];
   for(var a in SV.ammoMix)P.ammo[a]=tot?Math.round(cap*SV.ammoMix[a]/tot):(a==='ap'?cap:0);
-  P.nS=900;
+  P.nS=900;P.secM=P.st.secMag||0;P.secRl=0;
   if(P.st.alRack==='car')P.racks.car=cap;
   else if(P.st.alRack==='bus'){P.racks.bus=cap;P.blown=false;}
   else P.racks={r1:Math.round(cap*.4),r2:Math.round(cap*.35),r3:Math.round(cap*.25),car:0,bus:0};}
