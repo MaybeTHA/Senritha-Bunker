@@ -726,3 +726,33 @@ h1[tabindex="-1"]:focus { outline: none; }
   .ctab { width: 80px; }
   #nav a { font-size: 11px; }
 }
+
+/* ================= 2.3 มือถือ: เต็มจอ · ตัวอักษรเล็กลง =================
+   --zoom < 1 = ทุกอย่างในหน้าเล็กลงเท่ากัน (ตัวอักษร ระยะ ไอคอน) · ขอบข้างเหลือ 12px · แผงหลักกว้างชนขอบจอ
+   --bleed = ระยะขอบข้างหลังหักการย่อ (ใช้กับส่วนที่ยื่นออกไปชนขอบจอ) */
+@media (max-width: 899px) {
+  :root { --zoom: .92; --gut: 12px; --bleed: calc(var(--gut) / var(--zoom)); }
+  #page { padding-left: max(var(--gut), env(safe-area-inset-left, 0px)); padding-right: max(var(--gut), env(safe-area-inset-right, 0px)); }
+  #page::after { margin-left: calc(-1 * var(--gut)); margin-right: calc(-1 * var(--gut)); }
+  .hero { margin-left: calc(-1 * var(--bleed)); margin-right: calc(-1 * var(--bleed)); padding: 14px var(--bleed) 30px; }
+  .hero .popular, .recrow, .wrap[data-view="shop"] .filt { margin-left: calc(-1 * var(--bleed)); margin-right: calc(-1 * var(--bleed)); padding-left: var(--bleed); padding-right: var(--bleed); }
+  .recrow { scroll-padding-inline: var(--bleed); }
+  /* แผงหลักกว้างเต็มจอ (ไม่ซ้อนกล่องในกล่อง เนื้อหาได้ที่กว้างขึ้น) */
+  .panel { margin-left: calc(-1 * var(--bleed)); margin-right: calc(-1 * var(--bleed)); padding-left: var(--bleed); padding-right: var(--bleed); border-radius: 26px; box-shadow: 0 -1px 0 #EDF1F7, 0 18px 36px -30px rgba(11,27,77,.35); }
+  .panel.board { margin-top: -18px; padding-left: var(--bleed); padding-right: var(--bleed); border-radius: 26px 26px 0 0; box-shadow: 0 -10px 24px -18px rgba(11,27,77,.25); }
+  .panel.board + .catpanel { margin-top: 6px; border-radius: 0; box-shadow: 0 1px 0 #EDF1F7, 0 -1px 0 #EDF1F7; }
+  .ctabwrap { margin-left: calc(-1 * var(--bleed)); margin-right: calc(-1 * var(--bleed)); padding-left: var(--bleed); padding-right: var(--bleed); }
+  .bmark { width: 32px; height: 32px; }
+  .hubtop .wordmark { font-size: 21px; }
+  /* เมนูล่าง: เตี้ยลง ชิดขอบจอ */
+  #nav { width: calc(100vw - 16px); max-width: 480px; height: 60px; padding: 4px; border-radius: 22px; bottom: calc(6px + var(--safe-b)); }
+  #nav::before { top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 5); border-radius: 18px; }
+  #nav a { font-size: 11px; gap: 2px; }
+  #nav a svg { width: 22px; height: 22px; }
+  #sos { bottom: calc(76px + var(--safe-b)); height: 44px; font-size: 15px; }
+  .aibar { bottom: calc(74px + var(--safe-b)); }
+}
+/* เปิดจากหน้าจอโฮม (เต็มจอแบบแอป): เว้นที่แถบสถานะด้านบนให้พอ */
+@media (display-mode: standalone) and (max-width: 899px) {
+  #page { padding-top: calc(4px + env(safe-area-inset-top, 0px)); }
+}
