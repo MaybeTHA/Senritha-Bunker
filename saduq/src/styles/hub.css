@@ -649,3 +649,80 @@ h1[tabindex="-1"]:focus { outline: none; }
   .wrap[data-view="ai"] { padding-bottom: 90px; }
   .aiflow li:not(:last-child)::after { left: calc(50% + 20px); right: calc(-50% + 20px); }
 }
+
+/* ================= 2.2 มือถือ: ขนาดพอดีจอ · หัวหน้าเล็กลง · เมนูล่างทึบอ่านง่าย =================
+   ผู้ใช้ตอนนี้คือผู้ดูแล (ลูกหลาน) ไม่ใช่ผู้สูงอายุ → บนมือถือไม่ขยายทั้งหน้า 115% อีก (เดิมเหลือที่กว้างจริงแค่ ~310px ข้อความตกบรรทัดเยอะ)
+   ตัวอักษรพื้นฐานยังใหญ่ 15–17px และปุ่มยังสูง ≥ 44px */
+@media (max-width: 899px) {
+  :root { --zoom: 1; }
+  #page { padding-top: calc(6px + env(safe-area-inset-top, 0px)); }
+
+  /* หัวหน้า: แถวเดียว สูง ~52px */
+  .wrap[data-view="home"] .hubtop { gap: 8px; min-height: 52px; }
+  .bmark { width: 34px; height: 34px; border-radius: 10px; }
+  .hubtop .wordmark { font-size: 22px; }
+  .hubtop .brandrow2 { gap: 6px; }
+  .hubtop .hdate { font-size: 12.5px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bellbtn { width: 44px; height: 44px; border-radius: 50%; }
+  .bellbtn small { display: none; }
+  .bellbtn svg { width: 22px; height: 22px; }
+  .bellbtn em { top: -2px; right: -4px; min-width: 19px; height: 19px; font-size: 11px; line-height: 19px; box-shadow: 0 0 0 2px #fff; }
+  .mebtn .avatar { width: 44px; height: 44px; font-size: 17px; }
+
+  /* ฮีโร่: กระชับ ไม่ตกบรรทัด */
+  .hero { margin-top: 6px; padding: 18px 16px 22px; border-radius: 0 0 28px 28px; }
+  .hgreet { font-size: 14.5px; }
+  .htitle { font-size: 19px; line-height: 1.35; margin: 4px 0 2px; }
+  .typed { font-size: clamp(28px, 8.6vw, 36px); white-space: nowrap; max-width: 100%; }
+  .caret { width: 3px; }
+  .hsearch.big { min-height: 56px; margin-top: 12px; padding: 4px 6px 4px 16px; border-radius: 28px; }
+  .hsearch.big svg { width: 22px; height: 22px; }
+  .hsearch.big input { font-size: 16px; text-overflow: ellipsis; }
+  .hero .popular { gap: 6px; margin-top: 12px; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .popular > span { font-size: 13.5px; }
+  .pchip { min-height: 40px; padding: 0 14px; font-size: 14.5px; background: #fff; box-shadow: inset 0 0 0 1.5px #D5E2F7; }
+  .aicta { margin-top: 14px; padding: 12px; gap: 10px; border-radius: 20px; }
+  .aicta-ic { width: 40px; height: 40px; border-radius: 13px; }
+  .aicta b { font-size: 15.5px; }
+  .aicta small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 13px; line-height: 1.4; }
+
+  /* หัวข้อส่วน */
+  .hsec { margin: 22px 0 8px; }
+  .hsec h2 { font-size: 19px; line-height: 1.3; min-width: 0; }
+
+  /* แผง/การ์ด */
+  .panel { border-radius: 24px; padding: 12px; }
+  .panel.board { padding: 2px 12px 14px; }
+  .ctabwrap { margin: 0 -12px; padding: 0 12px; }
+  .ctab { width: 88px; gap: 6px; padding: 8px 2px 12px; font-size: 14px; }
+  .ct-ic { width: 52px; height: 52px; border-radius: 17px; } .ct-ic svg { width: 28px; height: 28px; }
+  .tiles2 { gap: 8px; margin-top: 12px; }
+  .ptile { min-height: 132px; padding: 12px; border-radius: 18px; }
+  .ptile b { font-size: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .ptile small { font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tiles2 > .ptile:last-child:nth-child(odd) { grid-column: span 2; min-height: 112px; }
+  .pc-stats small { font-size: 12px; }
+  .quickadd .qa { min-height: 70px; font-size: 13.5px; }
+  .recrow { scroll-padding-inline: 16px; }
+  .recrow .prodcard, .reccard { width: min(76vw, 280px); }
+  .banner { padding: 16px; border-radius: 24px; }
+  .bn-l b { font-size: 42px; }
+
+  /* เมนูล่าง: พื้นขาวทึบ (อ่านชัดเวลามีภาพ/สีอยู่ข้างหลัง) · ช่องที่อยู่ = พื้นฟ้าอ่อน ตัวน้ำเงิน */
+  #nav { width: min(calc(100vw - 20px), 460px); height: 66px; padding: 5px; border-radius: 24px; bottom: calc(8px + var(--safe-b));
+    background: rgba(255,255,255,.94); -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6);
+    box-shadow: 0 0 0 1px rgba(11,27,77,.08), 0 14px 32px -14px rgba(11,27,77,.35); }
+  #nav::before { top: 5px; bottom: 5px; left: 5px; width: calc((100% - 10px) / 5); border: 0; border-radius: 19px; background: var(--sky); box-shadow: none; }
+  #nav a { font-size: 12px; gap: 3px; color: #56627D; text-shadow: none; border-radius: 19px; }
+  #nav a svg { width: 24px; height: 24px; filter: none; }
+  #nav a[aria-current="page"], #nav.drag a.over { color: var(--blue); }
+  #nav a[aria-current="page"] svg { transform: none; }
+  #nav a[data-r="ai"][aria-current] svg { color: #7A44F0; }
+  #sos { bottom: calc(86px + var(--safe-b)); height: 48px; }
+  .aibar { bottom: calc(82px + var(--safe-b)); }
+}
+@media (max-width: 360px) {
+  .hubtop .hdate { display: none; }
+  .ctab { width: 80px; }
+  #nav a { font-size: 11px; }
+}

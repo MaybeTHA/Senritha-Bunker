@@ -35,7 +35,7 @@ function typedLine() {
 }
 export function homeView(root, keepFocus = false) {
   const d = new Date(), unread = S().notices.filter(n => !n.read).length, cp = curPerson();
-  const input = h('input', { id: 'hub-q', type: 'search', value: hs.q, autocomplete: 'off', placeholder: 'ค้นหาสินค้า บริการ สิทธิ เช่น ผ้าอ้อม รถเข็น บัตรทอง', 'aria-label': 'ค้นหาสินค้า บริการ และสิทธิ',
+  const input = h('input', { id: 'hub-q', type: 'search', value: hs.q, autocomplete: 'off', placeholder: matchMedia('(max-width: 480px)').matches ? 'ค้นหาสินค้า บริการ สิทธิ…' : 'ค้นหาสินค้า บริการ สิทธิ เช่น ผ้าอ้อม รถเข็น บัตรทอง', 'aria-label': 'ค้นหาสินค้า บริการ และสิทธิ',
     oninput: e => { hs.q = e.target.value; homeView(root, true); },
     onkeydown: e => { if (e.key === 'Enter' && hs.q.trim().split(/\s+/).length >= 2) { const q = hs.q.trim(); hs.q = ''; go('ai/' + encodeURIComponent(q)); } } });
   const keepTyped = keepFocus && root.querySelector('.typed');
