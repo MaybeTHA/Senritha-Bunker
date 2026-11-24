@@ -11,6 +11,7 @@ import { editName, toggleListen, exportData, restoreModal, privacyModal, subject
 import { MODES, listenMode } from './listen.js';
 import { openOnboarding } from './onboard.js';
 import { allPhotos } from '../domain/photos.js';
+import { addSampleReviews, removeSampleReviews, hasSampleReviews } from './reviews.js';
 import { personForm, MED, medText } from './people.js';
 
 const TEAM_REL = ['พี่น้อง', 'ลูก', 'หลาน', 'คู่สมรส', 'ผู้ดูแลจ้าง', 'เพื่อนบ้าน', 'อาสาสมัคร/อสม.', 'อื่น ๆ'];
@@ -106,7 +107,7 @@ export function applyScale() {}
 
 export function profileView(root) {
   const s = S(), row = (icon, label, value, onclick, sub) => h('button.list-btn', { onclick }, h('span.mi', { html: ic(icon) }), h('span.lk', label, sub ? h('small', sub) : ''), value != null ? h('span.lv', value) : '', h('span.chev', { html: ic('right') }));
-  const hasSamples = s.tasks.some(t => t.source === 'sample') || s.family.some(m => m.sample) || s.requests.some(r => r.sample) || s.vitals.some(v => v.sample);
+  const hasSamples = s.tasks.some(t => t.source === 'sample') || s.family.some(m => m.sample) || s.requests.some(r => r.sample) || s.vitals.some(v => v.sample) || hasSampleReviews();
   const rs = recipients();
   put(root, pageHead('ฉัน'),
     h('div.meline', avatar('me', myName() || 'ฉ', '.big'), h('div', h('b', myName() || 'ยังไม่ได้ตั้งชื่อ', S().prefs.name_sample ? demoTag() : ''), h('small', `ผู้ดูแล${rs.length ? ` · ดูแล ${rs.map(m => m.name).join(', ')}` : ''}`)), h('button.mename', { onclick: editName }, 'แก้ชื่อ')),
@@ -142,6 +143,7 @@ export async function toggleHubSamples(remove) {
     await st.removeSamples();
     for (const m of S().family.filter(m => m.sample)) await st.removeMember(m.id);
     for (const r of S().requests.filter(r => r.sample)) await st.removeRequest(r.id);
+    await removeSampleReviews();
     return toast('ลบข้อมูลตัวอย่างแล้ว');
   }
   await addHubSamples();
@@ -158,5 +160,6 @@ export async function addHubSamples() {
   for (const [v1, v2, h0] of [[138, 86, 2], [146, 92, 26], [132, 84, 50]]) await st.addVital({ for_id: mom.id, kind: 'bp', v1, v2, note: 'หลังตื่นนอน', at: hrs(h0), sample: true });
   await st.addVital({ for_id: mom.id, kind: 'sugar', v1: 124, v2: null, note: 'ก่อนอาหารเช้า', at: hrs(3), sample: true });
   await st.addRequest({ service_id: 'l-loan', cat: 'living', title: 'ยืมวีลแชร์ (Fa-Equipment)', for_id: mom.id, by_id: 'me', date: d(2), slot: 'morning', note: 'นักสังคมสงเคราะห์จะโทรกลับเพื่อนัดประเมิน', sample: true });
+  await addSampleReviews();
   await st.setPref('cur_person', mom.id);
 }

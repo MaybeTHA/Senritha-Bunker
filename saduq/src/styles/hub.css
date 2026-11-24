@@ -796,3 +796,14 @@ h1[tabindex="-1"]:focus { outline: none; }
 .myrev .chipbtn { margin-left: auto; height: 36px; }
 .pd-rev { font: 600 12px var(--disp); color: #B97A00; }
 .ac-rev { color: #B97A00; font-weight: 600; }
+/* ดาวบนการ์ด · แถบสรุปรีวิวด้านบนหน้ารายละเอียด */
+.pd-rev { display: flex; align-items: center; gap: 2px; margin-top: 2px; font: 600 12px var(--disp); color: #8A6200; }
+.pd-rev .st, .ratebar .st { color: #F2A600; letter-spacing: 1px; }
+.pd-rev.none { color: var(--text-2); font-weight: 500; }
+.pd-rev .dtag { margin-left: 4px; height: 18px; font-size: 11px; padding: 0 6px; }
+.ratebar { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 48px; margin: 0 0 12px; padding: 8px 14px; border-radius: 16px; background: #FFF8E6; text-align: left; font: 500 13px var(--disp); color: #5C4300; }
+.ratebar .st { font-size: 18px; } .ratebar .st.none { color: #D9C48A; }
+.ratebar b { font: 700 16px Inter, var(--disp); color: var(--ink); }
+.ratebar em { margin-left: auto; font-style: normal; font-weight: 600; color: var(--blue); flex: none; }
+.ratebar .dtag { margin-left: 0; }
+.revbox { scroll-margin-bottom: 120px; }
