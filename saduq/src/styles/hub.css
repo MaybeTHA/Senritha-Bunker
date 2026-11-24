@@ -763,3 +763,26 @@ h1[tabindex="-1"]:focus { outline: none; }
 .pd-body { gap: 2px; }
 .trust li { align-items: center; }
 .hero .popular { margin-top: 10px; }
+
+/* ================= 2.6 ภาพจริงของสินค้า (Wikimedia Commons · ภาพประกอบประเภทเดียวกัน) ================= */
+.pd-art.photo { display: block; height: auto; aspect-ratio: 3 / 2; background: #F4F6FA; overflow: hidden; }
+.pd-art.photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+.prodcard:hover .pd-art.photo img { transform: scale(1.03); }
+.pd-art.photo::after { display: block; content: ""; position: absolute; inset: auto 0 0; height: 45%; background: linear-gradient(180deg, transparent, rgba(5,10,30,.35)); pointer-events: none; }
+.pd-art.photo .pd-grp { left: 10px; bottom: 10px; color: var(--ink); background: rgba(255,255,255,.92); }
+.pd-ill { position: absolute; z-index: 1; right: 8px; top: 8px; font: 600 11px var(--disp); color: #fff; background: rgba(5,10,30,.45); border-radius: 7px; padding: 1px 7px; }
+.svcphoto.prod img { aspect-ratio: 3 / 2; }
+.recrow .prodcard { width: min(64vw, 240px); }
+@media (min-width: 900px) { .svcphoto.prod { max-width: 560px; } }
+@media (max-width: 899px) {
+  /* หน้าสินค้า: 2 คอลัมน์แบบแอปช้อปปิ้ง */
+  .wrap[data-view="shop"] .prodgrid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .prodgrid .pd-body { padding: 10px 10px 12px; }
+  .prodgrid .pd-body > b { font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .prodgrid .pd-brand { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pd-foot { flex-direction: column; align-items: flex-start; gap: 0; }
+  .prodgrid .pd-price { font-size: 15px; }
+  .pd-price.none { font-size: 13px; }
+  .pd-foot small { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+  .prodgrid .pd-art.photo .pd-grp { display: none; }
+}

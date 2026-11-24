@@ -162,5 +162,89 @@ export default {
  "c-meet": {
   "src": "assets/photos/c-meet.jpg",
   "own": true
+ },
+ "p-bp-omron": {
+  "src": "assets/photos/p-bp-omron.jpg",
+  "title": "File:Close-up of a woman using a blood pressure monitor.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Close-up_of_a_woman_using_a_blood_pressure_monitor.jpg",
+  "license": "CC BY 2.0",
+  "artist": "Shixart1985"
+ },
+ "p-oxi-yuwell": {
+  "src": "assets/photos/p-oxi-yuwell.jpg",
+  "title": "File:Pulse oximeter on a finger.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Pulse_oximeter_on_a_finger.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Jakub T. Jankiewicz"
+ },
+ "p-glu-accu": {
+  "src": "assets/photos/p-glu-accu.jpg",
+  "title": "File:Low Blood Sugar - Glucose Monitor - 50191694906.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Low_Blood_Sugar_-_Glucose_Monitor_-_50191694906.jpg",
+  "license": "CC BY 2.0",
+  "artist": "formulatehealth"
+ },
+ "p-wheel-soma": {
+  "src": "assets/photos/p-wheel-soma.jpg",
+  "title": "File:Blue folding lightweight wheelchair.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Blue_folding_lightweight_wheelchair.jpg",
+  "license": "CC BY 2.0",
+  "artist": "Arnold C (User:Buchanan-Hermit)"
+ },
+ "p-diaper-feelfree": {
+  "src": "assets/photos/p-diaper-feelfree.jpg",
+  "title": "File:AdultDiaper1.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:AdultDiaper1.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Hadifn"
+ },
+ "p-diaper-lifree": {
+  "src": "assets/photos/p-diaper-lifree.jpg",
+  "title": "File:Adult diapers in Tel Aviv.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Adult_diapers_in_Tel_Aviv.jpg",
+  "license": "CC BY 3.0",
+  "artist": "David Shankbone"
+ },
+ "p-bed-allwell": {
+  "src": "assets/photos/p-bed-allwell.jpg",
+  "title": "File:Hill-Rom hospital bed.JPG",
+  "page": "https://commons.wikimedia.org/wiki/File:Hill-Rom_hospital_bed.JPG",
+  "license": "CC BY-SA 3.0",
+  "artist": "BrokenSphere"
+ },
+ "p-mattress-air": {
+  "src": "assets/photos/p-mattress-air.jpg",
+  "title": "File:Luftkissen-Dekubitusmatratze.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Luftkissen-Dekubitusmatratze.jpg",
+  "license": "Public domain",
+  "artist": "Tiberius"
+ },
+ "p-o2": {
+  "src": "assets/photos/p-o2.jpg",
+  "title": "File:Home oxygen concentrator.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Home_oxygen_concentrator.jpg",
+  "license": "CC BY-SA 2.0 uk",
+  "artist": "GiollaUidir at English Wikipedia"
+ },
+ "p-shower-chair": {
+  "src": "assets/photos/p-shower-chair.jpg",
+  "title": "File:Foldable Shower Seat.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Foldable_Shower_Seat.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Pizzatomatojellycattttt"
+ },
+ "p-grab-bar": {
+  "src": "assets/photos/p-grab-bar.jpg",
+  "title": "File:Grabbar.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Grabbar.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Oneweekendwebsite"
+ },
+ "p-walker-yamada": {
+  "src": "assets/photos/p-walker-yamada.jpg",
+  "title": "File:Deambulateur.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Deambulateur.jpg",
+  "license": "Public domain",
+  "artist": "Choubaca"
  }
 };
