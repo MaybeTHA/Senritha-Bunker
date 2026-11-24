@@ -257,6 +257,10 @@ body.mbl #bScan{right:calc(12px + env(safe-area-inset-right));bottom:calc(200px 
 body.mbl #bMap{left:calc(12px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
 body.mbl #bExt{left:calc(66px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
 body.mbl #bPax{left:calc(120px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
+#bCmd{left:26px;bottom:192px;width:44px;height:44px;background:#5a4a2acc}
+body.mbl #bCmd{left:calc(174px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
+#cmdPanel{position:absolute;left:calc(236px + env(safe-area-inset-left));bottom:calc(60px + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:4px;pointer-events:auto;background:#0c100ae6;border:1px solid #f0b429;border-radius:8px;padding:6px;width:170px;z-index:8}
+#cmdPanel.on{display:flex}#cmdPanel .btn{width:100%}#cmdInfo{font-size:10px;color:#c8b878;line-height:1.3}
 body.mbl #bExt.hot{background:#c0441ecc;border-color:#ffd0a0;animation:bl .6s infinite}
 body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
 /* จอเตี้ยมาก (มีแถบเบราว์เซอร์): ย่อแผงซ้าย ย้ายปุ่มสแกนไปฝั่งซ้าย */
@@ -268,6 +272,8 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
  body.mbl #bSmk{right:calc(62px + env(safe-area-inset-right))}body.mbl #bMsl{right:calc(112px + env(safe-area-inset-right))}
  body.mbl #bExt{left:calc(62px + env(safe-area-inset-left))}body.mbl #bScan{right:auto;left:calc(112px + env(safe-area-inset-left))}
  body.mbl #bPax{left:calc(162px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));width:44px;height:44px}
+ body.mbl #bCmd{left:calc(212px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));width:44px;height:44px}
+ body.mbl #cmdPanel{bottom:calc(56px + env(safe-area-inset-bottom));max-height:calc(100vh - 70px);overflow-y:auto}
  body.mbl #bMain{right:calc(134px + env(safe-area-inset-right));width:72px;height:72px}
  body.mbl #bAlt{right:calc(158px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom));width:42px;height:42px}
 }
@@ -383,6 +389,8 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="fbtn" id="bMap">แผนที่</div>
   <div class="fbtn" id="bExt">ดับไฟ</div>
   <div class="fbtn" id="bPax">ลงรถ</div>
+  <div class="fbtn" id="bCmd" onclick="cmdMenu()">สั่งการ</div>
+  <div id="cmdPanel"><div id="cmdInfo"></div><button class="btn sm" onclick="cmdBtn('follow')">🚩 ตามฉัน</button><button class="btn sm" onclick="cmdBtn('attack')">⚔️ บุกจุดที่ชี้</button><button class="btn sm" onclick="cmdBtn('hold')">🛡️ ตั้งรับตรงนี้</button><button class="btn sm" onclick="cmdBtn('focus')">🎯 ยิงเป้าเดียวกัน</button><button class="btn sm" onclick="cmdBtn('cancel')">✖ ยกเลิกคำสั่ง</button></div>
 </div>
 
 <!-- BOOT -->
@@ -608,6 +616,9 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   ห้ามโจมตีฐานทัพหลักศัตรู รอบ HQ และเขตจุดเกิด · แต่ละอย่างมีคูลดาวน์ · AI ก็ใช้กติกาเดียวกัน<br>
   เติมเสบียง: จอดนิ่งที่ปั๊ม Zone 4 หรือรอบ HQ ฝ่ายเรา (ช่วงเตรียมพร้อมเติมได้ทุกที่ในเขตเรา) — เติมเฉพาะที่ขาด ไม่เกินความจุ<br>
   เฮลิคอปเตอร์ออกจากฐานไปช่วยจุดที่ปะทะ อยู่ราว 80 วิ แล้วบินกลับ · ยิงตกได้ด้วยปืนกล/ปืนใหญ่กล/จรวดทหาร<br><br>
+  <b style="color:#f0b429">■ สั่งการลูกน้อง</b><br>
+  <b>Z</b> ตามฉัน · <b>V</b> บุกจุดที่เมาส์ชี้ · <b>B</b> ตั้งรับตรงนี้ · <b>N</b> ยิงเป้าเดียวกัน (เป้าที่ล็อก/ใกล้เมาส์) · <b>H</b> ยกเลิก · มือถือ: ปุ่มสั่งการ<br>
+  สั่งรถฝ่ายเราที่ใกล้ที่สุด · เรดาร์ยิ่งดี สั่งได้ไกลขึ้น หลายคันขึ้น ตอบสนองเร็วขึ้น (ไม่มี 2 คัน/2.6 วิ → Gen3 9 คัน/0.35 วิ)<br><br>
   <b style="color:#f0b429">■ ทหารราบ & IFV</b><br>
   IFV บรรทุกทหารได้ตามขนาด (4/6/7/8 นาย) · ทหารต่อต้านรถถังยิงจรวด HEAT · ทหารนับช่วยยึดโซน (2 นาย = 1 หน่วย)<br>
   ขับ IFV: กด <b>G</b> (มือถือ: ปุ่มลงรถ) เพื่อส่งทหารลง / เรียกทหารใกล้ ๆ ขึ้นรถ · ทหารที่ลงจะคุ้มกันรถคุณ · เติมจรวด/ระเบิดมือที่ปั๊ม, HQ หรือข้าง IFV<br><br>
@@ -1422,10 +1433,10 @@ var PARTS={ch:CHASSIS,gun:ALLGUNS(),al:AUTOL,sec:SECS,atgm:ATGMS,fcs:FCSS,
 
 /* ═══════ SAVE / KEYS / BUFFS (กู้คืนจาก v4) ═══════ */
 var DEFKEYS={fwd:'w',back:'s',left:'a',right:'d',brake:' ',w1:'1',w2:'2',w3:'3',ammo:'r',
- scan:'shift',lock:'q',smoke:'x',use:'f',ext:'e',map:'m',pax:'g',quit:'escape'};
+ scan:'shift',lock:'q',smoke:'x',use:'f',ext:'e',map:'m',pax:'g',cmdF:'z',cmdA:'v',cmdH:'b',cmdT:'n',cmdX:'h',quit:'escape'};
 var KEYLBL={fwd:'เดินหน้า',back:'ถอยหลัง',left:'เลี้ยวซ้าย',right:'เลี้ยวขวา',brake:'เบรก',
  w1:'ปืนหลัก',w2:'ปืนรอง',w3:'ATGM',ammo:'สลับกระสุน',scan:'สแกน (กดค้าง)',lock:'ล็อกเป้า',
- smoke:'ควัน',use:'ใช้งาน',ext:'ดับเพลิง',map:'แผนที่ใหญ่',pax:'ทหาร ลง/ขึ้นรถ (IFV)',quit:'ออกจากการรบ'};
+ smoke:'ควัน',use:'ใช้งาน',ext:'ดับเพลิง',map:'แผนที่ใหญ่',pax:'ทหาร ลง/ขึ้นรถ (IFV)',cmdF:'สั่ง: ตามฉัน',cmdA:'สั่ง: บุกจุดที่ชี้',cmdH:'สั่ง: ตั้งรับตรงนี้',cmdT:'สั่ง: ยิงเป้าเดียวกัน',cmdX:'สั่ง: ยกเลิก',quit:'ออกจากการรบ'};
 var BUFFS=[
  {k:'heal',ico:'❤️',n:'ซ่อมด่วน',d:'ฟื้นพลังชีวิต 45%',w:10},
  {k:'healF',ico:'🛠️',n:'ซ่อมเต็มคัน',d:'ฟื้นเต็ม + ซ่อมโมดูล/ลูกเรือ',w:4},
@@ -2549,7 +2560,7 @@ function flCapture(dt){
  var cnt=[];for(var i=0;i<FLZ;i++)cnt.push([0,0]);
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead)continue;
   var z=zoneOf(t.x);cnt[z][teamSide(t.team)]++;}
- infCapCount(cnt);
+ infCapCount(cnt);FL.cnt=cnt;
  if(FL.rt!==undefined&&(FL.prep||!FL.to)){flCaptureRoles(cnt,dt);return;}
  for(var z=1;z<FLZ-1;z++){
   var f=cnt[z][0],e=cnt[z][1],tot=f+e;
@@ -3248,12 +3259,15 @@ function flGoal(e){
   return{x:P.x-dir*(170+(e.seed%3)*55),y:P.y+((e.seed%3)-1)*170,thr:hyp(P.x-e.x,P.y-e.y)>420?1:.7};}
  var q=sqInfo(e),dir2=side===0?1:-1,rl=flRole(side);
  if(rl!=='free'){
+  if(rl==='def'){var bz=-1,bdz=1e9,acode=side===0?3:2;for(var zz=1;zz<FLZ-1;zz++){if(FL.own[zz]===side&&FL.capT[zz]===acode){var dz=Math.abs(zoneCX(zz)-e.x);if(dz<bdz){bdz=dz;bz=zz;}}}
+   if(bz>=0)return{x:zoneCX(bz)+Math.cos(e.seed*1.3)*ZL*.25,y:((e.seed%5)-2)*300+Math.sin(e.seed)*90,thr:1};}
   if(rl!=='atk'){var xb=rl==='prep'?ownEdgeX(side):holdEdgeX(side);           /* ป้องกัน: ตั้งแนวในเขต + ชิงโซนกลางที่ติดกัน */
    return{x:xb-dir2*(230+(e.seed%4)*140),y:((e.seed%5)-2)*300+Math.sin(e.seed)*90,thr:.9};}
   if(q&&q.n>1&&(e.x-q.x)*dir2>560)return{x:e.x,y:e.y,thr:.15};
   var tz=side===0?Math.min(FLZ-1,zoneOf(ownEdgeX(0)+5)):Math.max(0,zoneOf(ownEdgeX(1)-5)),hq=null;
   if(tz===(side===0?FLZ-1:0))for(var j=0;j<structs.length;j++){var st=structs[j];if(st.k==='hq'&&st.team!==side&&!st.dead)hq=st;}
   if(hq)return{x:hq.x-dir2*430+Math.cos(e.seed)*200,y:hq.y+Math.sin(e.seed*1.3)*380,thr:1};
+  if(zoneOf(e.x)===tz&&Math.abs(e.x-zoneCX(tz))<ZL*.36&&(FL.capT[tz]||0)>0)return{x:e.x+Math.cos(e.seed+G.t*.2)*60,y:e.y+Math.sin(e.seed+G.t*.2)*60,thr:.35};
   return{x:zoneCX(tz)+Math.cos(e.seed*1.7)*ZL*.22,y:((e.seed%3)-1)*480+Math.sin(e.seed*2.3)*150,thr:1};}
  if(q&&q.mode==='hold')return{x:q.x-dir2*260,y:q.y+Math.sin(e.seed)*130,thr:.8};
  if(q&&q.n>1&&(e.x-q.x)*dir2>420)return{x:e.x,y:e.y,thr:0};      /* รอเพื่อนในหมู่ */
@@ -3768,7 +3782,7 @@ function commonStart(mode){
  $('hResp').classList.remove('on');closeBigMap();closeModal();
  G.mode=mode;buildMap(G.map);
  tanks=[];shots=[];parts=[];trails=[];debris=[];smokes=[];aps=[];arty=[];logs=[];
- $('hLog').innerHTML='';specReset();infReset();cineReset();
+ $('hLog').innerHTML='';specReset();infReset();cineReset();G.cmdM=null;G.cmdPick=null;
  G.score=[0,0];G.caps=[];G.lwsDir=null;G.alert=0;G.deaths=0;
  runBuff={dmg:1,pen:1,armor:1,hp:1,rel:1,spd:1,acc:1,cvg:1,regen:0,life:0,crew:0,scan:1,stealth:1};
  var ps=calc();
@@ -3922,7 +3936,7 @@ function update(dt){
   flSpawnQueue(dt);flCapture(dt);flArty(dt);updTurrets(dt);flHUD();flEvents(dt);supTick(dt);flRolesTick(dt);infUpdate(dt);cineTick(dt/(CINE.slow||1));}
  /* ── รถทุกคัน ── */
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead)continue;
-  if(t.team!==0){updSpot(t,dt);ai(t,dt);if(FL.on)infVehAI(t,dt);}
+  if(t.team!==0){updSpot(t,dt);cmdPre(t);ai(t,dt);if(FL.on)infVehAI(t,dt);cmdPost(t,dt);}
   var egd=t===P?(PLAT==='pc'?hyp(mouse.x+cam.x-P.x,mouse.y+cam.y-P.y):(P.asT&&!P.asT.dead?hyp(P.asT.x-P.x,P.asT.y-P.y):900)):(t.see&&t.seeT&&!t.seeT.dead?hyp(t.seeT.x-t.x,t.seeT.y-t.y):900);
   t.elev=lerp(t.elev||0,clamp((egd-520)/5000,-.07,.22),Math.min(1,dt*3));if(t.recoil>0)t.recoil=Math.max(0,t.recoil-dt*3.2);
   moveTank(t,dt);if(t.hp<=0)killTank(t);}
@@ -5021,7 +5035,7 @@ function flRolesTick(dt){if(FL.rt===undefined)return;FL.rt+=dt;FL.phaseT-=dt;
  if(FL.prep&&FL.phaseT>0&&FL.phaseT<=5&&Math.ceil(FL.phaseT)!==Math.ceil(FL.phaseT+dt))SFX.lwsBeep(false);
  if(FL.prep&&FL.phaseT<=0){FL.prep=false;FL.to=true;FL.phaseT=0;FL.warned=true;
   cineCard('TOTAL OFFENSIVE','ทุกฝ่ายบุก — ชิง ZONE 4','#ff7a3c',3.2);SFX.horn();SFX.radio('air');
-  addLog('⚔️ TOTAL OFFENSIVE — ทุกฝ่ายบุกเข้าหา Zone 4! ฝ่ายที่ยึดได้ก่อนจะเป็นฝ่ายป้องกัน','b');}
+  addLog('⚔️ TOTAL OFFENSIVE — ทุกฝ่ายบุกเข้าหา Zone 4! ฝ่ายที่ยึดได้ก่อนบุกต่อทันที','b');}
  else if(!FL.prep&&!FL.to){
   if(!FL.warned&&FL.phaseT<=FLR.warn){FL.warned=true;SFX.radio('air');
    addLog(FL.atk===0?'⏱️ อีก 10 วิ สลับเป็นฝ่ายป้องกัน — ถ้ากำลังยึดโซนอยู่จะได้ต่อเวลา':'⏱️ อีก 10 วิ ฝ่ายเราได้บุก!','b');}
@@ -5727,6 +5741,78 @@ function drawEv2(w,h){var E=FL.ev;if(!E)return;var i;
  E.air.forEach(function(a){if(a.k!=='ac130'||!a.fx.length)return;a.fx.forEach(function(f){cx.strokeStyle=f.big?'rgba(255,220,150,.85)':'rgba(255,240,180,.7)';cx.lineWidth=f.big?3:1.4;cx.beginPath();cx.moveTo(a.x-cam.x,a.y-cam.y-a.h*VK);cx.lineTo(f.x-cam.x,f.y-cam.y);cx.stroke();});});
  if(E.rk)for(i=0;i<E.rk.length;i++){var r=E.rk[i];if(r.t<0||r.cx===undefined)continue;var x=r.cx-cam.x,y=r.cy-cam.y-r.ch*VK;if(x<-30||x>w+30||y<-30||y>h+30)continue;
   cx.fillStyle='#f0ece0';cx.beginPath();cx.arc(x,y,2.4,0,6.2832);cx.fill();cx.globalCompositeOperation='lighter';cx.globalAlpha=.8;cx.drawImage(glowSpr('#ffb050'),x-10,y-10,20,20);cx.globalAlpha=1;cx.globalCompositeOperation='source-over';}}
+/* ═══════════════════════════════════════════════════════════
+   CAPTURE BAR — หลอดแย่งยึดในโซน (จำนวนรถ/ทหารแต่ละฝ่าย · ใครกำลังได้)
+   ═══════════════════════════════════════════════════════════ */
+function drawCapBars(w,h){if(!FL.on||!FL.cnt||CINE.k)return;var mb=PLAT==='mb',bw=mb?190:260,by=mb?h-96:Math.max(h*.3,196);
+ for(var z=1;z<FLZ-1;z++){var pr=FL.prog[z]||0,ct=FL.capT[z]||0;if(!ct&&Math.abs(pr)<.5)continue;
+  var zx0=-AX+z*ZL-cam.x,zx1=zx0+ZL;if(zx1<0||zx0>w)continue;
+  var cxp=clamp(w/2,zx0+bw/2+20,zx1-bw/2-20),c=FL.cnt[z],con=ct===1,pulse=.6+Math.sin(G.t*7)*.4,own=FL.own[z];
+  cx.save();cx.translate(cxp,by);
+  cx.fillStyle='rgba(8,10,8,.78)';cx.fillRect(-bw/2-46,-20,bw+92,40);cx.strokeStyle=con?'rgba(255,190,80,'+pulse+')':'rgba(120,130,110,.6)';cx.lineWidth=con?2:1;cx.strokeRect(-bw/2-46,-20,bw+92,40);
+  cx.fillStyle='#1a1d18';cx.fillRect(-bw/2,-6,bw,12);
+  var f=clamp(pr/100,-1,1);if(f>0){cx.fillStyle='#4fa0e0';cx.fillRect(0,-6,bw/2*f,12);}else if(f<0){cx.fillStyle='#e05a3c';cx.fillRect(bw/2*f,-6,-bw/2*f,12);}
+  cx.fillStyle='rgba(255,255,255,.7)';cx.fillRect(-1,-9,2,18);
+  cx.font='700 '+(mb?11:13)+'px Kanit, Tahoma';cx.textAlign='center';cx.fillStyle='#7fc0ff';cx.fillText(c[0],-bw/2-24,5);cx.fillStyle='#ff8a6a';cx.fillText(c[1],bw/2+24,5);
+  var lb=con?'⚔️ แย่งชิง ZONE '+(z+1):ct===2?'▶ น้ำเงินกำลังยึด ZONE '+(z+1):ct===3?'◀ แดงกำลังยึด ZONE '+(z+1):'ZONE '+(z+1)+(own===-1?' · พื้นที่กลาง':'');
+  cx.font='600 '+(mb?10:11.5)+'px Kanit, Tahoma';cx.fillStyle=con?'#ffd27a':'#e8e2d0';cx.fillText(lb+'  '+Math.round(Math.abs(pr))+'%',0,-10+(mb?-2:-2));
+  cx.restore();
+  if(con){cx.fillStyle='rgba(255,180,60,'+(.035*pulse)+')';cx.fillRect(Math.max(zx0,0),0,Math.min(zx1,w)-Math.max(zx0,0),h);}}
+ cx.textAlign='left';}
+
+/* ═══════════════════════════════════════════════════════════
+   SQUAD COMMANDS — สั่งการลูกน้อง (ตามฉัน · บุกจุด · ตั้งรับ · ยิงเป้าเดียวกัน)
+   เรดาร์ยิ่งดี: สั่งได้ไกลขึ้น · หลายคันขึ้น · ลูกน้องตอบสนองเร็วขึ้น
+   ═══════════════════════════════════════════════════════════ */
+var CMDR={rd0:{rng:650,n:2,dl:2.6},rd1:{rng:1100,n:4,dl:1.6},rd2:{rng:1600,n:6,dl:.9},rd3:{rng:2300,n:9,dl:.35}};
+var CMDN={follow:'ตามฉัน',attack:'บุกจุดที่ชี้',hold:'ตั้งรับตรงนี้',focus:'ยิงเป้าเดียวกัน'};
+function cmdSpec(){var r=(P&&P.b&&P.b.radar)||SV.build.radar||'rd0';return CMDR[r]||CMDR.rd0;}
+function cmdUnits(){var C=cmdSpec(),L=[],i,t;if(!P||P.dead)return L;
+ for(i=0;i<tanks.length;i++){t=tanks[i];if(t.dead||t===P||t.team!==2)continue;var d=hyp(t.x-P.x,t.y-P.y);if(d<=C.rng)L.push([d,t]);}
+ L.sort(function(a,b){return a[0]-b[0];});return L.slice(0,C.n);}
+function cmdIssue(k,x,y,tgt){if(!P||P.dead||SPEC.on){return;}var C=cmdSpec(),L=cmdUnits();
+ if(!L.length){toast('📡 ไม่มีหน่วยฝ่ายเราในระยะสั่งการ ('+C.rng+')');SFX.ui(false);return;}
+ if(k==='focus'&&(!tgt||tgt.dead)){toast('ไม่มีเป้าหมายให้รุมยิง — ล็อกเป้า (Q) หรือชี้ที่ศัตรู');SFX.ui(false);return;}
+ for(var i=0;i<L.length;i++){var t=L[i][1];t.cmd={k:k,x:x,y:y,tgt:tgt||null,at:G.t+C.dl*rnd(.8,1.25)*(1+L[i][0]/C.rng*.5),ack:false};}
+ G.cmdM={k:k,x:x,y:y,tgt:tgt||null,t:G.t};SFX.radio('air');
+ addLog('📻 สั่ง '+L.length+' คัน: '+CMDN[k]+' · ตอบรับใน ~'+C.dl.toFixed(1)+' วิ (เรดาร์ '+((P.b&&P.b.radar)||'rd0').toUpperCase()+')','b');}
+function cmdCancel(){var n=0;for(var i=0;i<tanks.length;i++)if(tanks[i].cmd){tanks[i].cmd=null;n++;}G.cmdM=null;if(n){addLog('📻 ยกเลิกคำสั่ง — หน่วยกลับไปปฏิบัติตามแผนรบ','b');SFX.ui(true);}}
+function cmdKey(k){if(!G.run||!P||P.dead||SPEC.on)return;var wx=mouse.x+cam.x,wy=mouse.y+cam.y;
+ if(k==='follow')cmdIssue('follow',P.x,P.y);
+ else if(k==='attack'){if(PLAT==='mb'){G.cmdPick='attack';toast('แตะบนสนามรบ/แผนที่เพื่อเลือกจุดบุก');return;}cmdIssue('attack',wx,wy);}
+ else if(k==='hold')cmdIssue('hold',P.x,P.y);
+ else if(k==='focus'){var tg=G.lock&&!G.lock.dead?G.lock:null;if(!tg){var bd=PLAT==='mb'?1400:220,ox=PLAT==='mb'?P.x:wx,oy=PLAT==='mb'?P.y:wy;
+   for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead||t.team!==1)continue;var d=hyp(t.x-ox,t.y-oy);if(d<bd){bd=d;tg=t;}}}cmdIssue('focus',tg?tg.x:0,tg?tg.y:0,tg);}
+ else if(k==='cancel')cmdCancel();}
+/* หลัง AI ตัดสินใจ: ถ้ามีคำสั่ง ให้คำสั่งคุมการเคลื่อนที่ (ป้อมยังเล็ง/ยิงตามปกติ) */
+function cmdPre(e){var c=e.cmd;if(!c||G.t<c.at)return;
+ if(!c.ack){c.ack=true;if(Math.random()<.4)addLog('📻 '+tkName(e)+': รับทราบ — '+CMDN[c.k],'');}
+ if(c.k==='focus'){var ft=c.tgt;if(!ft||ft.dead){e.cmd=null;return;}if(hyp(ft.x-e.x,ft.y-e.y)<1900){e.seeT=ft;e.see=true;e.seeP=Math.max(e.seeP||0,1.1);}e.hunt=ft;e.huntT=3;}
+ if(c.k==='follow'&&(!P||P.dead||P.team!==0)){e.cmd=null;}}
+function cmdPost(e,dt){var c=e.cmd;if(!c||G.t<c.at||e.dead||e.noMove)return;var gx,gy,tol,sp=((e.seed%5)-2);
+ if(c.k==='follow'){var dir=P.a,back=150+(e.seed%3)*60;gx=P.x-Math.cos(dir)*back-Math.sin(dir)*sp*70;gy=P.y-Math.sin(dir)*back+Math.cos(dir)*sp*70;tol=200;}
+ else if(c.k==='attack'||c.k==='hold'){gx=c.x+sp*60;gy=c.y+(((e.seed>>2)%5)-2)*60;tol=c.k==='hold'?150:170;
+  if(c.k==='attack'&&hyp(c.x-e.x,c.y-e.y)<260){c.k='hold';}}
+ else if(c.k==='focus'){var ft=c.tgt;if(!ft||ft.dead)return;var dd=hyp(ft.x-e.x,ft.y-e.y);if(dd<850)return;gx=ft.x;gy=ft.y;tol=850;}
+ var d=hyp(gx-e.x,gy-e.y);if(d>tol){steerTo(e,Math.atan2(gy-e.y,gx-e.x),d>500?1:.75,dt);}
+ else if(c.k==='hold'){e.thr=0;e.steer=0;}}
+function drawCmd(w,h){if(SPEC.on||!P)return;var M=G.cmdM,i,t;
+ for(i=0;i<tanks.length;i++){t=tanks[i];if(t.dead||!t.cmd)continue;var x=t.x-cam.x,y=t.y-cam.y-mdl(t.b).L-30;if(x<-40||x>w+40||y<-40||y>h+40)continue;
+  cx.fillStyle=t.cmd.ack?'#8fd44a':'#c8b878';cx.beginPath();cx.moveTo(x,y+6);cx.lineTo(x-5,y);cx.lineTo(x+5,y);cx.closePath();cx.fill();
+  if(!t.cmd.ack){cx.strokeStyle='rgba(200,184,120,.7)';cx.lineWidth=1;cx.beginPath();cx.arc(x,y-6,5,-Math.PI/2,-Math.PI/2+6.2832*clamp(1-(t.cmd.at-G.t)/3,0,1));cx.stroke();}}
+ if(!M)return;var age=G.t-M.t;
+ if(age<1.2){var L=cmdUnits();cx.strokeStyle='rgba(143,212,74,'+(.5*(1-age/1.2))+')';cx.lineWidth=1.2;cx.setLineDash([6,6]);
+  for(i=0;i<L.length;i++){cx.beginPath();cx.moveTo(P.x-cam.x,P.y-cam.y);cx.lineTo(L[i][1].x-cam.x,L[i][1].y-cam.y);cx.stroke();}cx.setLineDash([]);}
+ var any=false;for(i=0;i<tanks.length;i++)if(tanks[i].cmd&&!tanks[i].dead){any=true;break;}if(!any){G.cmdM=null;return;}
+ if(M.k==='attack'||M.k==='hold'){var mx2=M.x-cam.x,my2=M.y-cam.y,col=M.k==='attack'?'#ffb347':'#7fc8ff';cx.strokeStyle=col;cx.lineWidth=2;cx.globalAlpha=.7+Math.sin(G.t*4)*.25;
+  cx.beginPath();cx.ellipse(mx2,my2,90,90*VK,0,0,6.2832);cx.stroke();cx.beginPath();cx.moveTo(mx2-14,my2);cx.lineTo(mx2+14,my2);cx.moveTo(mx2,my2-14);cx.lineTo(mx2,my2+14);cx.stroke();
+  cx.globalAlpha=1;cx.font='700 12px Kanit, Tahoma';cx.textAlign='center';cx.fillStyle=col;cx.fillText(M.k==='attack'?'⚔️ บุก':'🛡️ ตั้งรับ',mx2,my2-70);cx.textAlign='left';}
+ if(M.k==='focus'&&M.tgt&&!M.tgt.dead){var fx=M.tgt.x-cam.x,fy=M.tgt.y-cam.y;cx.strokeStyle='#ff4a3a';cx.lineWidth=2;cx.globalAlpha=.6+Math.sin(G.t*8)*.3;
+  cx.beginPath();cx.arc(fx,fy,46,0,6.2832);cx.stroke();cx.beginPath();cx.moveTo(fx-56,fy);cx.lineTo(fx-36,fy);cx.moveTo(fx+36,fy);cx.lineTo(fx+56,fy);cx.moveTo(fx,fy-56);cx.lineTo(fx,fy-36);cx.moveTo(fx,fy+36);cx.lineTo(fx,fy+56);cx.stroke();cx.globalAlpha=1;}}
+function cmdMenu(){var el=$('cmdPanel');if(!el)return;var on=!el.classList.contains('on');el.classList.toggle('on',on);if(on){var C=cmdSpec();$('cmdInfo').textContent='เรดาร์: ระยะ '+C.rng+' · '+C.n+' คัน · ตอบสนอง ~'+C.dl+' วิ';}SFX.ui(on);}
+function cmdBtn(k){$('cmdPanel').classList.remove('on');cmdKey(k);}
+cv.addEventListener('pointerdown',function(e){if(G.cmdPick==='attack'&&G.run&&P&&!P.dead){G.cmdPick=null;cmdIssue('attack',e.clientX+cam.x,e.clientY+cam.y);}});
+if(bmc)bmc.addEventListener('pointerdown',function(e){if(G.cmdPick==='attack'&&G.run){G.cmdPick=null;var p=bmToWorld(e);closeBigMap();cmdIssue('attack',p.x,p.y);}});
 function render(){
  var w=innerWidth,h=innerHeight,time=G.t,m=MAPS[G.map];
  var sx=G.shake?rnd(-G.shake,G.shake):0,sy=G.shake?rnd(-G.shake,G.shake):0;
@@ -5782,7 +5868,8 @@ function render(){
   cx.fillStyle=col.base;cx.strokeStyle='#141810';cx.lineWidth=1.6;
   pathPts(cx,turPts(M.sty,TR));cx.fill();cx.stroke();
   cx.restore();}
- if(FL.on){drawAir(w,h);drawEv2(w,h);drawSupMarks(w,h);}
+ if(FL.on){drawAir(w,h);drawEv2(w,h);drawSupMarks(w,h);drawCapBars(w,h);}
+ drawCmd(w,h);
  drawClouds(w,h,gdt);
  /* กระสุน */
  for(var i=0;i<shots.length;i++){var s=shots[i];
@@ -6031,6 +6118,7 @@ addEventListener('keydown',function(e){
  if(k===SV.keys.smoke)dropSmoke();
  if(k===SV.keys.use)useObj();
  if(k===(SV.keys.pax||'g'))paxCmd();
+ if(k===(SV.keys.cmdF||'z'))cmdKey('follow');if(k===(SV.keys.cmdA||'v'))cmdKey('attack');if(k===(SV.keys.cmdH||'b'))cmdKey('hold');if(k===(SV.keys.cmdT||'n'))cmdKey('focus');if(k===(SV.keys.cmdX||'h'))cmdKey('cancel');
  if(k===SV.keys.ext)useExt(P);
  if(k===SV.keys.map){if($('bigmap').classList.contains('on'))closeBigMap();else openBigMap();}
  if(k===SV.keys.quit){if($('bigmap').classList.contains('on'))closeBigMap();else quitBattle();}
