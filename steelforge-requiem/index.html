@@ -5017,7 +5017,7 @@ function drawMobSet(){var el=$('mobSet');if(!el)return;var L=[['assist','🎯 �
    · ฝ่ายป้องกัน: ห้ามออกนอกโซนของทีม — ออกไปได้ 5 วิ ครบแล้วรถระเบิด
    ═══════════════════════════════════════════════════════════ */
 var FLR={prep:30,swap:120,warn:10,limit:10*60,grace:12,lossGrace:10,oob:5,siege:30,ot:30,bonus:45,
- tkPer:45,drain:.45,capSpd:7/4.5,btWin:90,btDur:60,breachT:6,breachS:1.2};
+ tkBase:240,tkPer:25,drain:.45,capSpd:7/4.5,btWin:90,btDur:60,breachT:6,breachS:1.2};
 function flRolesInit(){FL.rt=0;FL.prep=true;FL.to=false;tkInit();FL.phaseT=FLR.prep;FL.atk=Math.random()<.5?0:1;FL.warned=false;FL.swapN=0;
  FL.sgA={};addLog('⏳ เตรียมพร้อม 30 วิ — ยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้','b');}
 function flRole(side){if(!FL.on||FL.rt===undefined)return 'free';if(FL.prep)return 'prep';if(FL.to)return 'atk';
@@ -5825,7 +5825,7 @@ if(bmc)bmc.addEventListener('pointerdown',function(e){if(G.cmdPick==='attack'&&G
    · ทะลวงต่อเนื่อง: ยึด 2 โซนใน 90 วิ → 60 วิ ฝ่ายรับเกิดช้า ฝ่ายบุกยึดเร็วขึ้น
    · 10:00 ยังไม่จบ → HQ ฝ่ายแต้มน้อยระเบิด
    ═══════════════════════════════════════════════════════════ */
-function tkInit(){var n=Math.round((G.teamSize||12)*FLR.tkPer);FL.tk=[n,n];FL.tk0=n;FL.col=[false,false];FL.btT=[0,0];FL.capH=[[],[]];}
+function tkInit(){var n=Math.round(FLR.tkBase+(G.teamSize||12)*FLR.tkPer);FL.tk=[n,n];FL.tk0=n;FL.col=[false,false];FL.btT=[0,0];FL.capH=[[],[]];}
 function tkLose(side,n){if(!FL.tk||FL.prep||G.over||FL.col[0]||FL.col[1])return;FL.tk[side]=Math.max(0,FL.tk[side]-n);if(FL.tk[side]<=0&&!FL.col[side])tkCollapse(side);}
 function tkCost(t){return t.boss?6:(t.st.cls==='light'||t.st.cls==='ifv')?2:3;}
 function tkCollapse(s){var w=1-s,i;FL.col[s]=true;FL.to=false;FL.atk=w;FL.phaseT=999;FL.otOn=0;FL.ot=0;FL.warned=true;
