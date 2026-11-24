@@ -786,3 +786,13 @@ h1[tabindex="-1"]:focus { outline: none; }
   .pd-foot small { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
   .prodgrid .pd-art.photo .pd-grp { display: none; }
 }
+
+/* ================= 2.7 รีวิวของผู้ใช้ → AI ใช้จัดอันดับ ================= */
+.revbox .starpick button { width: 46px; height: 46px; font-size: 26px; border-radius: 14px; }
+.revnote { font-size: 12.5px; margin: 2px 0 6px; }
+.myrev { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 12px 14px; border-radius: 16px; background: #FFF8E6; }
+.myrev .stars { font-size: 20px; letter-spacing: 2px; color: #E0A100; } .myrev .stars span { font: 700 14px Inter, var(--disp); color: var(--ink); letter-spacing: 0; }
+.myrev > p:not(.stars) { flex-basis: 100%; font-size: 14px; color: var(--text); }
+.myrev .chipbtn { margin-left: auto; height: 36px; }
+.pd-rev { font: 600 12px var(--disp); color: #B97A00; }
+.ac-rev { color: #B97A00; font-weight: 600; }

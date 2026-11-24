@@ -117,12 +117,12 @@ export const INDEX = [
 export const itemOf = x => x.kind === 'product' ? productOf(x.id) : svcOf(x.id);
 
 /** รวมโปรไฟล์ที่ผู้ดูแลบันทึกไว้กับสิ่งที่เพิ่งเล่า (สิ่งที่เล่าใหม่ชนะ) */
-export function contextOf(u, people = [], { teamSize = 0 } = {}) {
+export function contextOf(u, people = [], { teamSize = 0, ratings = {} } = {}) {
   // คนเดียวในรายชื่อ → ใช้คนนั้น เว้นแต่เล่าถึงคนอื่น (เช่น เล่าว่า "พ่อ" แต่ที่บันทึกไว้คือแม่)
   const p = people.find(x => x.id === u.entities.person_id) || (people.length === 1 && (!u.entities.relation || people[0].relation === u.entities.relation) ? people[0] : null);
   const e = u.entities;
   return {
-    person: p, teamSize,
+    person: p, teamSize, ratings,
     bkk: e.bkk ?? p?.bkk ?? null,
     mobility: e.mobility || p?.mobility || null,
     age: e.age || p?.age || null,
@@ -163,8 +163,10 @@ export function rank(u, ctx, cands, k = 3) {
     if (ctx.mobility === 'wheel' && x.id === 'p-walker-yamada') s -= 3;
     if (x.id === 'h-med' && /ลืม/.test(u.text)) { s += 4; why.push('ช่วยเรื่องลืมให้ยา — มีเตือนทุกมื้อ'); }
     if (ctx.mobility === 'bed' && x.id === 'p-diaper-feelfree') { s += 1; why.push('แบบเทปเหมาะกับผู้ติดเตียง'); }
+    const rv = ctx.ratings?.[x.id]; // รีวิวของผู้ใช้: 3★ = กลาง ๆ · สูงกว่าดันขึ้น ต่ำกว่าลดลง
+    if (rv) { s += (rv.avg - 3) * 2; why.unshift(rv.avg >= 4 ? `คุณเคยให้ ${rv.avg}★` : rv.avg <= 2 ? `คุณเคยให้ ${rv.avg}★ — ลองตัวอื่นด้วย` : `คุณเคยให้ ${rv.avg}★`); }
     if (x.kind === 'product' && cands.some(c => c.kind === 'service' && c.cost === 'free' && c.need[Object.keys(x.need)[0]])) s -= .8; // มีของฟรีแนวเดียวกัน → ให้ของฟรีมาก่อน
-    return { x, item: it, score: s, why: [...new Set(why)].slice(0, 3) };
+    return { x, item: it, score: s, why: [...new Set(why)].slice(0, 3), rating: rv || null };
   }).filter(r => r.score > 0).sort((a, b) => b.score - a.score);
   // เลือกแบบกระจาย: ตัวที่แนว (angle) ซ้ำกับที่เลือกแล้วจะโดนลดคะแนน
   const picks = [], pool = [...scored];
@@ -172,18 +174,19 @@ export function rank(u, ctx, cands, k = 3) {
     pool.sort((a, b) => adj(b) - adj(a));
     picks.push(pool.shift());
   }
-  function adj(r) { const same = picks.filter(p => p.x.angle === r.x.angle).length; return r.score - same * 4; }
+  // ตัวที่คุณให้ 4★ ขึ้นไป โดนลดน้อยลงเมื่อแนวซ้ำ เพื่อให้ของที่เคยใช้แล้วดีกลับมาเป็นตัวเลือกได้
+  function adj(r) { const same = picks.filter(p => p.x.angle === r.x.angle).length; return r.score - same * (r.rating?.avg >= 4 ? 2 : 4); }
   const top = picks[0]?.score || 1;
   return { picks: picks.map(r => ({ ...r, fit: Math.max(35, Math.min(98, Math.round(r.score / top * 92))) })), considered: scored.length };
 }
 
 /** ท่อทั้งหมด: คืนผลแต่ละขั้นให้หน้าจอแสดงทีละขั้น */
-export async function runPipeline(text, { people = [], teamSize = 0 } = {}) {
+export async function runPipeline(text, { people = [], teamSize = 0, ratings = {} } = {}) {
   let u;
   try { u = await understander(text, { people }); if (!u?.intents) throw new Error('bad'); }
   catch { u = localUnderstand(text, { people }); }
   const urgent = u.intents.find(i => i.id === 'emergency');
-  const ctx = contextOf(u, people, { teamSize });
+  const ctx = contextOf(u, people, { teamSize, ratings });
   const found = retrieve(u, ctx);
   const ranked = rank(u, ctx, found.kept);
   return { understood: u, ctx, found, ranked, urgent: !!urgent, total: INDEX.length + 0 * SERVICES.length + 0 * PRODUCTS.length };

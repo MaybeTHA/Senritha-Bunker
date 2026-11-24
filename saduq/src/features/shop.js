@@ -7,6 +7,7 @@ import { photoById } from '../domain/photos.js';
 import { app, today } from './shared.js';
 import { P, pageHead, secHead } from './common.js';
 import { familyAsk } from './care.js';
+import { reviewSection, ratingOf } from './reviews.js';
 
 const priceText = p => p.price ? p.price.text : 'ดูราคาที่ร้าน';
 /** ภาพจริงจาก Wikimedia Commons: เป็นภาพสินค้าประเภทเดียวกัน ไม่ใช่รุ่นนั้นเป๊ะ จึงติดป้าย "ภาพประกอบ" */
@@ -19,6 +20,7 @@ export function productCard(p) {
       : h('div.pd-art', h('span.pd-ic', { html: ic(groupOf(p.group).icon) }), h('span.pd-grp', groupOf(p.group).name)),
     h('div.pd-body',
       h('small.pd-brand', `${p.brand} · ${p.model}`), h('b', p.name),
+      ratingOf(p.id) ? h('small.pd-rev', `★ ${ratingOf(p.id).avg} รีวิวของคุณ`) : '',
       h('div.pd-foot', h('span.pd-price' + (p.price ? '' : '.none'), priceText(p)), p.price ? h('small', p.price.where) : '')));
 }
 
@@ -51,6 +53,7 @@ export function productView(root, id) {
     h('section.dsec', h('h2', 'ผู้ดูแลใช้ทำอะไร'), h('p', p.why)),
     p.specs?.length ? h('section.dsec', h('h2', 'ข้อมูลสินค้า'), h('ul.ticks', p.specs.map(x => h('li', h('span', { html: ic('check') }), x)))) : '',
     p.tips?.length ? h('section.dsec', h('h2', 'เคล็ดลับจากการดูแล'), h('ul.ticks.tip', p.tips.map(x => h('li', h('span', { html: ic('info') }), x)))) : '',
+    reviewSection(p.id, 'สินค้านี้'),
     h('section.dsec', h('h2', 'แหล่งที่มาของข้อมูล'), sources(p.src), h('p.srcnote', `ตรวจข้อมูล ${CHECKED} · ราคาและสต็อกเปลี่ยนได้ ตรวจกับร้านก่อนซื้อ`)),
     h('div.stickycta.two',
       h('button.btn.ghost', { onclick: () => addToList(p) }, 'จดไว้ซื้อ'),

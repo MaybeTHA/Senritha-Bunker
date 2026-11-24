@@ -12,6 +12,7 @@ import { isActiveReq } from '../domain/catalog.js';
 import { photoOf } from '../domain/photos.js';
 import { careBoard, todayCare, benefitsBlock } from './people.js';
 import { productCard, featuredProducts, sources } from './shop.js';
+import { reviewSection } from './reviews.js';
 
 const DOWL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'], MON = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 const hs = { q: '', cat: 'living' };
@@ -184,6 +185,7 @@ export function serviceView(root, id) {
     prov ? h('section.dsec', h('h2', 'ผู้ให้บริการ'), prov, s.price ? h('dl.facts', h('div', h('dt', 'ค่าใช้จ่าย'), h('dd', s.price))) : '') : '',
     s.src?.length ? h('section.dsec', h('h2', 'แหล่งที่มาของข้อมูล'), sources(s.src), h('p.srcnote', `ตรวจข้อมูล ${CHECKED} · หลักเกณฑ์อาจเปลี่ยน ตรวจสอบกับหน่วยงานก่อนยื่น`)) : '',
     mine.length ? h('section.dsec', h('h2', 'เรื่องที่คุณติดตามของบริการนี้'), h('div.actlist', mine.map(reqRow))) : '',
+    s.cat !== 'emergency' ? reviewSection(s.id, 'บริการนี้') : '',
     h('div.stickycta' + (s.track ? '.two' : ''),
       s.track ? h('button.btn.ghost', { onclick: () => requestForm(s) }, 'ติดตามเรื่องนี้') : '',
       mainCta(s)));

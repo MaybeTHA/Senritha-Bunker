@@ -6,6 +6,7 @@ import { S, app } from './shared.js';
 import { P, PQ, pageHead, recipients, team, member, myName, avatar, go } from './common.js';
 import { requestForm } from './care.js';
 import { speechSupported, startListening } from './voice.js';
+import { allRatings } from './reviews.js';
 
 const EXAMPLES = ['แม่เดินไม่สะดวก ต้องไปหาหมอทุกเดือน', 'ยายติดเตียง ฉี่ราด ค่าผ้าอ้อมแพง', 'ต้องไปทำงานทั้งวัน แม่อยู่บ้านคนเดียว', 'พ่อเป็นไข้ ไอ เจ็บคอ ไม่อยากไปรอคิว', 'แม่ล้มในห้องน้ำบ่อย', 'แม่ลืมกินยาความดันบ่อย'];
 const STEPS = [['chat', 'Chat Bot', 'รับเรื่องที่คุณเล่า'], ['understand', 'AI เข้าใจโจทย์', 'จับว่าต้องการอะไร ของใคร ที่ไหน'], ['retrieve', 'ค้นบริการ', 'กรองตามประเภทและพื้นที่'], ['rank', 'AI จัดอันดับ', 'เรียงตามความเหมาะสมกับโจทย์']];
@@ -44,7 +45,7 @@ async function ask(root, text) {
   st.thread.push(turn); if (st.thread.length > 6) st.thread.shift();
   assistantView(root);
   try {
-    const res = await runPipeline(text, { people: recipients(), teamSize: team().length });
+    const res = await runPipeline(text, { people: recipients(), teamSize: team().length, ratings: allRatings() });
     turn.result = res;
     for (let i = 1; i <= 5; i++) { turn.step = i; repaint(root, turn); if (i < 5) await wait(i === 1 ? 250 : 450); }
     app.store.notify({ kind: 'ai', title: `ถามผู้ช่วย AI: ${text.slice(0, 60)}`, body: res.ranked.picks.map(p => p.item.name).join(' · '), by: 'me' });
@@ -110,7 +111,7 @@ function answer(r) {
   return h('div.aians',
     h('p.aih', `${picks.length} ตัวเลือกสำหรับปัญหานี้`),
     h('div.aicards', picks.map((p, i) => optionCard(p, i))),
-    h('p.srcnote', `เลือกจากบริการและสินค้าจริง (ตรวจ ${CHECKED}) · คะแนน = ความเหมาะสม ไม่ใช่รีวิว`));
+    h('p.srcnote', `เลือกจากบริการและสินค้าจริง (ตรวจ ${CHECKED}) · จัดอันดับจากความเหมาะสม + รีวิวของคุณ (ถ้ามี)`));
 }
 function optionCard(p, i) {
   const it = p.item, isP = p.x.kind === 'product', href = isP ? '#product/' + p.x.id : '#svc/' + p.x.id;
@@ -119,7 +120,7 @@ function optionCard(p, i) {
     h('div.ac-top', h('span.ac-rank', String(i + 1)), h('span.ac-ic', { html: ic(p.x.icon || 'spark') }),
       h('div.ac-fit', h('small', 'เหมาะกับโจทย์'), h('b', `${p.fit}%`), h('i', h('em', { style: { width: p.fit + '%' } })))),
     h('span.ac-kind', isP ? 'สินค้า' : p.x.cost === 'tool' ? 'เครื่องมือในแอป' : p.x.cost === 'free' ? 'บริการฟรี/ตามสิทธิ' : 'บริการ'),
-    h('b.ac-name', it.name), h('small.ac-sub', sub),
+    h('b.ac-name', it.name), h('small.ac-sub', sub, p.rating ? h('span.ac-rev', ` · ★ ${p.rating.avg} รีวิวของคุณ`) : ''),
     h('ul.ac-why', p.why.map(w => h('li', h('span', { html: ic('check') }), w))),
     h('div.ac-act',
       h('a.btn.primary.sm', { href }, 'ดูรายละเอียด'),
