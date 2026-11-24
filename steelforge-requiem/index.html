@@ -90,6 +90,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 #hUse.on{display:block}
 #hSup{bottom:132px;left:50%;transform:translateX(-50%);display:none;min-width:210px;text-align:center;border-color:#7ec24a;color:#cfe8b0}
 #hSup.on{display:block}
+.tkRow{display:flex;gap:5px;align-items:center;justify-content:center;font-size:11px;margin-bottom:2px}.tkBar{width:64px;height:6px;background:#1a1d18;border-radius:3px;overflow:hidden;display:inline-flex}.tkBar.r{justify-content:flex-end}.tkBar i{display:block;height:100%}
+body.mbl .tkBar{width:44px}
 body.cine #hud .hb,body.cine #hAmmo,body.cine #specBar,body.cine #mob,body.cine #hLog{opacity:0;pointer-events:none;transition:opacity .35s}
 #hud .hb,#hAmmo,#hLog{transition:opacity .35s}
 #supBar{top:146px;left:50%;transform:translateX(-50%);display:none;pointer-events:auto;text-align:center;border-color:#f0b429;min-width:280px;font-size:11.5px}
@@ -440,20 +442,20 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
     <button class="btn sm" style="width:auto" onclick="show('scMenu')">← กลับ</button></div>
   <h1 style="font-size:26px">🌲 FRONTLINE</h1>
   <p class="sub">สมรภูมิสแกนดิเนเวีย · แผนที่ยาว 7 โซน × 5 เลน<br>
-  เตรียมพร้อม 60 วิ → TOTAL OFFENSIVE ทุกฝ่ายบุกแย่ง Zone 4 → ฝ่ายที่ยึดได้บุกต่อทันที แล้วสลับบุก/ป้องกันทุก 3 นาที<br>ทำลาย HQ ศัตรู 6,000 หน่วยเพื่อชนะ (หรือครองโซนมากกว่าเมื่อครบ 25 นาที)</p>
+  เตรียม 30 วิ → TOTAL OFFENSIVE แย่ง Zone 4 → ผู้ยึดได้บุกต่อ · สลับบุก/ป้องกันทุก 2 นาที<br>กำลังพลหมด = กองทัพแตก (เกิดใหม่ไม่ได้ · ป้อมพัง) → อีกฝ่ายทะลวงไปทำลาย HQ · จบภายใน 10 นาที<br>ทำลาย HQ ศัตรู 4,500 หน่วยเพื่อชนะ (ครบ 10 นาที HQ ฝ่ายกำลังพลน้อยกว่าพัง)</p>
   <canvas id="flPrev" width="900" height="230" style="width:100%;border-radius:9px;background:#141a12;border:1px solid #333c29"></canvas>
   <h2>ขนาดกำลังพล</h2><div class="grid g3" id="fSize"></div>
   <h2>ระดับศัตรู</h2><div class="grid g4" id="fLvl"></div>
   <h2>เวลา & สภาพอากาศ</h2><div class="grid g4" id="fTod"></div>
   <div class="card" style="cursor:default;margin-top:10px"><div class="st" style="font-size:12px;line-height:1.95">
    <b style="color:#f0b429">■ กติกาบุก / ป้องกัน</b><br>
-   <b>60 วิแรก</b> — เตรียมพร้อม: ทุกคันยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้<br>
-   จากนั้นฝ่ายหนึ่ง <b style="color:#ffb347">บุก</b> อีกฝ่าย <b style="color:#7fc8ff">ป้องกัน</b> แล้วสลับกันทุก <b>3 นาที</b><br>
+   <b>30 วิแรก</b> — เตรียมพร้อม: ทุกคันยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้<br>
+   จากนั้นฝ่ายหนึ่ง <b style="color:#ffb347">บุก</b> อีกฝ่าย <b style="color:#7fc8ff">ป้องกัน</b> แล้วสลับกันทุก <b>2 นาที</b><br>
    <b>ฝ่ายบุก</b> — ทุกคันต้องบุก · ยึดโซนได้ = เครื่องบินมาถล่มโซนถัดไปให้ฟรี<br>
    <b>ฝ่ายป้องกัน</b> — ห้ามออกนอกโซนของทีม · ออกไปได้ <b>5 วิ</b> ครบแล้วรถระเบิด (ตอนสลับบทบาทได้ 12 วิ, โซนแตกได้ 10 วิ)<br>
    ศัตรูยึดโซนติด HQ ได้ = HQ โดนปิดล้อม เสียหายต่อเนื่อง<br><br>
    <b style="color:#f0b429">■ โครงสร้างแผนที่</b><br>
-   <b>Zone 1 / 7</b> — ฐานทัพหลัก HQ 6,000 หน่วย (ไม่ฟื้นฟู)<br>
+   <b>Zone 1 / 7</b> — ฐานทัพหลัก HQ 4,500 หน่วย (ไม่ฟื้นฟู)<br>
    <b>Zone 2 / 6</b> — แนวป้อมปืน 2 ป้อม ต้องทำลายก่อนจึงยึดโซนได้<br>
    <b>Zone 3 / 5</b> — สถานีวิทยุ กด <b>ใช้งาน</b> เพื่อเปิดแผนที่ข่าวกรอง<br>
    <b>Zone 4</b> — ปั๊มน้ำมันริมทางหลวง จอดนิ่งเพื่อเติมเสบียง<br>
@@ -605,12 +607,12 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   1/2/3 = ความเร็ว x1/x2/x4 · <b>T</b> หรือ 🎮 = เข้าไปขับรถฝ่ายน้ำเงินคันนั้น · 👁️ กลับไปดูได้ตลอด<br>
   ดูอย่างเดียวไม่ได้รางวัล · ถ้าเข้าไปขับ ได้รางวัลตามสัดส่วนเวลาที่เล่นเอง<br><br>
   <b style="color:#f0b429">■ FRONTLINE — บุก / ป้องกัน</b><br>
-  60 วิแรกเตรียมพร้อม (เติมเสบียงได้ทุกที่ในเขตเรา) · จากนั้น <b>TOTAL OFFENSIVE</b> ทุกฝ่ายบุกแย่ง Zone 4<br>
-  ฝ่ายที่ยึด Zone 4 ได้ก่อน <b>บุกต่อทันที</b> 3 นาที · แล้วสลับบุก/ป้องกันทุก 3 นาที (ดูมุมบนจอ ⚔️/🛡️)<br>
+  30 วิแรกเตรียมพร้อม (เติมเสบียงได้ทุกที่ในเขตเรา) · จากนั้น <b>TOTAL OFFENSIVE</b> ทุกฝ่ายบุกแย่ง Zone 4<br>
+  ฝ่ายที่ยึด Zone 4 ได้ก่อน <b>บุกต่อทันที</b> 2 นาที · แล้วสลับบุก/ป้องกันทุก 2 นาที (ดูมุมบนจอ ⚔️/🛡️)<br>
   ฝ่ายบุกยึดโซนได้ = เวลาบุก +45 วิ · ยิ่งรุกลึก เครื่องบินฝ่ายตัวเองยิ่งมาน้อย/ช้า ปืนใหญ่ยิ่งไม่แม่น ส่วนฝ่ายที่ถูกรุกได้เครื่องบินถี่ขึ้น<br>
   โซนกลางที่ติดเขตเรา ฝ่ายป้องกันเข้าไปชิงคืนได้ · ถ้ากำลังยึดโซนตอนหมดเวลาบุก จะต่อเวลาให้สูงสุด 30 วิ<br>
   ฝ่ายป้องกันออกนอกเขตทีมได้ 5 วิ ไม่งั้นรถระเบิด · เส้นแดงกะพริบ = ขอบเขต · ลายแดง = ห้ามเข้า<br>
-  ฝ่ายบุกจะเห็นกรอบ <b>⚔️ บุก Zone N</b> เป็นเป้าหมาย · ครบ 25 นาทีตัดสินจากจำนวนโซน<br><br>
+  ฝ่ายบุกจะเห็นกรอบ <b>⚔️ บุก Zone N</b> เป็นเป้าหมาย · กำลังพล: ตายเสียแต้ม · ถือโซนน้อยกว่าโดนดูดแต้ม · แต้มหมด = กองทัพแตก อีกฝ่ายทะลวงไป HQ · ยึด 2 โซนใน 90 วิ = ทะลวงแนว · ครบ 10 นาที HQ ฝ่ายแต้มน้อยพัง<br><br>
   <b style="color:#f0b429">■ วิทยุ · เสบียง · อากาศยาน</b><br>
   ที่สถานีวิทยุ (Zone 3/5) กด <b>F</b> → เรียก CAS / ปืนใหญ่ / สอดแนม · มาร์คเป้าบนสนามรบหรือแผนที่ แล้วกดยืนยัน (Enter) · Esc ยกเลิก<br>
   ห้ามโจมตีฐานทัพหลักศัตรู รอบ HQ และเขตจุดเกิด · แต่ละอย่างมีคูลดาวน์ · AI ก็ใช้กติกาเดียวกัน<br>
@@ -2467,7 +2469,7 @@ function buildNord(){
  [[0,0],[6,1]].forEach(function(a){
   var z=a[0],team=a[1],cxz=zoneCX(z);
   structs.push({k:'hq',team:team,x:cxz+(team?260:-260),y:0,w:230,h:300,
-   hp:6000,mhp:6000,solid:1,ar:60,dead:false,n:'ฐานทัพหลัก'});
+   hp:4500,mhp:4500,solid:1,ar:60,dead:false,n:'ฐานทัพหลัก'});
   /* กำแพงฐาน */
   for(var i=-1;i<=1;i+=2)
    obst.push({t:'r',x:cxz+(team?60:-60),y:i*420,w:36,h:420,col:'#2e3630',col2:'#4c564a',blockShot:1});
@@ -2501,7 +2503,7 @@ function flInit(){
  FL.on=true;flEvStop();
  FL.own=[0,0,0,-1,1,1,1];
  FL.prog=[0,0,0,0,0,0,0];FL.capT=[0,0,0,0,0,0,0];
- FL.hq=[6000,6000];FL.spawnQ=[];flUpdateFront();
+ FL.hq=[4500,4500];FL.spawnQ=[];flUpdateFront();
  FL.artyT=[8,11];FL.intel=[0,0];FL.pRespawn=0;}
 function teamSide(team){return (team===1)?1:0;}  /* 0 = ฝ่ายเรา(ซ้าย), 1 = ศัตรู(ขวา) */
 function flUpdateFront(){
@@ -2525,7 +2527,7 @@ function turretsAlive(z){var n=0;
  return n;}
 function flSpawnPoint(team){
  var side=teamSide(team);
- var lastStand=false;
+ var lastStand=!!(FL.col&&FL.col[side]);
  for(var i=0;i<tanks.length;i++){var t=tanks[i];
   if(t.dead)continue;
   if(side===0&&t.team===1&&zoneOf(t.x)===0)lastStand=true;
@@ -2545,13 +2547,13 @@ function flCaptureRoles(cnt,dt){
  for(var z=1;z<FLZ-1;z++){
   /* ฝ่ายป้องกันชิงโซนกลางที่ติดเขตตัวเองคืนได้ เมื่อมีกำลังมากกว่า */
   if(FL.own[z]===-1&&zoneCapturable(z,D)&&cnt[z][D]>cnt[z][A]){var dd=cnt[z][D],aa=cnt[z][A],dn=1/(1+Math.max(0,dd+aa-1)*0.24);FL.capT[z]=D===0?2:3;
-   FL.prog[z]=clamp(FL.prog[z]-(100/7)*dn*(0.55+clamp(dd-aa,1,5)*0.30)*dt*dir,-100,100);
+   FL.prog[z]=clamp(FL.prog[z]-(100/7)*capMul(D)*dn*(0.55+clamp(dd-aa,1,5)*0.30)*dt*dir,-100,100);
    if(FL.prog[z]*-dir>=100){FL.own[z]=D;FL.prog[z]=0;flZoneTaken(z,D);}continue;}
   if(!zoneCapturable(z,A)){if(FL.own[z]!==A&&Math.abs(FL.prog[z])>0)FL.prog[z]=toward(FL.prog[z],0,8*dt);continue;}
   var a=cnt[z][A],d=cnt[z][D],tot=a+d,dens=1/(1+Math.max(0,tot-1)*0.24);
   if(a===0||d>a){FL.capT[z]=d>a&&a>0?(D===0?2:3):0;FL.prog[z]=toward(FL.prog[z],0,(100/7)*.5*dt);continue;}
   FL.capT[z]=a===d?1:(A===0?2:3);FL.capNow=true;
-  var rate=(100/7)*dens*(0.55+clamp(a-d+1,1,5)*0.30)*(a===d?.6:1);
+  var rate=(100/7)*capMul(A)*dens*(0.55+clamp(a-d+1,1,5)*0.30)*(a===d?.6:1);
   FL.prog[z]=clamp(FL.prog[z]+rate*dt*dir,-100,100);
   if(Math.abs(FL.prog[z])>=100){
    if(FL.own[z]===-1){FL.own[z]=A;FL.prog[z]=0;flZoneTaken(z,A);}
@@ -2575,7 +2577,7 @@ function flCapture(dt){
   /* Density modifier: ยิ่งคนแน่นยิ่งช้า */
   var dens=1/(1+Math.max(0,tot-1)*0.24);
   var adv=clamp(Math.abs(net),1,5);
-  var rate=(100/7)*dens*(0.55+adv*0.30);
+  var rate=(100/7)*capMul(side)*dens*(0.55+adv*0.30);
   if(FL.own[z]===-1||FL.own[z]===side){
    FL.prog[z]=clamp(FL.prog[z]+rate*dt*(side===0?1:-1)*(FL.own[z]===-1?1:0),-100,100);
    if(FL.own[z]===-1){
@@ -2591,7 +2593,7 @@ function flCapture(dt){
     addLog('⚠️ Zone '+(z+1)+' กลายเป็นพื้นที่กลาง','r');flUpdateFront();}}}
  }
 function flZoneTaken(z,side){
- flUpdateFront();SFX.cap();SFX.radio(side===0?'good':'bad');
+ flUpdateFront();SFX.cap();SFX.radio(side===0?'good':'bad');if(FL.tk&&!FL.prep)tkBreak(side);
  if(FL.rt!==undefined&&!FL.prep&&!FL.to&&side===FL.atk){if(FL.otOn){FL.otOn=0;FL.ot=0;FL.phaseT=FLR.bonus;}else FL.phaseT=Math.min(FL.phaseT+FLR.bonus,300);FL.warned=FL.phaseT<=FLR.warn;
   addLog(side===0?'⏱️ ยึดได้! เวลาบุก +'+FLR.bonus+' วิ':'⏱️ ศัตรูยึดได้ — เวลาบุกของศัตรู +'+FLR.bonus+' วิ',side===0?'g':'r');}
  if(FL.ev&&FL.rt!==undefined&&!FL.prep){var nz=side===0?z+1:z-1;if(nz>0&&nz<FLZ-1){flAirStrike(side,nz);addLog(side===0?'✈️ ยึดได้! เครื่องบินสนับสนุนถล่ม Zone '+(nz+1):'⚠️ ศัตรูยึดได้ — เครื่องบินศัตรูกำลังมา!',side===0?'g':'r');}}
@@ -2599,12 +2601,12 @@ function flZoneTaken(z,side){
   cineCard('ZONE '+(z+1)+' ถูกยึด',SPEC.on?'น้ำเงินรุกคืบ':'ฝ่ายเรายึดได้ — แนวหน้าขยับ','#9fe06a',2.4);}
  else{addLog('❌ เสีย Zone '+(z+1)+' ให้ศัตรู','r');cineCard('ZONE '+(z+1)+' แตก',SPEC.on?'แดงรุกคืบ':'ศัตรูยึดได้ — แนวหน้าถอย','#ff6a4a',2.4);}
  if(FL.to&&z===3)flEndTO(side);}
-/* จบ Total Offensive: ฝ่ายที่ยึด Zone 4 ได้ = ป้องกัน · อีกฝ่ายบุกก่อน · จากนั้นสลับทุก 3 นาที */
+/* จบ Total Offensive: ฝ่ายที่ยึด Zone 4 ได้บุกต่อทันที · จากนั้นสลับทุก 2 นาที */
 function flEndTO(side){FL.to=false;FL.atk=side;FL.phaseT=FLR.swap;FL.warned=false;
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)!==side){t.oobMax=FLR.grace;t.oob=0;}}
  var us=side===0;SFX.horn();
- cineCard('ZONE 4 แตก',SPEC.on?(us?'น้ำเงินยึดได้ — บุกต่อทันที':'แดงยึดได้ — บุกต่อทันที'):us?'ฝ่ายเรายึดได้ — บุกต่อทันที 3 นาที':'ศัตรูยึดได้ — ฝ่ายเราตั้งรับ','#ffc46a',3);
- addLog(us?'⚔️ ยึด Zone 4 ได้ — ฝ่ายเราบุกต่อทันที 3 นาที!':'🛡️ ศัตรูยึด Zone 4 — ฝ่ายเราตั้งรับ 3 นาที (มี '+FLR.grace+' วิ กลับเข้าเขต)','b');}
+ cineCard('ZONE 4 แตก',SPEC.on?(us?'น้ำเงินยึดได้ — บุกต่อทันที':'แดงยึดได้ — บุกต่อทันที'):us?'ฝ่ายเรายึดได้ — บุกต่อทันที 2 นาที':'ศัตรูยึดได้ — ฝ่ายเราตั้งรับ','#ffc46a',3);
+ addLog(us?'⚔️ ยึด Zone 4 ได้ — ฝ่ายเราบุกต่อทันที 2 นาที!':'🛡️ ศัตรูยึด Zone 4 — ฝ่ายเราตั้งรับ 2 นาที (มี '+FLR.grace+' วิ กลับเข้าเขต)','b');}
 function bigMsg(txt){if(FL.on&&typeof CINE!=='undefined'&&(CINE.card||CINE.k))return;var w=$('wvTxt');w.textContent=txt;w.style.display='block';w.style.opacity='1';
  setTimeout(function(){w.style.transition='.7s';w.style.opacity='0';
   setTimeout(function(){w.style.display='none';w.style.transition='';},720);},1200);}
@@ -3594,14 +3596,16 @@ function killTank(t){
  t.gone=true;specKill(t);if(t.pax&&t.pax.length)infBail(t);
  if(t.team===1){G.kills++;SV.stat.kills++;
   if(!FL.on||Math.random()<.4)addLog('☠️ ทำลาย'+(t.boss?'บอส':'ศัตรู')+'ได้!','g');}
- if(FL.on&&t.team!==0)FL.spawnQ.push({team:t.team,t:0,st:t.st,skin:t.skin});
+ if(FL.on)tkLose(teamSide(t.team),tkCost(t));
+ if(FL.on&&t.team!==0&&!(FL.col&&FL.col[teamSide(t.team)]))FL.spawnQ.push({team:t.team,t:0,st:t.st,skin:t.skin});
  if(FL.on&&t.team===0)playerDown();
  setTimeout(function(){parts.push({x:t.x,y:t.y,vx:0,vy:0,l:99,ml:99,c:'#26251f',r:20,wreck:1});},100);}
 function queueTime(team){
  var n=0;for(var i=0;i<FL.spawnQ.length;i++)if(teamSide(FL.spawnQ[i].team)===teamSide(team))n++;
- return 3+6*clamp(n/Math.max(2,G.teamSize*0.6),0,1)*(FL.rt!==undefined&&!FL.prep?(FL.to?.8:FL.atk===teamSide(team)?.55:1.35):1);}
+ return (3+6*clamp(n/Math.max(2,G.teamSize*0.6),0,1)*(FL.rt!==undefined&&!FL.prep?(FL.to?.8:FL.atk===teamSide(team)?.55:1.35):1))+(FL.btT&&FL.btT[1-teamSide(team)]>0?6:0);}
 function playerDown(){
- G.deaths++;FL.pRespawn=queueTime(0);
+ G.deaths++;FL.pRespawn=FL.col&&FL.col[0]?20:queueTime(0);
+ if(FL.col&&FL.col[0])addLog('💀 กองทัพแตก — เกิดใหม่ได้ที่ HQ ช้าลง (กองหนุนสุดท้าย)','r');
  $('hResp').classList.add('on');}
 function respawnPlayer(){
  $('hResp').classList.remove('on');
@@ -3782,7 +3786,7 @@ function commonStart(mode){
  $('hResp').classList.remove('on');closeBigMap();closeModal();
  G.mode=mode;buildMap(G.map);
  tanks=[];shots=[];parts=[];trails=[];debris=[];smokes=[];aps=[];arty=[];logs=[];
- $('hLog').innerHTML='';specReset();infReset();cineReset();G.cmdM=null;G.cmdPick=null;
+ $('hLog').innerHTML='';$('hLog').style.top='';$('hLog')._t=0;G._lgT=0;specReset();infReset();cineReset();G.cmdM=null;G.cmdPick=null;
  G.score=[0,0];G.caps=[];G.lwsDir=null;G.alert=0;G.deaths=0;
  runBuff={dmg:1,pen:1,armor:1,hp:1,rel:1,spd:1,acc:1,cvg:1,regen:0,life:0,crew:0,scan:1,stealth:1};
  var ps=calc();
@@ -3835,7 +3839,7 @@ function startFrontline(){
  $('hInfo').textContent='FRONTLINE — '+flSel.size+' v '+flSel.size;
  flEvInit();flRolesInit();
  addLog('🌲 เข้าสู่แนวรบสแกนดิเนเวีย — '+TOD[FL.tod].n,'b');
- addLog('เตรียม 60 วิ → TOTAL OFFENSIVE แย่ง Zone 4 → สลับบุก/ป้องกันทุก 3 นาที · ทำลาย HQ ศัตรูเพื่อชนะ','');
+ addLog('เตรียม 30 วิ → TOTAL OFFENSIVE แย่ง Zone 4 → สลับบุก/ป้องกันทุก 2 นาที · กำลังพลหมด = แตก · ทำลาย HQ ศัตรูเพื่อชนะ','');
  cineIntro();}
 function nextWave(){
  G.wave++;var C=P;if(SPEC.on){C=SPEC.hero&&!SPEC.hero.dead?SPEC.hero:null;for(var ci=0;!C&&ci<tanks.length;ci++)if(!tanks[ci].dead&&teamSide(tanks[ci].team)===0)C=tanks[ci];C=C||P;}
@@ -3889,7 +3893,9 @@ function flHUD(){
   if(FL.capT[z]===1)lb='=';
   else if(o===-1&&Math.abs(FL.prog[z])>1)lb=Math.round(Math.abs(FL.prog[z]))+'';
   h+='<div class="fz" style="background:'+bg+'">'+lb+'</div>';}
- $('flBar').innerHTML=h;flRoleHUD();}
+ $('flBar').innerHTML=h;flRoleHUD();hudLogPos();}
+/* มือถือ: ให้ข้อความแจ้งเตือนอยู่ใต้กล่องสถานะ Frontline เสมอ (กล่องสูงขึ้นตามแถบกำลังพล) */
+function hudLogPos(){if(!document.body.classList.contains('mbl')||(G._lgT||0)>G.t)return;G._lgT=G.t+.5;var lg=$('hLog'),b=Math.round($('hScore').getBoundingClientRect().bottom)+4;if(b>40&&lg._t!==b){lg._t=b;lg.style.top=b+'px';}}
 function flEnd(victory,hq){
  if(G.over||(CINE.end&&!CINE.end.done))return;
  if(victory&&!SPEC.on)SV.stat.flWins++;
@@ -4937,8 +4943,8 @@ function flEvent(){var E=FL.ev,own=[0,0];FL.own.forEach(function(o){if(o>=0)own[
   for(var yy2=-AY*.82;yy2<=AY*.82;yy2+=240)smokes.push({x:fx2+rnd(-60,60),y:yy2,r:170,life:22,ml:22,grow:0,seed:rnd(0,99)});
   evSay(side,'🌫️ ม่านควันบังแนวรบ — บุกได้!','🌫️ ศัตรูวางม่านควัน!');}}
 function flEvents(dt){var E=FL.ev;if(!E)return;var i,j;
- if(!FL.prep){E.t-=dt*(G.teamSize>=24?1.25:1);if(E.t<=0){E.t=rnd(14,24);flEvent();}
-  E.dfT=(E.dfT===undefined?rnd(18,28):E.dfT)-dt;if(E.dfT<=0){E.dfT=rnd(22,36);dogfight();}}
+ if(!FL.prep){E.t-=dt*(G.teamSize>=24?1.25:1);if(E.t<=0){E.t=rnd(10,18);flEvent();}
+  E.dfT=(E.dfT===undefined?rnd(18,28):E.dfT)-dt;if(E.dfT<=0){E.dfT=rnd(16,26);dogfight();}}
  mlrsTick(E,dt);
  for(i=E.air.length-1;i>=0;i--){var a=E.air[i];
   if(a.k==='ac130'){if(acTick(a,dt)){if(a.snd)SFX.loopStop(a.snd);E.air.splice(i,1);}else if(a.snd)SFX.loopPos(a.snd,a.x,a.y,a.vx,a.vy,a.h);continue;}
@@ -5007,14 +5013,15 @@ function drawMobSet(){var el=$('mobSet');if(!el)return;var L=[['assist','🎯 �
  ['autofire','🔥 ยิงอัตโนมัติ','โยกจอยขวาสุดขอบ + เล็งตรงแล้ว = ยิงเอง'],['haptic','📳 สั่น','สั่นเมื่อยิง/โดนยิง/ทำลายศัตรู']];
  el.innerHTML=L.map(function(a){return '<div class="card'+(SV.mob[a[0]]?' sel':'')+'" onclick="setMob(\''+a[0]+'\')"><div class="nm">'+a[1]+(SV.mob[a[0]]?' ✔':'')+'</div><div class="st">'+a[2]+'</div></div>';}).join('');}
 /* ═══════════════════════════════════════════════════════════
-   FRONTLINE ROLES — บุก / ป้องกัน สลับทุก 3 นาที
+   FRONTLINE ROLES — บุก / ป้องกัน สลับทุก 2 นาที
    · 60 วิแรก = เตรียมพร้อม: ทุกคันเข้าโซนที่ยังไม่ได้ยึดไม่ได้
    · ฝ่ายบุก: ต้องบุกอย่างเดียว (AI ไม่ถอย ไม่ตั้งรับ)
    · ฝ่ายป้องกัน: ห้ามออกนอกโซนของทีม — ออกไปได้ 5 วิ ครบแล้วรถระเบิด
    ═══════════════════════════════════════════════════════════ */
-var FLR={prep:60,swap:180,warn:10,limit:25*60,grace:12,lossGrace:10,oob:5,siege:15,ot:30,bonus:45};
-function flRolesInit(){FL.rt=0;FL.prep=true;FL.to=false;FL.phaseT=FLR.prep;FL.atk=Math.random()<.5?0:1;FL.warned=false;FL.swapN=0;
- FL.sgA={};addLog('⏳ เตรียมพร้อม 60 วิ — ยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้','b');}
+var FLR={prep:30,swap:120,warn:10,limit:10*60,grace:12,lossGrace:10,oob:5,siege:30,ot:30,bonus:45,
+ tkBase:240,tkPer:22,drain:.45,capSpd:7/4.5,btWin:90,btDur:60,breachT:6,breachS:1.2};
+function flRolesInit(){FL.rt=0;FL.prep=true;FL.to=false;tkInit();FL.phaseT=FLR.prep;FL.atk=Math.random()<.5?0:1;FL.warned=false;FL.swapN=0;
+ FL.sgA={};addLog('⏳ เตรียมพร้อม 30 วิ — ยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้','b');}
 function flRole(side){if(!FL.on||FL.rt===undefined)return 'free';if(FL.prep)return 'prep';if(FL.to)return 'atk';
  if(FL.atk===side)return FL.phaseT<FLR.warn&&!FL.capNow?'ret':'atk';return 'def';}
 function zoneOwnOK(side,x){return FL.own[zoneOf(x)]===side;}
@@ -5031,27 +5038,24 @@ function flAirStrike(side,z){var E=FL.ev;if(!E)return;var foe=1-side,x=clamp(zon
  for(var i=0;i<tanks.length&&pl.drops.length<7;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)===foe&&zoneOf(t.x)===z)pl.drops.push({x:t.x+rnd(-40,40),y:t.y+rnd(-40,40)});}
  while(pl.drops.length<4)pl.drops.push({x:x+rnd(-220,220),y:rnd(-AY*.6,AY*.6)});
  pl.drops.sort(function(a,b){return (a.y-b.y)*dir;});pl.snd=SFX.loop('jet');E.air.push(pl);}
-function flRolesTick(dt){if(FL.rt===undefined)return;FL.rt+=dt;FL.phaseT-=dt;
+function flRolesTick(dt){if(FL.rt===undefined)return;FL.rt+=dt;FL.phaseT-=dt;tkTick(dt);
  if(FL.prep&&FL.phaseT>0&&FL.phaseT<=5&&Math.ceil(FL.phaseT)!==Math.ceil(FL.phaseT+dt))SFX.lwsBeep(false);
  if(FL.prep&&FL.phaseT<=0){FL.prep=false;FL.to=true;FL.phaseT=0;FL.warned=true;
   cineCard('TOTAL OFFENSIVE','ทุกฝ่ายบุก — ชิง ZONE 4','#ff7a3c',3.2);SFX.horn();SFX.radio('air');
   addLog('⚔️ TOTAL OFFENSIVE — ทุกฝ่ายบุกเข้าหา Zone 4! ฝ่ายที่ยึดได้ก่อนบุกต่อทันที','b');}
- else if(!FL.prep&&!FL.to){
+ else if(!FL.prep&&!FL.to&&!(FL.col&&(FL.col[0]||FL.col[1]))){
   if(!FL.warned&&FL.phaseT<=FLR.warn){FL.warned=true;SFX.radio('air');
    addLog(FL.atk===0?'⏱️ อีก 10 วิ สลับเป็นฝ่ายป้องกัน — ถ้ากำลังยึดโซนอยู่จะได้ต่อเวลา':'⏱️ อีก 10 วิ ฝ่ายเราได้บุก!','b');}
   if(FL.phaseT<=0&&FL.capNow&&(FL.ot||0)<FLR.ot){FL.phaseT=0;FL.ot=(FL.ot||0)+dt;
    if(!FL.otOn){FL.otOn=1;var ua=FL.atk===0;cineCard('ต่อเวลา','ยึดโซนให้ได้ภายใน '+FLR.ot+' วินาที','#ff7a3c',2.2);SFX.radio(ua?'air':'bad');addLog(ua?'⏱️ ต่อเวลา! กำลังยึดโซน — ยึดให้ได้ภายใน '+FLR.ot+' วิ':'⏱️ ศัตรูได้ต่อเวลา — กำลังยึดโซนเรา หยุดมัน!','b');}}
   else if(FL.phaseT<=0){FL.ot=0;FL.otOn=0;FL.atk=1-FL.atk;FL.phaseT=FLR.swap;FL.warned=false;FL.swapN++;
    for(var i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)!==FL.atk){t.oobMax=FLR.grace;t.oob=0;}}
-   var us=FL.atk===0;cineCard(SPEC.on?(us?'น้ำเงินบุก':'แดงบุก'):us?'ฝ่ายเราบุก':'ฝ่ายเราป้องกัน','สลับบทบาท · 3 นาที',us?'#ffb347':'#7fc8ff',2.6);SFX.horn();
-   addLog(us?'⚔️ ฝ่ายเราบุก 3 นาที!':'🛡️ ฝ่ายเราป้องกัน 3 นาที — มี '+FLR.grace+' วิ กลับเข้าเขต','b');}}
+   var us=FL.atk===0;cineCard(SPEC.on?(us?'น้ำเงินบุก':'แดงบุก'):us?'ฝ่ายเราบุก':'ฝ่ายเราป้องกัน','สลับบทบาท · 2 นาที',us?'#ffb347':'#7fc8ff',2.6);SFX.horn();
+   addLog(us?'⚔️ ฝ่ายเราบุก 2 นาที!':'🛡️ ฝ่ายเราป้องกัน 2 นาที — มี '+FLR.grace+' วิ กลับเข้าเขต','b');}}
  if(FL.ev){FL.ev.charge[0]=flRole(0)==='atk'?1:0;FL.ev.charge[1]=flRole(1)==='atk'?1:0;}
  /* ปิดล้อม: ถ้าศัตรูยึดโซนติด HQ ได้ HQ จะเสียหายต่อเนื่อง */
  for(var j=0;j<structs.length;j++){var s=structs[j];if(s.k!=='hq'||s.dead)continue;
-  var adj=s.team===0?1:FLZ-2;if(FL.own[adj]===1-s.team){if(FL.sgA&&!FL.sgA[s.team]){FL.sgA[s.team]=1;cineCard('HQ ถูกปิดล้อม',SPEC.on?(s.team===0?'ฐานทัพน้ำเงินกำลังเสียหาย':'ฐานทัพแดงกำลังเสียหาย'):(s.team===0?'ฐานทัพเรากำลังเสียหาย!':'ฐานทัพศัตรูกำลังพัง!'),'#ff6a4a',2.6);}s.hp-=FLR.siege*dt;FL.hq[s.team]=Math.max(0,s.hp);if(s.hp<=0){s.hp=0;flEnd(s.team===1,s);}}}
- /* หมดเวลา: ตัดสินจากจำนวนโซน แล้วค่อย HP ของ HQ */
- if(FL.rt>=FLR.limit&&!G.over&&!CINE.end){var c=[0,0];FL.own.forEach(function(o){if(o>=0)c[o]++;});
-  var win=c[0]!==c[1]?c[0]>c[1]:FL.hq[0]>=FL.hq[1];addLog('⏱️ หมดเวลา — '+(win?'ฝ่ายเราครองพื้นที่มากกว่า':'ศัตรูครองพื้นที่มากกว่า'),win?'g':'r');flEnd(win);}
+  var adj=s.team===0?1:FLZ-2;if(FL.own[adj]===1-s.team){if(FL.sgA&&!FL.sgA[s.team]){FL.sgA[s.team]=1;cineCard('HQ ถูกปิดล้อม',SPEC.on?(s.team===0?'ฐานทัพน้ำเงินกำลังเสียหาย':'ฐานทัพแดงกำลังเสียหาย'):(s.team===0?'ฐานทัพเรากำลังเสียหาย!':'ฐานทัพศัตรูกำลังพัง!'),'#ff6a4a',2.6);}s.hp-=FLR.siege*(FL.col&&FL.col[s.team]?2:1)*dt;FL.hq[s.team]=Math.max(0,s.hp);if(s.hp<=0){s.hp=0;flEnd(s.team===1,s);}}}
  /* กติกาเขตของแต่ละคัน */
  for(var k=0;k<tanks.length;k++){var t2=tanks[k];if(t2.dead)continue;var sd=teamSide(t2.team),rl=flRole(sd);
   if(rl==='prep'){if(!zoneOwnOK(sd,t2.x)){var xb=ownEdgeX(sd);t2.x=sd===0?Math.min(t2.x,xb-30):Math.max(t2.x,xb+30);t2.spd*=.4;
@@ -5063,7 +5067,10 @@ function flRolesTick(dt){if(FL.rt===undefined)return;FL.rt+=dt;FL.phaseT-=dt;
 /* โซนเสียไป: คนที่ยังอยู่ในโซนนั้นได้เวลาถอยนานขึ้น */
 function flZoneLostGrace(z,side){for(var i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)===side&&zoneOf(t.x)===z){t.oobMax=Math.max(t.oobMax||0,FLR.lossGrace);t.oob=0;}}}
 function mmss(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+('0'+s%60).slice(-2);}
-function flRoleHUD(){var el=$('flRole');if(!el||FL.rt===undefined)return;
+function flRoleHUD(){flRoleHUD0();var el=$('flRole');if(!el||!FL.tk||FL.rt===undefined)return;
+ if(FL.col[0]||FL.col[1]){var cl0=FL.col[0];el.innerHTML=tkHUD()+'<b style="color:'+(cl0?'#ff6a4a':'#9fe06a')+'">'+(SPEC.on?(cl0?'💀 น้ำเงินแตก — แดงทะลวงไป HQ':'💀 แดงแตก — น้ำเงินทะลวงไป HQ'):cl0?'💀 กองทัพเราแตก — ยันให้ถึงที่สุด':'🏁 ศัตรูแตก — ไปทำลาย HQ!')+'</b> · เหลือ '+mmss(FLR.limit-FL.rt);return;}
+ el.innerHTML=tkHUD()+el.innerHTML;}
+function flRoleHUD0(){var el=$('flRole');if(!el||FL.rt===undefined)return;
  if(FL.prep){el.innerHTML='<b style="color:#f0c43a">⏳ เตรียมพร้อม '+mmss(FL.phaseT)+'</b> · จากนั้น TOTAL OFFENSIVE';return;}
  if(FL.to){el.innerHTML='<b style="color:#ff7a3c">⚔️ TOTAL OFFENSIVE</b> · ทุกฝ่ายบุก — ยึด Zone 4 · เหลือ '+mmss(FLR.limit-FL.rt);return;}
  var otx=FL.otOn?' · <b style="color:#ff7a3c">⏱️ ต่อเวลา '+mmss(FLR.ot-(FL.ot||0))+'</b>':'';
@@ -5182,7 +5189,7 @@ function specHUD(){var a=$('specStat'),b=$('specFol');if(!a||!SPEC.st)return;var
  function acc(s){return S.sh[s]?Math.round(S.hit[s]/S.sh[s]*100)+'%':'—';}
  function k(n){return n>=1e4?(n/1e3).toFixed(1)+'k':fmt(Math.round(n));}
  var rows=[['เหลือ',al[0],al[1]],['ทำลาย',S.k[0],S.k[1]],['ยิงเข้า',acc(0),acc(1)],['ดาเมจ',k(S.dmg[0]),k(S.dmg[1])]];
- if(FL.on){var c=[0,0];FL.own.forEach(function(o){if(o>=0)c[o]++;});rows.push(['ทหาร',infCount(0),infCount(1)],['โซน',c[0],c[1]],['HQ',k(FL.hq[0]),k(FL.hq[1])]);}
+ if(FL.on){var c=[0,0];FL.own.forEach(function(o){if(o>=0)c[o]++;});rows.push(['กำลังพล',FL.tk?Math.ceil(FL.tk[0]):'-',FL.tk?Math.ceil(FL.tk[1]):'-'],['ทหาร',infCount(0),infCount(1)],['โซน',c[0],c[1]],['HQ',k(FL.hq[0]),k(FL.hq[1])]);}
  else if(G.mode==='cap'){var cp=[0,0];G.caps.forEach(function(q){if(q.own>=0)cp[q.own]++;});rows.push(['จุดยึด',cp[0],cp[1]]);}
  else if(G.mode==='inf')rows.push(['เวฟ',G.wave||0,'']);
  a.innerHTML='<div class="spT">👁️ โหมดผู้ชม <span>'+mmss(G.t)+(SPEC.spd>1?' · x'+SPEC.spd:'')+'</span></div>'+
@@ -5464,7 +5471,7 @@ function paxCmd(){if(!P||P.dead||!FL.on)return;var cap=paxCap(P);if(!cap){toast(
 function infGrid(){var G2={},i,s,k;for(i=0;i<inf.length;i++){s=inf[i];if(s.dead)continue;k=(Math.floor(s.x/80))+','+(Math.floor(s.y/80));(G2[k]||(G2[k]=[])).push(s);}INF.grid=G2;}
 function infNear(x,y,r,fn){var G2=INF.grid;if(!G2)return;var x0=Math.floor((x-r)/80),x1=Math.floor((x+r)/80),y0=Math.floor((y-r)/80),y1=Math.floor((y+r)/80);
  for(var gx=x0;gx<=x1;gx++)for(var gy=y0;gy<=y1;gy++){var c=G2[gx+','+gy];if(c)for(var i=0;i<c.length;i++)fn(c[i]);}}
-function infKill(s,by){if(s.dead)return;s.dead=true;s.hp=0;s.deadT=0;s.tgt=null;s.aimT=0;s.burst=0;
+function infKill(s,by){if(s.dead)return;if(FL.on)tkLose(teamSide(s.team),1);s.dead=true;s.hp=0;s.deadT=0;s.tgt=null;s.aimT=0;s.burst=0;
  if(by&&by.st){by.ik=(by.ik||0)+1;}if(SPEC.st){SPEC.st.ik=SPEC.st.ik||[0,0];SPEC.st.ik[1-teamSide(s.team)]++;}}
 function infHurt(s,d,by){if(s.dead)return;s.hp-=d;s.flinch=.25;if(s.hp<=0)infKill(s,by);}
 /* กระสุนผ่านตัวทหาร: เช็กเส้นทางของเฟรมที่แล้ว */
@@ -5525,7 +5532,7 @@ function infUpdate(dt){if(!FL.on)return;var i,s;
  if(!INF.init){INF.init=1;for(i=0;i<tanks.length;i++)if(tanks[i].st.cls==='ifv')infFill(tanks[i]);
   for(var sd=0;sd<2;sd++){var sp=flSpawnPoint(sd===0?2:1),n=Math.min(6,infQuota()-infCount(sd));if(n>0)infFoot(sd===0?2:1,n,sp.x,sp.y);}}
  infGrid();infShotPass();
- INF.spT-=dt;if(INF.spT<=0){INF.spT=16;for(var sd2=0;sd2<2;sd2++){var room=infQuota()-infCount(sd2);if(room>=3){var p2=flSpawnPoint(sd2===0?2:1);infFoot(sd2===0?2:1,Math.min(4,room),p2.x,p2.y);supSpawnMark(sd2,p2.x,p2.y);}}}
+ INF.spT-=dt;if(INF.spT<=0){INF.spT=16;for(var sd2=0;sd2<2;sd2++){var room=infQuota()-infCount(sd2);if(room>=3&&!(FL.col&&FL.col[sd2])){var p2=flSpawnPoint(sd2===0?2:1);infFoot(sd2===0?2:1,Math.min(4,room),p2.x,p2.y);supSpawnMark(sd2,p2.x,p2.y);}}}
  for(i=INF.fx.length-1;i>=0;i--){INF.fx[i].t-=dt;if(INF.fx[i].t<=0)INF.fx.splice(i,1);}
  for(i=INF.gren.length-1;i>=0;i--){var gq=INF.gren[i];gq.t+=dt;if(gq.t>=gq.T){explodeAt(gq.tx,gq.ty,70,120,.7);INF.gren.splice(i,1);}}
  for(i=inf.length-1;i>=0;i--){s=inf[i];if(s.dead){s.deadT+=dt;if(s.deadT>9)inf.splice(i,1);continue;}infStep(s,dt);}}
@@ -5629,7 +5636,7 @@ function cineIntro(){if(!FL.on)return;var hqE=heliBase(1),hqO=heliBase(0),py=P?P
  CINE.k='intro';CINE.t=0;CINE.lock=true;document.body.classList.add('cine');
  CINE.shots=[{t0:0,t1:3.4,a:{x:hqE.x+200,y:hqE.y-500},b:{x:zoneCX(5),y:hqE.y+300},title:'FRONTLINE',sub:'สมรภูมิสแกนดิเนเวีย · '+TOD[FL.tod].n+' · '+G.teamSize+' v '+G.teamSize},
   {t0:3.4,t1:6.6,a:{x:zoneCX(4),y:-AY*.4},b:{x:zoneCX(2),y:AY*.3},title:'ZONE 4',sub:'แนวรบชี้ขาด — ใครยึดได้ก่อนคุมเกม'},
-  {t0:6.6,t1:9.6,a:{x:hqO.x+900,y:hqO.y+400},b:{x:P?P.x:hqO.x,y:py},title:SPEC.on?'ดู AI สู้กันเอง':'กองพันของคุณ',sub:'60 วินาทีก่อน TOTAL OFFENSIVE'}];
+  {t0:6.6,t1:9.6,a:{x:hqO.x+900,y:hqO.y+400},b:{x:P?P.x:hqO.x,y:py},title:SPEC.on?'ดู AI สู้กันเอง':'กองพันของคุณ',sub:'30 วินาทีก่อน TOTAL OFFENSIVE'}];
  CINE.T=9.6;CINE.cam={x:CINE.shots[0].a.x,y:CINE.shots[0].a.y};cam.x=CINE.cam.x-innerWidth/2;cam.y=CINE.cam.y-innerHeight/2;SFX.braam(1);}
 function cineSkip(){if(CINE.k!=='intro')return;CINE.t=Math.max(CINE.t,CINE.T-.5);}
 /* จบเกม */
@@ -5813,6 +5820,46 @@ function cmdMenu(){var el=$('cmdPanel');if(!el)return;var on=!el.classList.conta
 function cmdBtn(k){$('cmdPanel').classList.remove('on');cmdKey(k);}
 cv.addEventListener('pointerdown',function(e){if(G.cmdPick==='attack'&&G.run&&P&&!P.dead){G.cmdPick=null;cmdIssue('attack',e.clientX+cam.x,e.clientY+cam.y);}});
 if(bmc)bmc.addEventListener('pointerdown',function(e){if(G.cmdPick==='attack'&&G.run){G.cmdPick=null;var p=bmToWorld(e);closeBigMap();cmdIssue('attack',p.x,p.y);}});
+/* ═══════════════════════════════════════════════════════════
+   กำลังพล (TICKETS) → กองทัพแตก → ดันไปทำลาย HQ
+   · ตายเสียแต้ม (รถ 3 · รถเบา/IFV 2 · บอส 6 · ทหาร 1) · ถือโซนมากกว่า = ดูดแต้มอีกฝ่าย
+   · แต้มหมด: เกิดใหม่ไม่ได้ (ผู้เล่นเกิดที่ HQ ช้า) · ป้อมพัง · อีกฝ่ายบุกถาวร ยึดเร็ว 3 เท่า
+   · ทะลวงต่อเนื่อง: ยึด 2 โซนใน 90 วิ → 60 วิ ฝ่ายรับเกิดช้า ฝ่ายบุกยึดเร็วขึ้น
+   · 10:00 ยังไม่จบ → HQ ฝ่ายแต้มน้อยระเบิด
+   ═══════════════════════════════════════════════════════════ */
+function tkInit(){var n=Math.round(FLR.tkBase+(G.teamSize||12)*FLR.tkPer);FL.tk=[n,n];FL.tk0=n;FL.col=[false,false];FL.btT=[0,0];FL.capH=[[],[]];}
+function tkLose(side,n){if(!FL.tk||FL.prep||G.over||FL.col[0]||FL.col[1])return;FL.tk[side]=Math.max(0,FL.tk[side]-n);if(FL.tk[side]<=0&&!FL.col[side])tkCollapse(side);}
+function tkCost(t){return t.boss?6:(t.st.cls==='light'||t.st.cls==='ifv')?2:3;}
+function tkCollapse(s){var w=1-s,i;FL.col[s]=true;FL.to=false;FL.atk=w;FL.phaseT=999;FL.otOn=0;FL.ot=0;FL.warned=true;
+ for(i=0;i<structs.length;i++){var st=structs[i];if(st.k==='turret'&&st.team===s&&!st.dead){st.hp=0;st.dead=true;fxBlast(st.x,st.y,1.2);}}
+ for(i=FL.spawnQ.length-1;i>=0;i--)if(teamSide(FL.spawnQ[i].team)===s)FL.spawnQ.splice(i,1);
+ for(i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)===s){t.oobMax=FLR.grace;t.oob=0;}}
+ var us=s===0;SFX.horn();
+ cineCard('กองทัพแตก!',SPEC.on?(us?'น้ำเงินหมดกำลังพล — แดงทะลวงไป HQ':'แดงหมดกำลังพล — น้ำเงินทะลวงไป HQ'):us?'ฝ่ายเราหมดกำลังพล — ยันให้ถึงที่สุด!':'ศัตรูแตกพ่าย — ดันไปทำลาย HQ!',us?'#ff6a4a':'#9fe06a',3.4);
+ addLog(us?'💀 กำลังพลฝ่ายเราหมด — เกิดใหม่ไม่ได้ ป้อมปืนพัง ศัตรูกำลังทะลวงไป HQ!':'🏁 ศัตรูหมดกำลังพล — ป้อมพังหมด บุกไปทำลาย HQ ให้จบ!',us?'r':'g');}
+function tkBreak(side){var h=FL.capH[side];h.push(FL.rt);while(h.length>2)h.shift();
+ if(h.length===2&&h[1]-h[0]<=FLR.btWin&&FL.btT[side]<=0){FL.btT[side]=FLR.btDur;var us=side===0;
+  cineCard('BREAKTHROUGH',SPEC.on?(us?'น้ำเงินทะลวงแนว':'แดงทะลวงแนว'):us?'ทะลวงแนว! ศัตรูเกิดช้าลง 60 วิ':'ศัตรูทะลวงแนว! ตั้งรับให้ได้',us?'#9fe06a':'#ff6a4a',2.6);
+  addLog(us?'⚡ ทะลวงแนว! 60 วิ — ฝ่ายเรายึดเร็วขึ้น ศัตรูเกิดช้าลง':'⚡ ศัตรูทะลวงแนว! 60 วิ — ศัตรูยึดเร็วขึ้น ฝ่ายเราเกิดช้าลง',us?'g':'r');}}
+/* ตัวคูณความเร็วยึด */
+function capMul(side){return FLR.capSpd*(FL.col&&FL.col[1-side]?3:1)*(FL.btT&&FL.btT[side]>0?1.5:1);}
+function tkTick(dt){if(!FL.tk)return;var c=[0,0],i;FL.own.forEach(function(o){if(o>=0)c[o]++;});
+ if(!FL.prep&&!G.over){var df=c[0]-c[1];if(df!==0)tkLose(df>0?1:0,Math.abs(df)*FLR.drain*dt);}
+ for(i=0;i<2;i++)if(FL.btT[i]>0)FL.btT[i]-=dt;
+ /* HQ: ปิดล้อม + ทะลวงเข้าโซน HQ (ยิ่งศัตรูอยู่ในโซน HQ เยอะ ยิ่งพังเร็ว) */
+ for(i=0;i<structs.length;i++){var s=structs[i];if(s.k!=='hq'||s.dead)continue;var hz=s.team===0?0:FLZ-1,n=0,m=0,k;
+  for(k=0;k<tanks.length;k++){var t=tanks[k];if(!t.dead&&teamSide(t.team)!==s.team&&zoneOf(t.x)===hz)n++;}
+  for(k=0;k<inf.length;k++){var q=inf[k];if(!q.dead&&teamSide(q.team)!==s.team&&zoneOf(q.x)===hz)m++;}
+  var br=Math.min(n,12)*FLR.breachT+Math.min(m,20)*FLR.breachS;if(br>0){s.hp-=br*(FL.col[s.team]?2:1)*dt;FL.hq[s.team]=Math.max(0,s.hp);
+   if(!s._brA){s._brA=1;cineCard('HQ ถูกบุกถึงตัว',s.team===0?'ศัตรูอยู่ในฐานทัพเรา!':'ฝ่ายเราอยู่ในฐานทัพศัตรู — ทำลายให้ได้!','#ff6a4a',2.4);}
+   if(s.hp<=0){s.hp=0;flEnd(s.team===1,s);}}}
+ /* ครบเวลา: HQ ฝ่ายกำลังพลน้อยกว่าระเบิด */
+ if(FL.rt>=FLR.limit&&!G.over&&!CINE.end){var lose=FL.col[0]?0:FL.col[1]?1:FL.tk[0]!==FL.tk[1]?(FL.tk[0]<FL.tk[1]?0:1):(FL.hq[0]<=FL.hq[1]?0:1),hq=null;
+  for(i=0;i<structs.length;i++)if(structs[i].k==='hq'&&structs[i].team===lose)hq=structs[i];
+  addLog('⏱️ ครบ 10 นาที — ฐานทัพของฝ่ายที่กำลังพลน้อยกว่าพังทลาย',lose===0?'r':'g');if(hq){hq.hp=0;FL.hq[lose]=0;}flEnd(lose===1,hq);}}
+function tkHUD(){if(!FL.tk)return '';var a=Math.ceil(FL.tk[0]),b=Math.ceil(FL.tk[1]),f0=a/FL.tk0*100,f1=b/FL.tk0*100;
+ return '<div class="tkRow"><b class="sb">'+(FL.col[0]?'💀 ':'')+a+'</b><span class="tkBar"><i style="width:'+f0.toFixed(0)+'%;background:#4fa0e0"></i></span><span style="color:#93a181;font-size:9.5px">กำลังพล</span><span class="tkBar r"><i style="width:'+f1.toFixed(0)+'%;background:#e05a3c"></i></span><b class="sr">'+b+(FL.col[1]?' 💀':'')+'</b></div>'+
+  ((FL.btT[0]>0||FL.btT[1]>0)?'<div style="color:#ffd27a;font-size:10px">⚡ '+(FL.btT[0]>0?(SPEC.on?'น้ำเงิน':'เรา'):(SPEC.on?'แดง':'ศัตรู'))+'ทะลวงแนว '+Math.ceil(Math.max(FL.btT[0],FL.btT[1]))+' วิ</div>':'');}
 function render(){
  var w=innerWidth,h=innerHeight,time=G.t,m=MAPS[G.map];
  var sx=G.shake?rnd(-G.shake,G.shake):0,sy=G.shake?rnd(-G.shake,G.shake):0;
