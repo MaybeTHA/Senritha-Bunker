@@ -7,7 +7,7 @@ import { photoById } from '../domain/photos.js';
 import { app, today } from './shared.js';
 import { P, pageHead, secHead } from './common.js';
 import { familyAsk } from './care.js';
-import { reviewSection, ratingOf } from './reviews.js';
+import { reviewSection, ratingLine, ratingBar } from './reviews.js';
 
 const priceText = p => p.price ? p.price.text : 'ดูราคาที่ร้าน';
 /** ภาพจริงจาก Wikimedia Commons: เป็นภาพสินค้าประเภทเดียวกัน ไม่ใช่รุ่นนั้นเป๊ะ จึงติดป้าย "ภาพประกอบ" */
@@ -20,7 +20,7 @@ export function productCard(p) {
       : h('div.pd-art', h('span.pd-ic', { html: ic(groupOf(p.group).icon) }), h('span.pd-grp', groupOf(p.group).name)),
     h('div.pd-body',
       h('small.pd-brand', `${p.brand} · ${p.model}`), h('b', p.name),
-      ratingOf(p.id) ? h('small.pd-rev', `★ ${ratingOf(p.id).avg} รีวิวของคุณ`) : '',
+      ratingLine(p.id),
       h('div.pd-foot', h('span.pd-price' + (p.price ? '' : '.none'), priceText(p)), p.price ? h('small', p.price.where) : '')));
 }
 
@@ -46,6 +46,7 @@ export function productView(root, id) {
   const ph = productPhoto(p);
   put(root, pageHead(p.name, { back: 'shop/' + p.group, sub: `${p.brand} · ${p.model}` }),
     ph ? h('figure.svcphoto.prod', h('img', { src: ph.src, alt: '', loading: 'lazy' }), h('figcaption', `ภาพประกอบ ไม่ใช่รุ่นนี้ · ${ph.artist || 'Wikimedia Commons'} · ${ph.license}`)) : '',
+    ratingBar(p.id, 'สินค้านี้'),
     h('section.pricebox',
       h('div', h('small', p.price ? `ราคาที่พบ · ${p.price.where}` : 'ราคา'), h('b', priceText(p)), p.price?.note ? h('p', p.price.note) : h('p', 'ยังไม่มีราคาที่ยืนยันได้ — เปิดลิงก์ร้านด้านล่างเพื่อดูราคาปัจจุบัน')),
       h('div.buylinks', p.buy.map((b, i) => h('a.btn' + (i === 0 ? '.primary' : '.ghost'), { href: b.url, target: '_blank', rel: 'noopener', html: `<span>${b.label}</span>` + ic('ext') })))),

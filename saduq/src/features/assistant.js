@@ -120,7 +120,7 @@ function optionCard(p, i) {
     h('div.ac-top', h('span.ac-rank', String(i + 1)), h('span.ac-ic', { html: ic(p.x.icon || 'spark') }),
       h('div.ac-fit', h('small', 'เหมาะกับโจทย์'), h('b', `${p.fit}%`), h('i', h('em', { style: { width: p.fit + '%' } })))),
     h('span.ac-kind', isP ? 'สินค้า' : p.x.cost === 'tool' ? 'เครื่องมือในแอป' : p.x.cost === 'free' ? 'บริการฟรี/ตามสิทธิ' : 'บริการ'),
-    h('b.ac-name', it.name), h('small.ac-sub', sub, p.rating ? h('span.ac-rev', ` · ★ ${p.rating.avg} รีวิวของคุณ`) : ''),
+    h('b.ac-name', it.name), h('small.ac-sub', sub, p.rating ? h('span.ac-rev', ` · ★ ${p.rating.avg} ${p.rating.sample ? 'รีวิวตัวอย่าง' : 'รีวิวของคุณ'}`) : ''),
     h('ul.ac-why', p.why.map(w => h('li', h('span', { html: ic('check') }), w))),
     h('div.ac-act',
       h('a.btn.primary.sm', { href }, 'ดูรายละเอียด'),

@@ -12,7 +12,7 @@ import { isActiveReq } from '../domain/catalog.js';
 import { photoOf } from '../domain/photos.js';
 import { careBoard, todayCare, benefitsBlock } from './people.js';
 import { productCard, featuredProducts, sources } from './shop.js';
-import { reviewSection } from './reviews.js';
+import { reviewSection, ratingBar } from './reviews.js';
 
 const DOWL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'], MON = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 const hs = { q: '', cat: 'living' };
@@ -177,6 +177,7 @@ export function serviceView(root, id) {
     h('div.svchero', { style: { '--ct': c.tint, '--ci': c.ink } },
       h('span.cc-ic.xl', { html: ic(s.icon) }),
       h('div', h('a.chipcat', { href: '#cat/' + c.id }, c.short), h('p.lead', s.short))),
+    s.cat !== 'emergency' ? ratingBar(s.id, 'บริการนี้') : '',
     s.action === 'call' && s.provider?.phone && !s.contact ? callBoxLite(s) : '',
     s.contact?.length ? h('section.dsec', h('h2', 'ช่องทางติดต่อ'), h('div.ctlist', s.contact.map(contactEl))) : '',
     h('section.dsec', h('h2', 'รายละเอียด'), h('p', s.desc), s.includes?.length ? h('ul.ticks', s.includes.map(x => h('li', h('span', { html: ic('check') }), x))) : ''),

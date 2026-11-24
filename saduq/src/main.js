@@ -12,6 +12,7 @@ import { openReminder } from './features/remind.js';
 import { avatar } from './features/common.js';
 import { needsOnboarding } from './features/onboard.js';
 import { addHubSamples } from './features/family.js';
+import { addSampleReviews } from './features/reviews.js';
 import { personView } from './features/people.js';
 import { productsView, productView } from './features/shop.js';
 import { assistantView } from './features/assistant.js';
@@ -80,6 +81,8 @@ async function boot() {
     await store.setPref('hub_onboarded', true);
     await addHubSamples();
   } else if (!store.state.prefs.cg_v2) await migrateToCaregiver(store);
+  // รุ่น 2.2: ผู้ใช้เดิมที่ยังมีข้อมูลตัวอย่าง → เติมรีวิวตัวอย่างครั้งเดียว (ติดป้าย "ตัวอย่าง")
+  if (!store.state.prefs.reviews_seeded) { if (store.state.family.some(m => m.sample)) await addSampleReviews(); await store.setPref('reviews_seeded', true, false); }
   addEventListener('offline', () => toast('ออฟไลน์อยู่ — ใช้การเตือนและข้อมูลในเครื่องได้ตามปกติ'));
   globalThis.__sabaii = store;
 }
