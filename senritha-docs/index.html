@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Senritha's Docs</title>
+<meta name="description" content="เขียนและแก้ไขเอกสาร Word (.docx) ในเบราว์เซอร์ เปิด PDF มาแก้ไข และส่งออกเป็น Word หรือ PDF">
+<meta name="theme-color" content="#F4F3F0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231F5FBF'/%3E%3Cpath d='M10 7h9l5 5v13H10z' fill='%23fff'/%3E%3Cpath d='M13 16h8M13 19.5h8M13 23h5' stroke='%231F5FBF' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- UI font + Thai document fonts offered in the font menu -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Sarabun:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Thai:wght@400;700&family=Noto+Serif+Thai:wght@400;700&family=Kanit:ital,wght@0,400;0,600;1,400&family=Prompt:ital,wght@0,400;0,600;1,400&family=Chakra+Petch:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="vendor/superdoc/style.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ Home: documents on this device ============ -->
+<main id="home" class="home">
+  <header class="home-bar">
+    <a class="back-bunker" href="../" aria-label="กลับไป Inside Bunker" title="Inside Bunker"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></a>
+    <div class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3.5h7l4.5 4.5v12.5H7z"/><path d="M14 3.5V8h4.5"/><path class="a" d="M9.8 12.5h6M9.8 15.5h6M9.8 18.5h3.6"/></svg></span><b>Senritha's Docs</b></div>
+  </header>
+
+  <section class="start">
+    <h1>เริ่มเอกสาร</h1>
+    <div class="start-row">
+      <button class="tile" id="btnNew"><span class="sheet"><svg viewBox="0 0 24 24"><path d="M12 7v10M7 12h10"/></svg></span><b>เอกสารเปล่า</b><small>A4 · Sarabun 14</small></button>
+      <button class="tile" id="btnOpen"><span class="sheet open"><svg viewBox="0 0 24 24"><path d="M12 16V6M8 10l4-4 4 4"/><path d="M6 18h12"/></svg></span><b>เปิดไฟล์</b><small>.docx · .pdf</small></button>
+    </div>
+    <p class="hint" id="dropHint">หรือลากไฟล์ Word / PDF มาวางที่หน้านี้</p>
+  </section>
+
+  <section class="recent">
+    <div class="recent-head"><h2>เอกสารล่าสุด</h2><span class="count" id="docCount"></span></div>
+    <div id="docList" class="doc-list"></div>
+  </section>
+  <p class="foot">เก็บไว้ในเบราว์เซอร์บนเครื่องนี้เท่านั้น ไม่ได้ส่งขึ้นเซิร์ฟเวอร์ · ตัวแก้ไขใช้ <a href="https://github.com/superdoc/docx-editor" target="_blank" rel="noopener">SuperDoc</a> (AGPL-3.0)</p>
+</main>
+
+<!-- ============ Editor ============ -->
+<section id="editor" class="editor" hidden>
+  <header class="ed-bar">
+    <button class="ib" id="btnBack" aria-label="กลับไปหน้าเอกสาร" title="เอกสารทั้งหมด"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <span class="logo sm" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3.5h7l4.5 4.5v12.5H7z"/><path d="M14 3.5V8h4.5"/><path class="a" d="M9.8 12.5h6M9.8 15.5h6M9.8 18.5h3.6"/></svg></span>
+    <div class="title-wrap">
+      <input id="docName" class="doc-name" spellcheck="false" autocomplete="off" aria-label="ชื่อเอกสาร">
+      <span id="saveState" class="save-state" aria-live="polite"></span>
+    </div>
+    <div class="ed-actions">
+      <button class="btn ghost" id="btnOpen2" title="เปิดไฟล์ .docx หรือ .pdf"><svg viewBox="0 0 24 24"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6H10l2 2h6.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/></svg><span>เปิด</span></button>
+      <button class="btn" id="btnDocx" title="ดาวน์โหลดเป็น Word (.docx)"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M5 19h14"/></svg><span>Word</span></button>
+      <button class="btn primary" id="btnPdf" title="ส่งออกเป็น PDF"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M5 19h14"/></svg><span>PDF</span></button>
+    </div>
+  </header>
+  <div id="toolbar" class="ed-toolbar"></div>
+  <div class="ed-scroll" id="edScroll"><div id="superdoc"></div></div>
+  <div class="loading" id="loading"><span class="spin"></span><span id="loadingText">กำลังเปิดเอกสาร…</span></div>
+</section>
+
+<input type="file" id="filePick" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+<div class="drop" id="drop" hidden><div><svg viewBox="0 0 24 24"><path d="M12 16V6M8 10l4-4 4 4"/><path d="M6 18h12"/></svg><b>วางไฟล์เพื่อเปิด</b><small>.docx หรือ .pdf</small></div></div>
+<div class="toast" id="toast" role="status"></div>
+<dialog id="dlg" class="dlg"><form method="dialog"><h3 id="dlgTitle"></h3><p id="dlgBody"></p><div class="dlg-actions"><button class="btn ghost" value="cancel" id="dlgCancel">ยกเลิก</button><button class="btn primary" value="ok" id="dlgOk">ตกลง</button></div></form></dialog>
+
+<script src="vendor/superdoc/superdoc.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
