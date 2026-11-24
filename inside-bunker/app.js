@@ -17,6 +17,7 @@ const G={ /* two-tone glyphs: white strokes + one blue accent (.a) */
   clips:'<rect x="3" y="4.5" width="18" height="12.5" rx="2.5"/><path d="M9 20h6"/><circle class="a" cx="12" cy="10.75" r="2.6"/>',
   steelforge:'<rect x="3" y="13" width="18" height="5.5" rx="2.75"/><path d="M6 13v-2.5A1.5 1.5 0 0 1 7.5 9H14l2 4"/><path class="a" d="M12 9V7.5h9"/>',
   saduq:'<path d="M9.5 3h5v4.5H19v5h-4.5V17h-5v-4.5H5v-5h4.5z"/><path class="a" d="M3 19.2c4.5 2.4 12.5 2.4 18-2.4"/>',
+  docs:'<path d="M7 3.5h7l4.5 4.5v12.5H7z"/><path d="M14 3.5V8h4.5"/><path class="a" d="M9.8 12.5h6M9.8 15.5h6M9.8 18.5h3.6"/>',
 };
 const APPS=[
   {id:'workspace',href:'senritha-workspace/',name:"Senritha's Work Space",desc:'Channels, sub-channels, messages and images. Saved on this device.',cat:'Productivity'},
@@ -26,6 +27,7 @@ const APPS=[
   {id:'motorhome',href:'senritha-motorhome/',name:"Senritha's Motorhome 3D",desc:'Walk through a luxury motorhome parked in a snowy forest at blue hour.',cat:'3D Worlds'},
   {id:'summit',href:'senritha-summit/',name:"Senritha's Last Summit X3D",desc:'Climb from a warm mountain cabin to a red flag on a snowy summit: sunrise, clear afternoon or aurora, light or strong wind.',cat:'3D Worlds'},
   {id:'perf',href:'senritha-perf/',name:"Senritha's Test Performance",desc:'WebGL2 graphics benchmark: GPU, CPU and frame pacing, measured.',cat:'System'},
+  {id:'docs',href:'senritha-docs/',name:"Senritha's Docs",desc:'Word-style editor: open, edit and save .docx files, pull text out of PDFs, export to Word or PDF. Saved on this device. Thai.',cat:'Productivity'},
   {id:'clips',href:'senritha-clips/',name:"Senritha's Random Clips",desc:'Long screen-recording sessions that save short clips at random moments. Every timing is yours to set.',cat:'Productivity'},
   {id:'steelforge',href:'steelforge-requiem/',name:'Steelforge Requiem',desc:'Top-down tank battles: Frontline, duels, capture, and endless waves. Build your tank part by part. PC and phone.',cat:'Games'},
   {id:'saduq',href:'saduq/',name:'Saduq',desc:'Assistant for caregivers of older adults: care schedule, health log, real government benefits and products with sources. Thai.',cat:'Health & Care'},
