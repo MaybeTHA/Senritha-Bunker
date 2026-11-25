@@ -121,6 +121,10 @@ body.spec #hSup{display:none!important}
 #bMap{left:132px;bottom:104px;width:44px;height:44px;background:#3a5a7acc}
 #bExt{left:26px;bottom:138px;width:44px;height:44px;background:#2f6a8acc}
 #bPax{left:80px;bottom:138px;width:44px;height:44px;background:#5a6a3acc;display:none}
+#bSkill{right:68px;bottom:150px;width:46px;height:46px;background:#8a6a1ecc;display:none}#bRwsAm{right:120px;bottom:168px;width:42px;height:42px;background:#8a4a2acc;display:none;font-size:9px}
+body.pskill #bSkill{display:flex}body.pabx #bRwsAm{display:flex}
+body.mbl #ab5{display:none}
+#hAmmo .ab.rdy{box-shadow:0 0 0 1px #f0b429 inset}
 body.pifv #bPax{display:flex}
 #modal{position:absolute;inset:0;background:#000000d0;display:none;z-index:14;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
 #modal.on{display:flex}
@@ -259,6 +263,8 @@ body.mbl #bScan{right:calc(12px + env(safe-area-inset-right));bottom:calc(200px 
 body.mbl #bMap{left:calc(12px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
 body.mbl #bExt{left:calc(66px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
 body.mbl #bPax{left:calc(120px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bSkill{right:calc(66px + env(safe-area-inset-right));bottom:calc(200px + env(safe-area-inset-bottom));width:48px;height:48px}
+body.mbl #bRwsAm{right:calc(120px + env(safe-area-inset-right));bottom:calc(218px + env(safe-area-inset-bottom));width:44px;height:44px}
 #bCmd{left:26px;bottom:192px;width:44px;height:44px;background:#5a4a2acc}
 body.mbl #bCmd{left:calc(174px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
 #cmdPanel{position:absolute;left:calc(236px + env(safe-area-inset-left));bottom:calc(60px + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:4px;pointer-events:auto;background:#0c100ae6;border:1px solid #f0b429;border-radius:8px;padding:6px;width:170px;z-index:8}
@@ -275,6 +281,8 @@ body.mbl.portrait #hud,body.mbl.portrait #mob{visibility:hidden}
  body.mbl #bExt{left:calc(62px + env(safe-area-inset-left))}body.mbl #bScan{right:auto;left:calc(112px + env(safe-area-inset-left))}
  body.mbl #bPax{left:calc(162px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));width:44px;height:44px}
  body.mbl #bCmd{left:calc(212px + env(safe-area-inset-left));bottom:calc(132px + env(safe-area-inset-bottom));width:44px;height:44px}
+ body.mbl #bSkill{right:calc(62px + env(safe-area-inset-right));bottom:calc(178px + env(safe-area-inset-bottom));width:44px;height:44px}
+ body.mbl #bRwsAm{right:calc(112px + env(safe-area-inset-right));bottom:calc(178px + env(safe-area-inset-bottom));width:42px;height:42px}
  body.mbl #cmdPanel{bottom:calc(56px + env(safe-area-inset-bottom));max-height:calc(100vh - 70px);overflow-y:auto}
  body.mbl #bMain{right:calc(134px + env(safe-area-inset-right));width:72px;height:72px}
  body.mbl #bAlt{right:calc(158px + env(safe-area-inset-right));bottom:calc(88px + env(safe-area-inset-bottom));width:42px;height:42px}
@@ -365,6 +373,7 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
     <div class="ab" id="ab2" onclick="pickW(2)">ATGM<br><b id="n2">0</b></div>
     <div class="ab" id="ab3" onclick="cycAmmo()">กระสุน<br><b id="n3">AP</b></div>
     <div class="ab" id="ab4" onclick="dropSmoke()">ควัน<br><b id="n4">0</b></div>
+    <div class="ab" id="ab5" onclick="useSkill(P)">สกิล [V]<br><b id="n5">—</b></div>
   </div>
 </div>
 <div id="lws"></div>
@@ -391,6 +400,8 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="fbtn" id="bMap">แผนที่</div>
   <div class="fbtn" id="bExt">ดับไฟ</div>
   <div class="fbtn" id="bPax">ลงรถ</div>
+  <div class="fbtn" id="bSkill">สกิล</div>
+  <div class="fbtn" id="bRwsAm">AP/HE</div>
   <div class="fbtn" id="bCmd" onclick="cmdMenu()">สั่งการ</div>
   <div id="cmdPanel"><div id="cmdInfo"></div><button class="btn sm" onclick="cmdBtn('follow')">🚩 ตามฉัน</button><button class="btn sm" onclick="cmdBtn('attack')">⚔️ บุกจุดที่ชี้</button><button class="btn sm" onclick="cmdBtn('hold')">🛡️ ตั้งรับตรงนี้</button><button class="btn sm" onclick="cmdBtn('focus')">🎯 ยิงเป้าเดียวกัน</button><button class="btn sm" onclick="cmdBtn('cancel')">✖ ยกเลิกคำสั่ง</button></div>
 </div>
@@ -618,8 +629,12 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   ห้ามโจมตีฐานทัพหลักศัตรู รอบ HQ และเขตจุดเกิด · แต่ละอย่างมีคูลดาวน์ · AI ก็ใช้กติกาเดียวกัน<br>
   เติมเสบียง: จอดนิ่งที่ปั๊ม Zone 4 หรือรอบ HQ ฝ่ายเรา (ช่วงเตรียมพร้อมเติมได้ทุกที่ในเขตเรา) — เติมเฉพาะที่ขาด ไม่เกินความจุ<br>
   เฮลิคอปเตอร์ออกจากฐานไปช่วยจุดที่ปะทะ อยู่ราว 80 วิ แล้วบินกลับ · ยิงตกได้ด้วยปืนกล/ปืนใหญ่กล/จรวดทหาร<br><br>
+  <b style="color:#f0b429">■ สกิลพิเศษ [V] / จุดเด่นรถถังรุ่นจริง</b><br>
+  <b>KF51</b> เกราะหนาที่สุด · [V] โดรนพลีชีพ 2 ลำ/ครั้ง แยกเป้า (คลัง 6) คูลดาวน์ 5 วิ · หมดรีโหลด 12 วิ<br>
+  <b>AbramsX</b> สมดุล · RWS 30mm ไม่จำกัด · [V] อัตโนมัติ ↔ ยิงตามศูนย์พร้อมปืนใหญ่ · [T] AP/HE · ร้อนเกิน = ยิงช้า 5 วิ<br>
+  <b>T-14</b> เร็วที่สุด · APS 12 นัด ชาร์จคืน 1 นัด/8 วิ · <b>Leopard</b> ปืน/กระสุนดีที่สุด · <b>K2</b> บรรจุ 3 วิ · <b>T-90M</b> ERA 34 ก้อน · <b>Stealth-X</b> [V] ล่องหน 10 วิ<br><br>
   <b style="color:#f0b429">■ สั่งการลูกน้อง</b><br>
-  <b>Z</b> ตามฉัน · <b>V</b> บุกจุดที่เมาส์ชี้ · <b>B</b> ตั้งรับตรงนี้ · <b>N</b> ยิงเป้าเดียวกัน (เป้าที่ล็อก/ใกล้เมาส์) · <b>H</b> ยกเลิก · มือถือ: ปุ่มสั่งการ<br>
+  <b>4</b> ตามฉัน · <b>5</b> บุกจุดที่เมาส์ชี้ · <b>6</b> ตั้งรับตรงนี้ · <b>7</b> ยิงเป้าเดียวกัน (เป้าที่ล็อก/ใกล้เมาส์) · <b>8</b> ยกเลิก · มือถือ: ปุ่มสั่งการ<br>
   สั่งรถฝ่ายเราที่ใกล้ที่สุด · เรดาร์ยิ่งดี สั่งได้ไกลขึ้น หลายคันขึ้น ตอบสนองเร็วขึ้น (ไม่มี 2 คัน/2.6 วิ → Gen3 9 คัน/0.35 วิ)<br><br>
   <b style="color:#f0b429">■ ทหารราบ & IFV</b><br>
   IFV บรรทุกทหารได้ตามขนาด (4/6/7/8 นาย) · ทหารต่อต้านรถถังยิงจรวด HEAT · ทหารนับช่วยยึดโซน (2 นาย = 1 หน่วย)<br>
@@ -1122,22 +1137,22 @@ var CHASSIS={
    d:'รุ่นทดลอง ป้อมไร้คน ลูกเรือ 3 นาย'},
  LEO:{n:'Leopard 2A7V',cls:'mbt',sty:'leo',fam:'modern',hp:2050,w:66,crew:4,ammo:42,
    ar:{hf:400,hs:122,hr:72,tf:560,ts:168,tr:92},sp:.86,tv:1.00,prof:1.12,cost:380000,
-   d:'เยอรมนี · ป้อมลิ่มคอมโพสิต + กล้อง PERI/EMES · คู่กับ Rh-120 L55A1 · ทนและแม่นรอบด้าน'},
+   d:'เยอรมนี · ปืนและกระสุนดีที่สุด: เจาะ +15% · ดาเมจ +10% · แม่นขึ้น 25% · กระสุนเร็วขึ้น 12% · ป้อมลิ่ม + PERI/EMES'},
  KF51:{n:'KF51 Panther',cls:'mbt',sty:'kf51',fam:'modern',hp:2150,w:59,crew:3,ammo:30,
-   ar:{hf:420,hs:140,hr:78,tf:560,ts:190,tr:96},sp:.84,tv:.95,prof:1.10,cost:520000,
-   d:'Rheinmetall (เยอรมนี) · ป้อมแบนกว้าง + กล่องโดรน Hero-120 · ออกแบบมาเพื่อปืน 130mm'},
+   ar:{hf:480,hs:170,hr:92,tf:650,ts:220,tr:110},sp:.84,tv:.95,prof:1.10,cost:520000,
+   d:'Rheinmetall (เยอรมนี) · เกราะหนาที่สุดในเกม · ปืน 130mm · สกิล [V] ปล่อยโดรนพลีชีพ Hero-120 ครั้งละ 2 ลำ แยกกันโจมตี (คลัง 6 ลำ) · คูลดาวน์ 5 วิ · ใช้หมดรีโหลด 12 วิ'},
  ABX:{n:'AbramsX',cls:'mbt',sty:'abx',fam:'modern',hp:2000,w:60,crew:3,ammo:36,
    ar:{hf:390,hs:132,hr:76,tf:520,ts:160,tr:90},sp:.92,tv:1.10,prof:1.00,cost:460000,
-   d:'สหรัฐฯ (ต้นแบบไฮบริด) · ป้อมเตี้ยไร้คน + RWS + แผง Trophy · เร็ว เตี้ย ซ่อนตัวง่าย'},
+   d:'สหรัฐฯ · สมดุลทุกด้าน · RWS 30mm กระสุนไม่จำกัด: [V] สลับ ยิงอัตโนมัติใส่รถถังที่ใกล้สุด ↔ ยิงตามศูนย์พร้อมปืนใหญ่ · [T] สลับ AP/HE · ยิงต่อเนื่องจนร้อนเกิน = ยิงช้า 5 วิ'},
  T90:{n:'T-90M',cls:'mbt',sty:'t90',fam:'modern',hp:1850,w:46,crew:3,ammo:40,
    ar:{hf:360,hs:110,hr:66,tf:480,ts:140,tr:84},sp:.84,tv:.92,prof:.92,cost:340000,
-   d:'รัสเซีย · ป้อมกลม + ERA Relikt + กรงซี่หลังป้อม · ตัวเล็กยิงโดนยาก · ปืน 125mm'},
+   d:'รัสเซีย · ERA Relikt 34 ก้อน (กัน HEAT/ATGM/โดรน) · กรงสแลต · ตัวเล็กยิงโดนยาก · ปืน 125mm'},
  T14:{n:'T-14 Armata',cls:'mbt',sty:'t14',fam:'modern',hp:2100,w:55,crew:3,ammo:45,wheels:7,
-   ar:{hf:430,hs:140,hr:78,tf:400,ts:120,tr:80},sp:.90,tv:1.12,prof:1.08,cost:500000,
-   d:'รัสเซีย · ป้อมไร้คน + แคปซูลลูกเรือในตัวถัง · ท่อ APS Afganit · ล้อ 7 คู่ · คู่กับ 2A82-1M'},
+   ar:{hf:430,hs:140,hr:78,tf:400,ts:120,tr:80},sp:1.08,tv:1.15,prof:1.08,cost:500000,
+   d:'รัสเซีย · เครื่องยนต์เร็วที่สุดในเกม · APS Afganit 12 นัด ชาร์จคืน 1 นัด/8 วิ (สกัดจรวด/โดรนทุกนัด · กระสุน ≥80mm 50%) · ป้อมไร้คน'},
  K2:{n:'K2 Black Panther',cls:'mbt',sty:'k2',fam:'modern',hp:1980,w:55,crew:3,ammo:40,
    ar:{hf:400,hs:126,hr:74,tf:540,ts:160,tr:90},sp:.92,tv:1.08,prof:1.00,cost:420000,
-   d:'เกาหลีใต้ · ป้อมลิ่มยื่นยาว + เรดาร์ MMW · ช่วงล่างไฮโดรนิวแมติก · คล่องตัวสูง'},
+   d:'เกาหลีใต้ · บรรจุอัตโนมัติ 3 วิ · ป้อมลิ่มยื่นยาว + เรดาร์ MMW · ช่วงล่างไฮโดรนิวแมติก · คล่องตัวสูง'},
  V1:{n:'IFV-20 ไลนซ์',cls:'ifv',sty:'lynx',fam:'ifv',hp:720,w:22,crew:3,ammo:320,
    ar:{hf:66,hs:34,hr:26,tf:70,ts:38,tr:30},sp:1.02,tv:1.10,prof:.86,cost:34000,
    d:'IFV เบา ยิงรัว ไล่ล่ารถเบาได้ดี'},
@@ -1435,10 +1450,10 @@ var PARTS={ch:CHASSIS,gun:ALLGUNS(),al:AUTOL,sec:SECS,atgm:ATGMS,fcs:FCSS,
 
 /* ═══════ SAVE / KEYS / BUFFS (กู้คืนจาก v4) ═══════ */
 var DEFKEYS={fwd:'w',back:'s',left:'a',right:'d',brake:' ',w1:'1',w2:'2',w3:'3',ammo:'r',
- scan:'shift',lock:'q',smoke:'x',use:'f',ext:'e',map:'m',pax:'g',cmdF:'z',cmdA:'v',cmdH:'b',cmdT:'n',cmdX:'h',quit:'escape'};
+ scan:'shift',lock:'q',smoke:'x',use:'f',ext:'e',map:'m',pax:'g',cmdF:'4',cmdA:'5',cmdH:'6',cmdT:'7',cmdX:'8',skill:'v',rwsAm:'t',quit:'escape'};
 var KEYLBL={fwd:'เดินหน้า',back:'ถอยหลัง',left:'เลี้ยวซ้าย',right:'เลี้ยวขวา',brake:'เบรก',
  w1:'ปืนหลัก',w2:'ปืนรอง',w3:'ATGM',ammo:'สลับกระสุน',scan:'สแกน (กดค้าง)',lock:'ล็อกเป้า',
- smoke:'ควัน',use:'ใช้งาน',ext:'ดับเพลิง',map:'แผนที่ใหญ่',pax:'ทหาร ลง/ขึ้นรถ (IFV)',cmdF:'สั่ง: ตามฉัน',cmdA:'สั่ง: บุกจุดที่ชี้',cmdH:'สั่ง: ตั้งรับตรงนี้',cmdT:'สั่ง: ยิงเป้าเดียวกัน',cmdX:'สั่ง: ยกเลิก',quit:'ออกจากการรบ'};
+ smoke:'ควัน',use:'ใช้งาน',ext:'ดับเพลิง',map:'แผนที่ใหญ่',pax:'ทหาร ลง/ขึ้นรถ (IFV)',cmdF:'สั่ง: ตามฉัน',cmdA:'สั่ง: บุกจุดที่ชี้',cmdH:'สั่ง: ตั้งรับตรงนี้',cmdT:'สั่ง: ยิงเป้าเดียวกัน',cmdX:'สั่ง: ยกเลิก',skill:'สกิลพิเศษประจำรุ่น',rwsAm:'AbramsX: สลับกระสุน 30mm AP/HE',quit:'ออกจากการรบ'};
 var BUFFS=[
  {k:'heal',ico:'❤️',n:'ซ่อมด่วน',d:'ฟื้นพลังชีวิต 45%',w:10},
  {k:'healF',ico:'🛠️',n:'ซ่อมเต็มคัน',d:'ฟื้นเต็ม + ซ่อมโมดูล/ลูกเรือ',w:4},
@@ -1495,6 +1510,9 @@ function loadSave(){
   if(!tb||!tb[d.build[c]])d.build[c]=D.build[c];}
  if(['low','med','high'].indexOf(d.gfx)<0)d.gfx='med';
  if(d.plat!=='pc'&&d.plat!=='mb')d.plat=D.plat;
+ /* ย้ายปุ่มสั่งการลูกน้องจาก Z/V/B/N/H → 4-8 (V = สกิลพิเศษ) */
+ if(d.keys){var OK={cmdF:'z',cmdA:'v',cmdH:'b',cmdT:'n',cmdX:'h'};for(var o in OK)if(d.keys[o]===OK[o])d.keys[o]=DEFKEYS[o];
+  ['skill','rwsAm'].forEach(function(a){if(!d.keys[a]){for(var q in d.keys)if(d.keys[q]===DEFKEYS[a])d.keys[q]='';d.keys[a]=DEFKEYS[a];}});}
  return d;}
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV));}catch(e){}}
 var SV=loadSave();
@@ -1565,7 +1583,7 @@ function calc(b,tune,crewBonus,crewSrc){
  var loadMul=al.crew>0?1:(1/ld);
  var rel=gn.rel*al.rel*(1-tune.load*.026)*loadMul/cmdA*(ch.cls==='heavy'?1.06:1);
  var apsT=1+tune.aps*.03;
- return{
+ var R={
   b:b,cls:ch.cls,sty:ch.sty,isIFV:isIFV,name:ch.n,W:+W.toFixed(1),pw:+pw.toFixed(1),turbo:en.turbo,
   hp:Math.round(ch.hp*(1+tune.hull*.024)*(1+(ar.m-1)*.16)),
   ar:{hf:Math.round(ch.ar.hf*armM+ad.fs),hs:Math.round(ch.ar.hs*armM+ad.ss),
@@ -1594,7 +1612,7 @@ function calc(b,tune,crewBonus,crewSrc){
   apsHs:clamp((aH.shell||0)*apsT,0,.9),apsHrate:aH.rate||2,
   fireCh:en.fire*(1-tune.fire*.08),scanSp:rd*fc.aim*cmdA,zoom:fc.zoom,skin:b.skin,
   cost:ch.cost+gn.cost+al.cost+sc.cost+at.cost+fc.cost+ar.cost+ad.cost+en.cost+tk.cost+
-   lw.cost+sm.cost+aS.cost+aH.cost};}
+   lw.cost+sm.cost+aS.cost+aH.cost};perkApply(R,b);return R;}
 function tuneUsed(){var t=0;for(var k in SV.tune)t+=SV.tune[k];return t;}
 
 /* ═══════ NAV ═══════ */
@@ -2408,6 +2426,16 @@ var MB3={
           กล่องกล้องผู้บังคับการทรงสูง (ขวา) · กล้องพลยิง (ซ้าย) · ท่อควัน 4 รู · Trophy ข้างหลังคา · เสาอากาศท้ายขวา
     ตัวถัง: หน้าลาดแบน แผ่นล่างหน้าเอียงชัน · กระโปรง 6 แผ่น (ลายสามเหลี่ยมดำ) · กล่องบังโคลนหน้า/ท้าย · ตะแกรงท้าย */
  ABX:{h:[.4,.03,.03,.2,.9],tuH:.72,hh:1.23,g0:1.55,
+  rwsDraw:function(C,g){var t=C.t,T=C.TR,z=C.hH,h=C.tuH,ax=.003344*T,ay=.004188*T,gr='#6f7474',px=-75*ax,ta=C.ta;
+   function B(x0,x1,y0,y1,za,zb,col,o,df,dr,ds){r3box(x0*ax,x1*ax,y0*ay,y1*ay,za,zb,col,o,df,dr,ds);}
+   g.save();g.translate(Math.cos(ta)*px,Math.sin(ta)*px);r3begin(C.isPrev||t.rwsA===undefined?ta:t.rwsA,C.K,C.cam,C.sm);
+   r3cyl(0,0,T*.1,z+h,z+h+4.6,gr,{},8);B(-100,100,-90,90,z+h+4.6,z+h+9.4,C.bc,{cam:1},T*.06,T*.04,T*.03);
+   B(-45,30,95,185,z+h+5,z+h+9,'#5f6364',{},T*.04,0,0);glass(28*ax,33*ax,105*ay,175*ay,z+h+6.4,z+h+8.4);
+   B(90,330,10,26,z+h+9.6,z+h+10.6,'#2b2e2f',{});B(-95,115,-135,-90,z+h+4.6,z+h+7.6,t.rwsHE?'#9a6a4a':'#8a8e8e',{});
+   r3cyl(-35*ax,-65*ay,T*.07,z+h+9.4,z+h+12.4,gr,{},6);r3cyl(0,-20*ay,T*.07,z+h+10.6,z+h+12.6,gr,{},6);
+   if(t.rwsFl>0)B(330,365,4,32,z+h+9.3,z+h+10.9,'#ffd27a',{ns:1});
+   if(t.rwsOH>0&&GFX.glow){B(150,330,8,28,z+h+10.6,z+h+10.7,'#ff5a2a',{ns:1});}
+   r3flush(g);g.restore();},
   side:function(C,s){var L=C.L,W=C.W,tw=C.tw,hH=C.hH,trH=C.trH,bc=C.bc,hv=C.b.add==='x2'||C.b.add==='x3'||C.b.arm==='c3',th=hv?3.2:2,Wt=W+tw+.4,yo=Wt+.3,y=yr(s,yo-th,yo),i;
    var X=function(u){return L-u*2*L;},n=6,x0=X(.03),pw=(X(.03)-X(.8))/n,zb=hH*.5,zt=hH*1.0;
    for(i=0;i<n;i++){var xa=x0-(i+1)*pw+.3,xb=x0-i*pw-.3,zf=i===0?hH*.78:zb;
@@ -2435,10 +2463,7 @@ var MB3={
    /* กล้องพลยิง (ซ้าย) + ฝา */
    Bx(600,720,Mi(310),Mi(160),z+h-.2,z+h+4.4,bc,{cam:1},T*.05,T*.02,T*.03);var gE=P(604,Mi(290)),gF=P(604,Mi(180));glass(gE[0]-.6,gE[0],gE[1],gF[1],z+h+2.4,z+h+3.8);var h2=P(680,535);r3cyl(h2[0],h2[1],T*.11,z+h-.2,z+h+1.1,bc,{cam:1},8);
    /* RWS 30mm บนเสา + กล้องเล็ง + ท่อกระสุนโค้ง + กล่องกระสุน */
-   var pd=P(850,390);r3cyl(pd[0],pd[1],T*.1,z+h,z+h+4.6,gr,{},8);
-   Bx(750,950,300,480,z+h+4.6,z+h+9.4,bc,{cam:1},T*.06,T*.04,T*.03);Bx(820,895,205,295,z+h+5,z+h+9,'#5f6364',{},T*.04,0,0);var gS=P(822,215),gT=P(822,285);glass(gS[0]-.5,gS[0],gT[1],gS[1],z+h+6.4,z+h+8.4);
-   Bx(520,760,364,380,z+h+9.6,z+h+10.6,'#2b2e2f',{});Bx(735,945,480,525,z+h+4.6,z+h+7.6,'#8a8e8e',{});
-   var ch=P(885,455);r3cyl(ch[0],ch[1],T*.07,z+h+9.4,z+h+12.4,gr,{},6);var ch2=P(850,410);r3cyl(ch2[0],ch2[1],T*.07,z+h+10.6,z+h+12.6,gr,{},6);
+   /* (RWS วาดแยกใน rwsDraw — หมุนเล็งเองได้) */
    /* แผงเก็บของข้างหลังคา + โดมเซนเซอร์มุมหน้า + เสาอากาศท้ายขวา */
    [[60,130],[Mi(130),Mi(60)]].forEach(function(r){Bx(620,830,r[0],r[1],z+h-.3,z+h+1.4,bc,{cam:1},0,0,T*.02);});
    [[450,75],[450,705]].forEach(function(q){var p=P(q[0],q[1]);r3cyl(p[0],p[1],T*.07,z+h*.8,z+h+1.5,dk,{},6);});
@@ -2656,7 +2681,7 @@ function drawTankBody(g,t,time,isPrev,lod){
  var yA=-(W+tw*.5-1),yB=W+tw*.5-1,ca=Math.cos(a),farY=yA*ca<yB*ca?yA:yB,nearY=farY===yA?yB:yA,off=t.trkOff||0,nearS=nearY<0?-1:1;
  var tdmg=!!(t.mod&&t.mod.trk>0);C.nearS=nearS;TPW=typeof bc==='string'&&bc.charAt(0)==='#'?bc:null;
  trackPrism(g,a,farY,L,tw,trH,K,farY<0?-off:off,M.wheels,M.trkC,tdmg,lod,b.trk);
- var sm=!!X&&!lod&&GFX.q!=='low'&&typeof Path2D!=='undefined';r3begin(a,K,cam,sm);hullGen(C,MD?MD.h:(SLP[sty]||SLP.classic).h,deckPostGen(C),glPostGen(C));
+ var sm=!!X&&!lod&&GFX.q!=='low'&&typeof Path2D!=='undefined';C.cam=cam;C.sm=sm;r3begin(a,K,cam,sm);hullGen(C,MD?MD.h:(SLP[sty]||SLP.classic).h,deckPostGen(C),glPostGen(C));
  if(b.add==='x1'||b.add==='x3')frontPlate(C);if(MD&&MD.hull)MD.hull(C);sideBuild(C,-nearS);r3flush(g);
  trackPrism(g,a,nearY,L,tw,trH,K,nearY<0?-off:off,M.wheels,M.trkC,tdmg,lod,b.trk);
  r3begin(a,K,cam,sm);sideBuild(C,nearS);r3flush(g);
@@ -2685,7 +2710,7 @@ function drawTankBody(g,t,time,isPrev,lod){
  else{turGen(C,(SLP[sty]||SLP.classic).t,turPostGen(C));turArm3(C,b.arm,false);var mw=M.BW*1.5;r3box(TR*.86,TR*1.32,-mw,mw,hH+tuH*.22,hH+tuH*.86,col.dk,{},TR*.1,0,0);}
  if(b.add==='x4'&&b.ch!=='T90'){var y0=TR*1.08,z1=hH+tuH,S=[];[-1,1].forEach(function(sd){for(var k=0;k<2;k++){var zz=hH+tuH*(.25+k*.6);S.push(-TR*.2,sd*y0,zz,-TR*1.7,sd*y0,zz);}for(var x=-TR*.2;x>=-TR*1.7;x-=3)S.push(x,sd*y0,hH+tuH*.25,x,sd*y0,hH+tuH*.85);});
   r3lines(S,'rgba(58,64,48,.95)',.85);}
- r3flush(g);g.restore();
+ r3flush(g);if(MD&&MD.rwsDraw)MD.rwsDraw(C,g);g.restore();
  if(!back)barrel();
  if(rcj>0)g.restore();}
 /* ลำกล้องรุ่นจริง: ปลอกกันร้อน · MRS ปากลำกล้อง · ปากลำกล้องรูพรุน (AbramsX) · ปลายหนา (T-90M) */
@@ -3098,6 +3123,7 @@ function mkTank(x,y,st,team,opt){opt=opt||{};
   ws:pick(WSPOTS),wsShown:false,known:false,marked:false,hunt:null,huntT:0,
   see:false,seeT:null,seeP:0,lastKX:x,lastKY:y,lostT:0,revealT:0,lasing:0,losT:rnd(0,.25),
   smkN:st.smkN,smkCd:0,apsCh:st.apsHc,apsCd:0,resupT:0,
+  drn:SKD.drnMax,drnCd:0,drnRl:0,rwsMode:0,rwsHE:false,rwsHeat:0,rwsOH:0,rwsCd:0,rwsFl:0,rwsA:opt.a||0,apsRg:0,cloakT:0,cloakCd:0,
   nS:900,nA:opt.na!==undefined?opt.na:(st.atDmg?6:0),
   ammo:{},racks:{r1:0,r2:0,r3:0,car:0,bus:0},aimErr:0,sepX:0,sepY:0};
  var cap=st.ammoCap;
@@ -3166,7 +3192,7 @@ function updSpot(e,dt){
  if(recompute)e.losT=.22+Math.random()*.12;
  var foes=enemyOf(e.team),best=null,bd=1e9;
  for(var i=0;i<tanks.length;i++){var o=tanks[i];
-  if(o.dead||foes.indexOf(o.team)<0)continue;
+  if(o.dead||foes.indexOf(o.team)<0||o.cloakT>0)continue;
   var d=hyp(o.x-e.x,o.y-e.y);if(d<bd){bd=d;best=o;}}
  if(!best){e.see=false;e.seeT=null;return;}
  var tgt=best,d=bd,view=e.st.view*(FL.on?1.5:1);
@@ -3411,7 +3437,7 @@ function crewOut(t){var a=crewAlive(t);return t.crew.length<=3?a===0:a<2;}
 function crewKO(t){if(t.dead||t.hp<=0)return;t.hp=-1;t.crewKO=true;if(t.team===0)addLog('💀 ลูกเรือหมดสภาพ','r');}
 /* ── เรขาคณิต ── */
 /* จุดหมุนป้อม (บางรุ่นอยู่หลังกึ่งกลางตัวรถ) */
-function rgO(t){var o=mdl(t.b).tox||0;return o?[Math.cos(t.a)*o,Math.sin(t.a)*o]:[0,0];}
+function rgO(t){if(!t.b)return[0,0];var o=mdl(t.b).tox||0;return o?[Math.cos(t.a)*o,Math.sin(t.a)*o]:[0,0];}
 function toLoc(t,a,x,y){var c=Math.cos(-a),s=Math.sin(-a),dx=x-t.x,dy=y-t.y;return[dx*c-dy*s,dx*s+dy*c];}
 function rotV(a,x,y){var c=Math.cos(a),s=Math.sin(a);return[x*c-y*s,x*s+y*c];}
 function polySg(p){var ar=0;for(var i=0;i<p.length;i++){var a=p[i],b=p[(i+1)%p.length];ar+=a[0]*b[1]-b[0]*a[1];}return ar>0?1:-1;}
@@ -3446,7 +3472,10 @@ function plateEff(t,g,dx,dy,A,s,dry){var ar=t.st.ar;
  var T=g.fr==='t'?(g.pl==='f'?ar.tf:g.pl==='s'?ar.ts:ar.tr):(g.pl==='f'?ar.hf:g.pl==='s'?ar.hs:ar.hr);
  if(t.team===0)T*=runBuff.armor;var ws=false;
  if(t.ws&&(t.ws.turret?g.fr==='t':g.fr==='h')){var wp=wsPos(t);if(hyp(g.x-wp.x,g.y-wp.y)<16){T*=t.ws.mul;ws=true;}}
- var cs=clamp(-(dx*g.n[0]+dy*g.n[1]),0,1),th=Math.acos(cs)*57.2958,cal=s.cal||0;
+ var cs=clamp(-(dx*g.n[0]+dy*g.n[1]),0,1),cal=s.cal||0;
+ /* โจมตีจากด้านบน (โดรน) = หลังคาบาง ตั้งฉาก */
+ if(s.top){T=Math.min(T,(g.fr==='t'?ar.tr:ar.hr)*.55);cs=Math.max(cs,.9);}
+ var th=Math.acos(cs)*57.2958;
  var ke=s.kind!==2&&!A.eraW&&!A.splash,om=ke&&cal>=T*3;
  var eff=T*(om?1+(1/Math.max(cs,.17)-1)*.25:Math.pow(1/Math.max(cs,.17),A.slope));
  var chem=(A.eraW||s.kind===2),era=false;
@@ -3491,7 +3520,7 @@ function innerPath(t,x,y,dx,dy,A,s,over,mainOn){var cs=clamp((s.cal||75)/90,.5,1
    if(e.k==='eng'&&Math.random()<(r.main?t.st.fireCh:t.st.fireCh*.3))out.fire='เครื่องยนต์';}});
  return out;}
 /* ── ผลการยิงหนึ่งนัด (จริง) ── */
-function hitTank(s,t,step){var A=AMMOT[s.ammo]||AMMOT.ap,sl=hyp(s.vx,s.vy)||1,dx=s.vx/sl,dy=s.vy/sl;
+function hitTank(s,t,step){if(t.cloakT>0)return null;var A=AMMOT[s.ammo]||AMMOT.ap,sl=hyp(s.vx,s.vy)||1,dx=s.vx/sl,dy=s.vy/sl;
  if(s.zH===undefined)s.zH=Math.random();
  var g=geoHit(t,s.x-dx*60,s.y-dy*60,dx,dy,s.zH,61);if(!g)return null;
  var isPT=t.team===0,dist=P?hyp(t.x-P.x,t.y-P.y):0,R={x:g.x,y:g.y,mods:[],crew:[],zone:'',dmg:0};
@@ -3927,7 +3956,7 @@ function moveTank(t,dt){
  if(t.secCd2>0)t.secCd2-=dt;
  if(t.atCd>0)t.atCd-=dt;
  if(t.smkCd>0)t.smkCd-=dt;
- if(t.apsCd>0)t.apsCd-=dt;
+ if(t.apsCd>0)t.apsCd-=dt;skillTick(t,dt);
  if(t.hitFlash>0)t.hitFlash-=dt;
  if(t.revealT>0)t.revealT-=dt;
  if(t.st.mag&&t.rl<=0&&t.mag<=0)t.mag=t.st.mag;
@@ -4396,6 +4425,7 @@ function update(dt){
  /* ── กระสุน ── */
  for(var i=shots.length-1;i>=0;i--){var s=shots[i];
   if(s.kind===2){
+   if(s.drone){droneSeek(s);var dl=s.lock?hyp(s.lock.x-s.x,s.lock.y-s.y):999;s.alt=s.arm>0?Math.min(26,(s.alt||0)+dt*70):Math.min(26,Math.max(2,dl/140*26));}
    if(s.arm>0)s.arm-=dt;
    else{
     var tgt=null;
@@ -4435,7 +4465,7 @@ function update(dt){
     if(t.st.apsHc&&dd<t.st.apsHr&&dd>34&&apsTryIntercept(t,s)){shots.splice(i,1);hit=true;break;}}
    if(hit)break;
    /* โครงสร้าง */
-   for(var j=0;j<structs.length;j++){var st2=structs[j];
+   for(var j=0;j<structs.length&&!s.drone;j++){var st2=structs[j];
     if(st2.dead)continue;
     var oside=(s.own.team===1)?1:0;
     if(st2.team===oside)continue;
@@ -4445,7 +4475,7 @@ function update(dt){
       $('hSub').textContent='โจมตี HQ −'+Math.round(dm);
      shots.splice(i,1);hit=true;break;}}
    if(hit)break;
-   if(blocked(s.x,s.y)){SFX.at(s.x,s.y).ric();burst(s.x,s.y,Math.round(8*GFX.parts),'#b9a98a');
+   if(!s.drone&&blocked(s.x,s.y)){SFX.at(s.x,s.y).ric();burst(s.x,s.y,Math.round(8*GFX.parts),'#b9a98a');
     if(s.kind===2)burst(s.x,s.y,Math.round(18*GFX.parts),'#ff8a4c');
     shots.splice(i,1);hit=true;break;}
    for(var j=0;j<tanks.length;j++){var t=tanks[j];
@@ -4522,7 +4552,7 @@ function update(dt){
  /* ── HUD ── */
  if(P&&!SPEC.on){var hr=clamp(P.hp/P.mhp,0,1);
   $('bHP').style.width=(hr*100)+'%';$('tHP').textContent=Math.round(hr*100)+'%';
-  $('bRL').style.width=(P.rl>0?(1-P.rl/Math.max(P.st.rel,.1))*100:100)+'%';
+  $('bRL').style.width=(P.rl>0?(1-P.rl/Math.max(P.st.rel,.1))*100:100)+'%';skillHUD();
   $('bAim').style.width=Math.round(clamp(P.aim,0,1)*100)+'%';
   $('tSpot').innerHTML=P.marked?'<span style="color:#e0603c">🚨 ล้ำเขต — ถูก Mark!</span>':
    (anySee()?'<span style="color:#e0603c">👁 ถูกตรวจพบ!</span>':
@@ -4653,7 +4683,7 @@ function endGame(victory){
 /* ═══════ RENDER ═══════ */
 function drawTank(t,time,lod){
  if(t.gone)return;
- cx.save();cx.translate(t.x-cam.x,t.y-cam.y);drawTankBody(cx,t,time,false,lod);cx.restore();
+ cx.save();cx.translate(t.x-cam.x,t.y-cam.y);if(t.cloakT>0)cx.globalAlpha=(t.team===0||SPEC.on)?.38:.1;drawTankBody(cx,t,time,false,lod);cx.restore();
  if(t.dead)return;
  var hr=clamp(t.hp/t.mhp,0,1),M=mdl(t.b),bx=t.x-cam.x,by=t.y-cam.y-(M.L+15)-tankTopZ(t)*VK*.6;
  cx.fillStyle='#00000090';cx.fillRect(bx-26,by,52,6);
@@ -6289,6 +6319,100 @@ function tkTick(dt){if(!FL.tk)return;var c=[0,0],i;FL.own.forEach(function(o){if
 function tkHUD(){if(!FL.tk)return '';var a=Math.ceil(FL.tk[0]),b=Math.ceil(FL.tk[1]),f0=a/FL.tk0*100,f1=b/FL.tk0*100;
  return '<div class="tkRow"><b class="sb">'+(FL.col[0]?'💀 ':'')+a+'</b><span class="tkBar"><i style="width:'+f0.toFixed(0)+'%;background:#4fa0e0"></i></span><span style="color:#93a181;font-size:9.5px">กำลังพล</span><span class="tkBar r"><i style="width:'+f1.toFixed(0)+'%;background:#e05a3c"></i></span><b class="sr">'+b+(FL.col[1]?' 💀':'')+'</b></div>'+
   ((FL.btT[0]>0||FL.btT[1]>0)?'<div style="color:#ffd27a;font-size:10px">⚡ '+(FL.btT[0]>0?(SPEC.on?'น้ำเงิน':'เรา'):(SPEC.on?'แดง':'ศัตรู'))+'ทะลวงแนว '+Math.ceil(Math.max(FL.btT[0],FL.btT[1]))+' วิ</div>':'');}
+/* ═══════════════════════════════════════════════════════════
+   สกิลพิเศษ [V] + จุดเด่นประจำรุ่น
+   KF51  : เกราะหนาที่สุด · [V] ปล่อยโดรนพลีชีพ 2 ลำ/ครั้ง (แยกเป้า) คลัง 6 · คูลดาวน์ 5 วิ · หมดคลังรีโหลด 12 วิ
+   ABX   : สมดุล · RWS 30mm กระสุนไม่จำกัด · [V] สลับ อัตโนมัติ (ยิงรถถังใกล้สุด) ↔ ยิงตามศูนย์พร้อมปืนใหญ่ · [T] AP/HE · ร้อนเกิน = ยิงช้า 5 วิ
+   T-14  : เร็วที่สุด · APS Afganit 12 นัด ชาร์จคืน 1 นัด/8 วิ (จรวด/โดรน 100% · กระสุน ≥80mm 50%)
+   LEO   : ปืน/กระสุนดีที่สุด · K2 : บรรจุ 3 วิ · T-90M : ERA 34 ก้อน
+   Stealth-X (รถเบา): [V] ล่องหน 10 วิ ยิงไม่เข้า · คูลดาวน์ 30 วิ
+   ═══════════════════════════════════════════════════════════ */
+var SKD={drnMax:6,drnPer:2,drnCd:5,drnRl:12,rwsRof:.11,rwsRofOH:.34,rwsHeat:4.6,rwsCool:14,rwsOH:5,rwsRange:950};
+function perkApply(R,b){var c=b.ch;R.skill=null;
+ if(c==='LEO'){R.pen=Math.round(R.pen*1.15);R.dmg=Math.round(R.dmg*1.1);R.disp=+(R.disp*.75).toFixed(4);R.shellV=R.shellV*1.12;}
+ if(c==='K2')R.rel=Math.min(R.rel,3);
+ if(c==='T90'){R.eraMax=34;R.heatR=Math.max(R.heatR,2.1);}
+ if(c==='T14'){R.apsHc=Math.max(R.apsHc,12);R.apsHs=Math.max(R.apsHs,.5);R.apsHr=Math.max(R.apsHr,125);R.apsHrate=Math.min(R.apsHrate,.5);R.apsRegen=8;R.acc=+(R.acc*1.3).toFixed(3);}
+ if(c==='KF51')R.skill='drone';
+ if(c==='ABX')R.skill='rws';
+ if(!R.skill&&ADDONS[b.add]&&ADDONS[b.add].cloak)R.skill='cloak';}
+function skMsg(t,m,c){if(t===P&&!SPEC.on){toast(m);if(c)addLog(m,c);}}
+function useSkill(t){if(!t||t.dead||!G.run)return;var s=t.st;
+ if(s.skill==='drone')return launchDrones(t);
+ if(s.skill==='rws'){t.rwsMode=t.rwsMode?0:1;skMsg(t,t.rwsMode?'🎯 30mm: ยิงตามศูนย์พร้อมปืนใหญ่':'🤖 30mm: ยิงอัตโนมัติ (รถถังใกล้สุด)','b');if(t===P)SFX.ui(true);return;}
+ if(s.skill==='cloak'){if(t.cloakCd>0){skMsg(t,'ล่องหนยังคูลดาวน์ '+Math.ceil(t.cloakCd)+' วิ');return;}
+  t.cloakT=10;t.cloakCd=40;skMsg(t,'🫥 ล่องหน 10 วิ — ยิงไม่เข้า','g');burst(t.x,t.y,Math.round(18*GFX.parts),'#9fe0ff');return;}
+ if(t===P&&!SPEC.on){var pk={LEO:'Leopard: ปืนและกระสุนดีที่สุด (ไม่มีสกิลกด)',K2:'K2: บรรจุอัตโนมัติ 3 วิ (ไม่มีสกิลกด)',T90:'T-90M: ERA 34 ก้อน (ไม่มีสกิลกด)',T14:'T-14: APS ทำงานเองอัตโนมัติ'}[t.b.ch];toast(pk||'รถคันนี้ไม่มีสกิลพิเศษ');}}
+function rwsAmmo(t){if(!t||t.dead||t.st.skill!=='rws')return;t.rwsHE=!t.rwsHE;skMsg(t,t.rwsHE?'💥 30mm: กระสุน HE':'🔩 30mm: กระสุน AP','b');if(t===P)SFX.ui(true);}
+/* ── โดรนพลีชีพ (KF51) ── */
+function skFoes(t){var f=enemyOf(t.team),out=[];for(var i=0;i<tanks.length;i++){var o=tanks[i];if(!o.dead&&f.indexOf(o.team)>=0&&!(o.cloakT>0))out.push(o);}return out;}
+function launchDrones(t){
+ if(t.drn<=0){skMsg(t,'โดรนหมด — รีโหลด '+Math.ceil(t.drnRl)+' วิ');return;}
+ if(t.drnCd>0){skMsg(t,'โดรนคูลดาวน์ '+Math.ceil(t.drnCd)+' วิ');return;}
+ var foes=skFoes(t).filter(function(o){return hyp(o.x-t.x,o.y-t.y)<2200;}).sort(function(a,b){return hyp(a.x-t.x,a.y-t.y)-hyp(b.x-t.x,b.y-t.y);});
+ if(t===P&&G.lock&&!G.lock.dead){foes=foes.filter(function(o){return o!==G.lock;});foes.unshift(G.lock);}
+ else if(t!==P&&t.seeT&&!t.seeT.dead){foes=foes.filter(function(o){return o!==t.seeT;});foes.unshift(t.seeT);}
+ var n=Math.min(SKD.drnPer,t.drn),ro=rgO(t),M=mdl(t.b),bx=t.x+ro[0]-Math.cos(t.ta)*M.TR*.9,by=t.y+ro[1]-Math.sin(t.ta)*M.TR*.9;
+ for(var i=0;i<n;i++){var tg=foes.length?foes[i%foes.length]:null,a=t.ta+(i?.5:-.5);
+  shots.push({x:bx,y:by,a:a,vx:Math.cos(a)*2,vy:Math.sin(a)*2,dmg:380,pen:540,ammo:'heat',own:t,kind:2,drone:1,top:1,gen:3,turn:3.4,spd:5.4,seek:2600,lock:tg,arm:.55,
+   life:900,col:'#ffcf7a',r:3.6,dist:0,jammed:false,cal:120,alt:0,zH:.2});}
+ t.drn-=n;t.drnCd=SKD.drnCd;if(t.drn<=0)t.drnRl=SKD.drnRl;
+ SFX.at(t.x,t.y).launch();t.revealT=3;
+ skMsg(t,'🛩️ ปล่อยโดรน '+n+' ลำ'+(foes.length>1&&n>1?' (แยกเป้า)':'')+' · เหลือ '+t.drn,'g');}
+function droneSeek(s){if(s.lock&&!s.lock.dead&&!(s.lock.cloakT>0))return;var f=skFoes(s.own),best=null,bd=s.seek;
+ for(var i=0;i<f.length;i++){var o=f[i],d=hyp(o.x-s.x,o.y-s.y);if(d<bd){bd=d;best=o;}}s.lock=best;if(best)triggerLWS(best,s.x,s.y,1);}
+function drawDrone(s,sx,sy){var alt=s.alt||0;
+ cx.save();cx.globalAlpha=.28;cx.fillStyle='#000';cx.beginPath();cx.ellipse(sx+alt*.25,sy+alt*.15,7,4,0,0,6.2832);cx.fill();cx.restore();
+ cx.save();cx.translate(sx,sy-SHZ-alt);cx.rotate(s.a);cx.fillStyle='#3a3f36';cx.strokeStyle='#14170f';cx.lineWidth=1;
+ cx.beginPath();cx.moveTo(9,0);cx.lineTo(-6,-2.2);cx.lineTo(-6,2.2);cx.closePath();cx.fill();cx.stroke();
+ cx.fillRect(-1,-8,3.4,16);cx.strokeRect(-1,-8,3.4,16);cx.fillRect(-7,-4.5,2.4,9);
+ cx.fillStyle=s.own&&s.own.team===1?'#ff6a4a':'#7fe0ff';cx.fillRect(7,-.8,1.6,1.6);
+ if(GFX.glow){cx.globalCompositeOperation='lighter';cx.globalAlpha=.6;cx.fillStyle='#ffb060';cx.beginPath();cx.arc(-7,0,2.2,0,6.2832);cx.fill();}
+ cx.restore();}
+/* ── RWS 30mm (AbramsX) ── */
+function rwsPivot(t){var M=mdl(t.b),ro=rgO(t),px=-75*.003344*M.TR;return[t.x+ro[0]+Math.cos(t.ta)*px,t.y+ro[1]+Math.sin(t.ta)*px];}
+function rwsTarget(t){var f=skFoes(t),p=rwsPivot(t),best=null,bd=SKD.rwsRange;
+ for(var i=0;i<f.length;i++){var o=f[i],d=hyp(o.x-p[0],o.y-p[1]);if(d<bd){if(!losClear(t,o))continue;bd=d;best=o;}}return best;}
+function ownerFiring(t){if(t===P&&!SPEC.on)return (mouse.down&&PLAT==='pc')||!!G.mobFire;
+ return !!(t.see&&t.seeT&&!t.seeT.dead&&Math.abs(angD(t.ta,Math.atan2(t.seeT.y-t.y,t.seeT.x-t.x)))<.1&&hyp(t.seeT.x-t.x,t.seeT.y-t.y)<1200);}
+function rwsTick(t,dt){
+ if(t.rwsOH>0){t.rwsOH-=dt;if(t.rwsOH<=0){t.rwsHeat=30;skMsg(t,'❄️ 30mm เย็นลงแล้ว');}}
+ else t.rwsHeat=Math.max(0,t.rwsHeat-SKD.rwsCool*dt);
+ if(t.rwsCd>0)t.rwsCd-=dt;if(t.rwsFl>0)t.rwsFl-=dt;
+ var want=t.ta,go=false;
+ if(t.rwsMode===0){t.rwsTT=(t.rwsTT||0)-dt;if(t.rwsTT<=0){t.rwsTT=.3;t.rwsTg=rwsTarget(t);}var tg=t.rwsTg;
+  if(tg&&!tg.dead&&!(tg.cloakT>0)){var p=rwsPivot(t);want=Math.atan2(tg.y-p[1],tg.x-p[0]);go=Math.abs(angD(t.rwsA,want))<.07;}}
+ else go=ownerFiring(t);
+ t.rwsA+=clamp(angD(t.rwsA,want),-4.5*dt,4.5*dt);
+ if(go&&t.rwsCd<=0)rwsFire(t);}
+function rwsFire(t){var oh=t.rwsOH>0,he=!!t.rwsHE,M=mdl(t.b),p=rwsPivot(t),a=t.rwsA+rnd(-.022,.022),ml=330*.003344*M.TR,c=Math.cos(t.rwsA),sn=Math.sin(t.rwsA),oy=18*.004188*M.TR;
+ var x=p[0]+c*ml-sn*oy,y=p[1]+sn*ml+c*oy;
+ shots.push({x:x,y:y,a:a,vx:Math.cos(a)*14,vy:Math.sin(a)*14,dmg:he?62:40,pen:he?16:74,ammo:he?'he':'ap',own:t,kind:1,life:72,
+  col:he?'#ffb070':(t.team===1?'#ff9a7a':'#ffe8a0'),r:2.4,dist:0,cal:30,rws:1});
+ t.rwsCd=oh?SKD.rwsRofOH:SKD.rwsRof;t.rwsFl=.05;t.revealT=Math.max(t.revealT,1.5);
+ var d=P?hyp(t.x-P.x,t.y-P.y):0;if(t===P||d<1400)SFX.at(x,y).mg(30,t===P?0:d);
+ for(var k=0;k<Math.round(3*GFX.parts);k++)parts.push({x:x,y:y-SHZ-10,vx:Math.cos(a+rnd(-.5,.5))*rnd(1,5),vy:Math.sin(a+rnd(-.5,.5))*rnd(1,5),l:rnd(.06,.2),ml:.2,c:'#ffd27a',r:rnd(1.5,3.5),gl:1});
+ if(!oh){t.rwsHeat+=SKD.rwsHeat;if(t.rwsHeat>=100){t.rwsHeat=100;t.rwsOH=SKD.rwsOH;skMsg(t,'🔥 30mm ร้อนเกิน — ยิงช้า 5 วิ','r');}}}
+/* ── ต่อรถหนึ่งคันต่อเฟรม ── */
+function skillTick(t,dt){var s=t.st;
+ if(t.drnCd>0)t.drnCd-=dt;if(t.drn<=0&&s.skill==='drone'){t.drnRl-=dt;if(t.drnRl<=0){t.drn=SKD.drnMax;skMsg(t,'🛩️ โดรนพร้อม 6 ลำ','g');}}
+ if(s.apsRegen&&t.apsCh<s.apsHc){t.apsRg=(t.apsRg||0)+dt;if(t.apsRg>=s.apsRegen){t.apsRg=0;t.apsCh++;}}else t.apsRg=0;
+ if(t.cloakT>0)t.cloakT-=dt;if(t.cloakCd>0&&!(t.cloakT>0))t.cloakCd-=dt;
+ if(s.skill==='rws'&&!t.dead)rwsTick(t,dt);
+ /* AI ใช้สกิลเอง */
+ if(t!==P||SPEC.on){
+  if(s.skill==='drone'&&t.drn>0&&t.drnCd<=0&&t.see&&t.seeT&&!t.seeT.dead&&hyp(t.seeT.x-t.x,t.seeT.y-t.y)<1700&&Math.random()<dt*.8)launchDrones(t);
+  if(s.skill==='cloak'&&t.cloakCd<=0&&t.hp<t.mhp*.45&&Math.random()<dt*.5)useSkill(t);
+  if(s.skill==='rws'&&t.rwsMode!==0)t.rwsMode=0;}}
+/* ── แถบสถานะสกิลบน HUD ── */
+function skillHUD(){if(!P||!$('n5'))return;var s=P.st,t=P,h='—',on=false;
+ if(s.skill==='drone'){h=t.drn>0?('โดรน '+t.drn+(t.drnCd>0?' · '+Math.ceil(t.drnCd)+'s':'')):('รีโหลด '+Math.ceil(t.drnRl)+'s');on=t.drn>0&&t.drnCd<=0;}
+ else if(s.skill==='rws'){h=(t.rwsMode?'ตามศูนย์':'อัตโนมัติ')+' · '+(t.rwsHE?'HE':'AP')+' · '+(t.rwsOH>0?'🔥'+Math.ceil(t.rwsOH)+'s':Math.round(t.rwsHeat)+'°');on=t.rwsOH<=0;}
+ else if(s.skill==='cloak'){h=t.cloakT>0?('ล่องหน '+Math.ceil(t.cloakT)+'s'):t.cloakCd>0?('คูลดาวน์ '+Math.ceil(t.cloakCd)+'s'):'ล่องหน พร้อม';on=t.cloakCd<=0;}
+ else if(s.apsRegen){h='APS '+t.apsCh+'/'+s.apsHc+(t.apsCh<s.apsHc?' · '+Math.ceil(s.apsRegen-(t.apsRg||0))+'s':'');on=t.apsCh>0;}
+ else h={LEO:'ปืนเยี่ยม',K2:'บรรจุ 3 วิ',T90:'ERA '+t.eraLeft+'/34'}[t.b.ch]||'—';
+ var el=$('n5');if(el.textContent!==h)el.textContent=h;$('ab5').classList.toggle('no',!s.skill&&!s.apsRegen&&!{LEO:1,K2:1,T90:1}[t.b.ch]);$('ab5').classList.toggle('rdy',on);
+ document.body.classList.toggle('pabx',s.skill==='rws');document.body.classList.toggle('pskill',!!s.skill);}
 function render(){
  var w=innerWidth,h=innerHeight,time=G.t,m=MAPS[G.map];
  var sx=G.shake?rnd(-G.shake,G.shake):0,sy=G.shake?rnd(-G.shake,G.shake):0;
@@ -6351,6 +6475,7 @@ function render(){
  for(var i=0;i<shots.length;i++){var s=shots[i];
   var sxp=s.x-cam.x,syp=s.y-cam.y;
   if(sxp<-60||sxp>w+60||syp<-60||syp>h+60)continue;
+  if(s.drone){drawDrone(s,sxp,syp);continue;}
   cx.save();cx.translate(sxp,syp-SHZ);cx.rotate(s.a);
   cx.globalCompositeOperation='lighter';cx.globalAlpha=.55;var gs2=Math.min(s.r*3.6,14);cx.drawImage(glowSpr(s.col),-gs2*1.6,-gs2,gs2*3.2,gs2*2);cx.globalAlpha=1;cx.globalCompositeOperation='source-over';
   cx.fillStyle=s.col;if(GFX.glow){cx.shadowColor=s.col;cx.shadowBlur=12;}
@@ -6594,7 +6719,8 @@ addEventListener('keydown',function(e){
  if(k===SV.keys.smoke)dropSmoke();
  if(k===SV.keys.use)useObj();
  if(k===(SV.keys.pax||'g'))paxCmd();
- if(k===(SV.keys.cmdF||'z'))cmdKey('follow');if(k===(SV.keys.cmdA||'v'))cmdKey('attack');if(k===(SV.keys.cmdH||'b'))cmdKey('hold');if(k===(SV.keys.cmdT||'n'))cmdKey('focus');if(k===(SV.keys.cmdX||'h'))cmdKey('cancel');
+ if(k===(SV.keys.cmdF||'4'))cmdKey('follow');if(k===(SV.keys.cmdA||'5'))cmdKey('attack');if(k===(SV.keys.cmdH||'6'))cmdKey('hold');if(k===(SV.keys.cmdT||'7'))cmdKey('focus');if(k===(SV.keys.cmdX||'8'))cmdKey('cancel');
+ if(k===(SV.keys.skill||'v'))useSkill(P);if(k===(SV.keys.rwsAm||'t'))rwsAmmo(P);
  if(k===SV.keys.ext)useExt(P);
  if(k===SV.keys.map){if($('bigmap').classList.contains('on'))closeBigMap();else openBigMap();}
  if(k===SV.keys.quit){if($('bigmap').classList.contains('on'))closeBigMap();else quitBattle();}
@@ -6624,11 +6750,11 @@ function bindStick(padId,knobId,st){
  pad.addEventListener('touchend',end);pad.addEventListener('touchcancel',end);}
 bindStick('stL','knL',joyL);bindStick('stR','knR',joyR);
 function bindFire(id,kind){var el=$(id),held=false,iv=null;
- function on(e){e.preventDefault();SFX.init();SFX.resume();held=true;el.classList.add('dn');
+ function on(e){e.preventDefault();SFX.init();SFX.resume();held=true;el.classList.add('dn');if(kind===0)G.mobFire=true;
   if(G.run&&P&&!P.dead){wSel=kind;updAmmoUI();fire(P,kind);}
   var gap=kind===1?60:(P&&P.st.mag?70:120);
   iv=setInterval(function(){if(held&&G.run&&P&&!P.dead)fire(P,kind);},gap);}
- function off(){held=false;el.classList.remove('dn');if(iv){clearInterval(iv);iv=null;}}
+ function off(){held=false;el.classList.remove('dn');if(kind===0)G.mobFire=false;if(iv){clearInterval(iv);iv=null;}}
  el.addEventListener('touchstart',on,{passive:false});
  el.addEventListener('touchend',off);el.addEventListener('touchcancel',off);
  el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);}
@@ -6638,7 +6764,7 @@ bindFire('bMain',0);bindFire('bAlt',1);bindFire('bMsl',2);
  el.addEventListener('touchstart',on,{passive:false});
  el.addEventListener('touchend',off);el.addEventListener('touchcancel',off);
  el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);})();
-[['bLock',function(){tryLock();}],['bSmk',function(){dropSmoke();}],
+[['bLock',function(){tryLock();}],['bSmk',function(){dropSmoke();}],['bSkill',function(){useSkill(P);}],['bRwsAm',function(){rwsAmmo(P);}],
  ['bExt',function(){useExt(P);}],['bPax',function(){paxCmd();}],['bMap',function(){if($('bigmap').classList.contains('on'))closeBigMap();else openBigMap();}]]
 .forEach(function(a){var el=$(a[0]);if(!el)return;
  function on(e){e.preventDefault();a[1]();}
