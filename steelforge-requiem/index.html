@@ -3511,7 +3511,7 @@ function buildNord(){
    พิกัด u = ความลึกจากชายทะเล (0) ไปจนถึง HQ · x = frX(u) (กลับด้านเมื่อฝ่ายบุกเป็นฝั่งขวา)
    ═══════════════════════════════════════════════════════════ */
 var FRC={len:26000,hw:3200,shore:3000,cliff:6600,cb:85,rampW:320,objU:[4400,7700,13300,18400,22700],hqU:24800,prep:45,limit:20*60,
- capR:[0,780,690,720,760],capT:42,capMax:6,OBN:['หาดยกพลขึ้นบก','แนวสันเขาชายฝั่ง','แนวป้องกันส่วนหน้า','ฐานที่มั่นทางทหาร','แนวรอบกองบัญชาการ'],LET:['A','B','C','D','E']};
+ capR:[0,780,690,720,760],capT:38,capMax:6,OBN:['หาดยกพลขึ้นบก','แนวสันเขาชายฝั่ง','แนวป้องกันส่วนหน้า','ฐานที่มั่นทางทหาร','แนวรอบกองบัญชาการ'],LET:['A','B','C','D','E']};
 var FRS={16:{n:'Small Battle',veh:6,inf:10,tk:500,cr:70000,box:'l'},32:{n:'Medium Battle',veh:10,inf:22,tk:800,cr:100000,box:'l'},
  64:{n:'Large Battle',veh:16,inf:48,tk:1300,cr:140000,box:'l'},128:{n:'Massive Battle',veh:26,inf:102,tk:2000,cr:190000,box:'l'}};
 var frSel={team:'atk',size:32,lvl:4,tod:'dyn'};
@@ -3833,7 +3833,7 @@ function frRampWaves(dt){FR.rwT=(FR.rwT||0)-dt;for(var i=0;i<FR.ramps.length;i++
   for(k=0;k<tanks.length;k++){var t=tanks[k];if(!t.dead&&!t.craft&&teamSide(t.team)===FR.atk&&hyp(t.x-sx,t.y-r2.y)<520)n++;}
   if(inf.length)infNear(sx,r2.y,520,function(q){if(!q.dead&&teamSide(q.team)===FR.atk)ni++;});
   if(n+ni>0)r2.gT=(r2.gT||0)+.5;else r2.gT=0;
-  if(!(r2.goT>0)&&(n>=3||(n>=2&&ni>=4)||(r2.gT>=24&&n+ni>=2))){r2.goT=22;r2.gT=0;r2.waves=(r2.waves||0)+1;
+  if(!(r2.goT>0)&&(n>=2||(n>=1&&ni>=4)||(r2.gT>=12&&n+ni>=1))){r2.goT=35;r2.gT=0;r2.waves=(r2.waves||0)+1;
    if(teamSide(0)===FR.atk&&!SPEC.on&&P&&!P.dead&&hyp(P.x-sx,P.y-r2.y)<1400)addLog('📣 ระลอกบุกขึ้นทางลาด — ไปพร้อมกัน!','b');}}}
 function frRetreat(e){var sd=teamSide(e.team),best=null,bd=1e9,i;for(i=0;i<structs.length;i++){var s=structs[i];if(s.dead||s.k!=='gas')continue;if(sd!==FR.atk&&!zoneHoldOK(sd,s.x))continue;var d=hyp(s.x-e.x,s.y-e.y);if(d<bd){bd=d;best=s;}}
  if(best&&bd<4500)return{x:best.x+Math.cos(e.seed)*120,y:best.y+Math.sin(e.seed)*90};var od=FR.obj[Math.min(FR.next,4)];return{x:frX(od.u+900),y:e.y*.7};}
