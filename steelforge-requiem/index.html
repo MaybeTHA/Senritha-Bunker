@@ -872,12 +872,12 @@ function N(v,kind,t,d,rate){var s=ctx.createBufferSource();s.buffer=NZ[kind||'p'
  var off=Math.random()*(s.buffer.duration-.1);s.start(t,off);s.stop(t+d);if(v)v.src.push(s);return s;}
 function O(v,ty,hz,t,d){var o=ctx.createOscillator();o.type=ty;o.frequency.value=hz;o.start(t);o.stop(t+d);if(v)v.src.push(o);return o;}
 /* ── ตำแหน่ง: ระยะ (ลดเสียง + ทึบลงตามอากาศ) · ซ้าย/ขวา · เสียงมาช้ากว่าแสงเมื่อไกล ── */
-function lis(){if(typeof P!=='undefined'&&P&&!P.dead)return{x:P.x,y:P.y};return{x:cam.x+innerWidth/2,y:cam.y+innerHeight/2};}
+function lis(){var Q=(typeof RC!=='undefined'&&RC&&RC._sv)?RC._sv[0]:(typeof P!=='undefined'?P:null);if(Q&&!Q.dead)return{x:Q.x,y:Q.y};if(typeof RC!=='undefined'&&RC&&RC._sv)return{x:RC._sv[10]+innerWidth/2,y:RC._sv[11]+innerHeight/2};return{x:cam.x+innerWidth/2,y:cam.y+innerHeight/2};}
 function at(x,y){_pos={x:x,y:y,t:performance.now()};return api;}
 function takePos(){var p=_pos;_pos=null;if(!p||performance.now()-p.t>4)return null;return p;}
 /* begin: เริ่มเสียงหนึ่งเสียง → {o: จุดต่อเข้า, t: เวลาเริ่ม, a: ความดังตามระยะ, d: ระยะ, near, own}
    ref = ระยะที่ยังดังเต็ม · delay = เสียงเดินทาง (เฉพาะไกล) */
-function begin(cat,dist,dur,o){o=o||{};var p=takePos();if(!live())return null;
+function begin(cat,dist,dur,o){o=o||{};var p=takePos();if(!live())return null;if(typeof RC!=='undefined'&&RC&&!p)return null;
  var L=lis(),dx=0,d=dist||0;if(p){dx=p.x-L.x;d=Math.hypot(dx,p.y-L.y);}
  var own=d<90,ref=o.ref||420,a=d<=ref?1:Math.pow(ref/d,o.roll||1.15);
  if(o.max&&d>o.max)return null;
@@ -1766,7 +1766,7 @@ function confirmBox(t,b,f){_cbYes=f;
  '<button class="btn" onclick="cbNo()">✕ ยกเลิก</button></div>');}
 function cbOK(){closeModal();var f=_cbYes;_cbYes=null;if(f)f();}
 function cbNo(){closeModal();_cbYes=null;SFX.ui(false);}
-function toast(m){var d=document.createElement('div');
+function toast(m){if(typeof RC!=='undefined'&&RC){humOutbox('toast',m);return;}var d=document.createElement('div');
  d.style.cssText='position:fixed;left:50%;top:13%;transform:translateX(-50%);z-index:99;'+
  'background:#131a10ee;border:1px solid #f0b429;color:#ffd97a;padding:9px 15px;border-radius:9px;'+
  'font-size:13px;box-shadow:0 4px 18px #000;max-width:88%;text-align:center';
@@ -3350,9 +3350,9 @@ var P=null,tanks=[],shots=[],parts=[],trails=[],debris=[],obst=[],marks=[],smoke
 var cam={x:0,y:0},keys={},mouse={x:0,y:0,down:false};
 var wSel=0,aSel='ap',logs=[];
 var runBuff={dmg:1,pen:1,armor:1,hp:1,rel:1,spd:1,acc:1,cvg:1,regen:0,life:0,crew:0,scan:1,stealth:1};
-function addLog(t,c){logs.unshift({t:t,c:c||''});if(logs.length>5)logs.pop();
+function addLog(t,c){if(typeof RC!=='undefined'&&RC){humOutbox('log',t,c);return;}logs.unshift({t:t,c:c||''});if(logs.length>5)logs.pop();
  var h='';logs.forEach(function(l){h+='<div class="lg '+l.c+'">'+l.t+'</div>';});$('hLog').innerHTML=h;}
-function addShake(m,d){G.shake=Math.max(G.shake,m);G.shakeT=Math.max(G.shakeT,d);}
+function addShake(m,d){if(typeof RC!=='undefined'&&RC)return;G.shake=Math.max(G.shake,m);G.shakeT=Math.max(G.shakeT,d);}
 
 /* ── SPATIAL GRID ── */
 var OG={cell:420,m:{},w:0,h:0,x0:0,y0:0};
@@ -4616,6 +4616,34 @@ function drawSeaGlint(xS,ys,n,dir,time){if(GFX.q==='low')return;var T=curTod();i
  for(var q=0;q<n;q+=2){for(var k=0;k<3;k++){var hsh=Math.sin(q*91.7+k*47.3)*43758.5,f=hsh-Math.floor(hsh),ph=Math.sin(time*(1.4+f*2)+f*40);if(ph<.7)continue;
   var xg=xS[q]-dir*(60+f*1300),yg=ys[q]+((f*17)%1)*18;cx.globalAlpha=(ph-.7)*2.2;cx.fillRect(xg-3,yg,7,1.6);cx.fillRect(xg,yg-1.5,1.6,4.5);}}cx.restore();}
 
+/* ═══ CO-OP เฟส A: ผู้เล่นหลายคน (โฮสต์รันเกม · เพื่อนส่งคำสั่ง) ═══
+   ผู้เล่นทุกคนเป็นรถทีม 0 (AI ข้ามให้อยู่แล้ว) · บนโฮสต์ "สลับบริบท" ชั่วคราว (P, อาวุธ, ล็อกเป้า, เมาส์เสมือน)
+   เพื่อใช้โค้ดผู้เล่นเดิมขับรถของเพื่อน · ระหว่างสลับ ข้อความ/เสียง UI/สั่น ของเพื่อนถูกส่งเข้า outbox แทนหน้าจอโฮสต์ */
+var NET={mode:'off'};          /* off | host | client */
+var HUMS=[];                   /* ผู้เล่นคนจริงบนโฮสต์ (ไม่รวมตัวโฮสต์เอง) */
+var RC=null;                   /* ผู้เล่นระยะไกลที่กำลังรันในบริบทอยู่ */
+function humNew(o){o=o||{};return{id:o.id||('h'+Math.random().toString(36).slice(2,8)),name:o.name||'เพื่อน',remote:true,build:o.build||null,st:o.st||null,tank:null,
+ ctx:{wSel:0,aSel:'ap',lock:null,scanning:false,scan:0,pRespawn:0},cmd:{th:0,sr:0,ax:0,ay:0,fire:false},acts:[],out:[],deaths:0,kills:0,joined:G.t||0};}
+function humIn(h){RC=h;var c=h.ctx;h._sv=[P,wSel,aSel,G.lock,G.scanning,G.scan,FL.pRespawn,mouse.x,mouse.y,mouse.down,cam.x,cam.y,PLAT,G.mobFire,SV.build];
+ P=h.tank;wSel=c.wSel;aSel=c.aSel;G.lock=c.lock;G.scanning=c.scanning;G.scan=c.scan;FL.pRespawn=c.pRespawn;
+ /* เมาส์เสมือน: mouse+cam = จุดเล็งของเพื่อน */
+ cam.x=(h.cmd.ax||0)-640;cam.y=(h.cmd.ay||0)-360;mouse.x=640;mouse.y=360;mouse.down=!!h.cmd.fire;PLAT='pc';G.mobFire=false;if(h.build)SV.build=h.build;}
+function humOut(h){var c=h.ctx,s=h._sv;h.tank=P;c.wSel=wSel;c.aSel=aSel;c.lock=G.lock;c.scanning=G.scanning;c.scan=G.scan;c.pRespawn=FL.pRespawn;
+ P=s[0];wSel=s[1];aSel=s[2];G.lock=s[3];G.scanning=s[4];G.scan=s[5];FL.pRespawn=s[6];mouse.x=s[7];mouse.y=s[8];mouse.down=s[9];cam.x=s[10];cam.y=s[11];PLAT=s[12];G.mobFire=s[13];SV.build=s[14];RC=null;}
+function humOutbox(t,a,b){if(!RC)return false;if(RC.out.length<60)RC.out.push([t,a,b]);return true;}
+/* คำสั่งแบบกดครั้งเดียวของเพื่อน (รันในบริบทเพื่อน) */
+function humActs(h){var A=h.acts;h.acts=[];for(var i=0;i<A.length;i++){var a=A[i];try{switch(a.a){
+ case 'w':pickW(a.i|0);break;case 'ammo':cycAmmo();break;case 'smoke':dropSmoke();break;case 'skill':useSkill(P);break;case 'rws':rwsAmmo(P);break;
+ case 'ext':useExt(P);break;case 'use':useObj();break;case 'lock':tryLock();break;case 'pax':paxCmd();break;case 'scan':G.scanning=!!a.on;break;}}catch(e){}}}
+function humDown(h){if(RC===h){playerDown();return;}humIn(h);playerDown();humOut(h);}
+/* โฮสต์: รันผู้เล่นระยะไกลทุกเฟรม (ควบคุม + นับถอยหลังเกิดใหม่) */
+function humTick(dt){if(NET.mode!=='host'||!HUMS.length)return;
+ for(var i=0;i<HUMS.length;i++){var h=HUMS[i];if(!h.remote)continue;humIn(h);try{
+  if(!P){if(FL.on&&!G.over)respawnPlayer();}
+  else{humActs(h);plCtl(dt);if(P.dead&&FL.on&&FL.pRespawn>0){FL.pRespawn-=dt;if(FL.pRespawn<=0)respawnPlayer();}}}finally{humOut(h);}}}
+function humAdd(o){var h=humNew(o);HUMS.push(h);if(NET.mode==='off')NET.mode='host';return h;}
+function humRemove(h){var i=HUMS.indexOf(h);if(i>=0)HUMS.splice(i,1);if(h.tank&&!h.tank.dead){h.tank.hum=null;h.tank.team=2;}if(!HUMS.length&&NET.mode==='host')NET.mode='off';}
+
 /* ═══════ FRONTLINE STATE ═══════ */
 var FL={on:false,own:[],prog:[],capT:[],hq:[6000,6000],front:[1,5],
  spawnQ:[],lastBrain:0,artyT:[6,9],msg:'',intel:[0,0],pRespawn:0,pQueue:0};
@@ -4729,7 +4757,7 @@ function flEndTO(side){FL.to=false;FL.atk=side;FL.phaseT=FLR.swap;FL.warned=fals
  var us=side===0;SFX.horn();
  cineCard('ZONE 4 แตก',SPEC.on?(us?'น้ำเงินยึดได้ — บุกต่อทันที':'แดงยึดได้ — บุกต่อทันที'):us?'ฝ่ายเรายึดได้ — บุกต่อทันที 2 นาที':'ศัตรูยึดได้ — ฝ่ายเราตั้งรับ','#ffc46a',3);
  addLog(us?'⚔️ ยึด Zone 4 ได้ — ฝ่ายเราบุกต่อทันที 2 นาที!':'🛡️ ศัตรูยึด Zone 4 — ฝ่ายเราตั้งรับ 2 นาที (มี '+FLR.grace+' วิ กลับเข้าเขต)','b');}
-function bigMsg(txt){if(FL.on&&typeof CINE!=='undefined'&&(CINE.card||CINE.k))return;var w=$('wvTxt');w.textContent=txt;w.style.display='block';w.style.opacity='1';
+function bigMsg(txt){if(typeof RC!=='undefined'&&RC){humOutbox('big',txt);return;}if(FL.on&&typeof CINE!=='undefined'&&(CINE.card||CINE.k))return;var w=$('wvTxt');w.textContent=txt;w.style.display='block';w.style.opacity='1';
  setTimeout(function(){w.style.transition='.7s';w.style.opacity='0';
   setTimeout(function(){w.style.display='none';w.style.transition='';},720);},1200);}
 /* ล้ำเขตลึก */
@@ -4935,7 +4963,7 @@ function pickW(i){if(!P)return;
 function cycAmmo(){var ks=[];for(var k in AMMOT)if(SV.ammoDev[k]&&P&&P.ammo[k]>0)ks.push(k);
  if(!ks.length)return;var i=ks.indexOf(aSel);aSel=ks[(i+1)%ks.length];
  SFX.ui(true);addLog('เปลี่ยนกระสุน → '+AMMOT[aSel].n,'');updAmmoUI();}
-function updAmmoUI(){if(!P)return;
+function updAmmoUI(){if(!P||RC)return;
  for(var i=0;i<3;i++)$('ab'+i).classList.toggle('on',i===wSel);
  var tot=ammoTotal(P);
  $('n0').textContent=P.st.mag?(P.mag+'/'+tot):tot;
@@ -5250,7 +5278,7 @@ function predictShot(sh,tg,am){var A=AMMOT[am]||AMMOT.ap,s=sh.st,dx=Math.cos(sh.
  var c=ric?'#7fc8ff':r>1.12?'#7ee04a':r>.9?'#f0c43a':'#e0503c',txt=ric?'แฉลบ':r>1.12?'เจาะได้':r>.9?'อาจเจาะ':'ไม่เจาะ';
  return{c:c,t:txt+' · '+Math.round(pen)+'/'+Math.round(pe.eff)+'mm'+(pe.ws?' ⚡':''),g:g};}
 /* ── ข้อความลอยตรงจุดกระทบ ── */
-function pop(x,y,txt,col,sz){GX.pops=GX.pops||[];GX.pops.push({x:x,y:y,t:txt,c:col,l:1.3,ml:1.3,s:sz||13});if(GX.pops.length>24)GX.pops.shift();}
+function pop(x,y,txt,col,sz){if(typeof RC!=='undefined'&&RC){humOutbox('pop',txt,col);return;}GX.pops=GX.pops||[];GX.pops.push({x:x,y:y,t:txt,c:col,l:1.3,ml:1.3,s:sz||13});if(GX.pops.length>24)GX.pops.shift();}
 function hitPop(R,mine){var c={pen:'#ffa040',ric:'#8fd0ff',nopen:'#b8b8b0',trk:'#c8d0d8',dud:'#c8b080',spall:'#ffb070'}[R.type]||'#fff',
  t={pen:'เจาะ!',ric:'แฉลบ!',nopen:'ไม่เจาะ',trk:'โดนสายพาน',dud:'ไม่ระเบิด',spall:'สะเก็ด HESH'}[R.type]||'';
  if(R.ws&&R.type==='pen')t='⚡ จุดอ่อน! '+t;if(R.det)t='💥 แร็คระเบิด!';if(R.era)t='ERA · '+t;
@@ -5728,12 +5756,12 @@ function drawSupRing(){if(!FL.on||!P||P.dead||!P.supOn||SPEC.on)return;var f=sup
 
 /* ═══════ KILL / RESPAWN ═══════ */
 function killTank(t){
- if(!t.dead){if(t===P)vib([90,50,150]);else if(t.team===1&&P&&hyp(t.x-P.x,t.y-P.y)<900)vib(35);}
+ if(!t.dead){if(t===P&&!RC)vib([90,50,150]);else if(t.team===1&&P&&hyp(t.x-P.x,t.y-P.y)<900)vib(35);}
  if(t.dead)return;t.dead=true;
  if(G.lock===t)G.lock=null;
  var big=t.ammoBlew,dist=P?hyp(t.x-P.x,t.y-P.y):0;
- SFX.at(t.x,t.y).boom(big?1.9:1.4,t.team===0?0:dist);
- addShake(t.team===0?18:(dist<900?6:2),.6);
+ SFX.at(t.x,t.y).boom(big?1.9:1.4,t===P?0:dist);
+ addShake(t===P?18:(dist<900?6:2),.6);
  burst(t.x,t.y,Math.round((big?70:44)*GFX.parts),'#ff7a3c');
  burst(t.x,t.y,Math.round((big?34:20)*GFX.parts),'#ffd66a');
  var ang=rnd(0,6.28),pw=big?rnd(4.5,7.5):rnd(2.2,4.2);
@@ -5746,25 +5774,26 @@ function killTank(t){
   if(!FL.on||Math.random()<.4)addLog('☠️ ทำลาย'+(t.boss?'บอส':'ศัตรู')+'ได้!','g');}
  if(FL.on)tkLose(teamSide(t.team),tkCost(t));
  if(FL.on&&t.team!==0&&!(FL.col&&FL.col[teamSide(t.team)])&&!(FR.on&&(t.boss||teamSide(t.team)===FR.atk&&FR.tk<=0)))FL.spawnQ.push({team:t.team,t:0,st:t.st,skin:t.skin});
- if(FL.on&&t.team===0)playerDown();
+ if(FL.on&&t.team===0){if(t.hum&&t.hum.remote)humDown(t.hum);else if(t===P)playerDown();}
  setTimeout(function(){parts.push({x:t.x,y:t.y,vx:0,vy:0,l:99,ml:99,c:'#26251f',r:20,wreck:1});},100);}
 function queueTime(team){
  var n=0;for(var i=0;i<FL.spawnQ.length;i++)if(teamSide(FL.spawnQ[i].team)===teamSide(team))n++;
  return (3+6*clamp(n/Math.max(2,G.teamSize*0.6),0,1)*(FL.rt!==undefined&&!FL.prep?(FL.to?.8:FL.atk===teamSide(team)?.55:1.35):1))+(FL.btT&&FL.btT[1-teamSide(team)]>0?6:0)+(FR.on&&teamSide(team)===FR.def?9*Math.sqrt(Math.max(1,FR.size/32)):0);}
 function playerDown(){
+ if(RC){RC.deaths++;FL.pRespawn=(FR.on&&teamSide(0)===FR.atk&&FR.tk<=0)?0:(FL.col&&FL.col[0]?20:queueTime(0));if(!FL.pRespawn)humOutbox('dead','noresp');return;}
  if(FR.on&&teamSide(0)===FR.atk&&FR.tk<=0){G.deaths++;FL.pRespawn=0;$('hResp').classList.add('on');$('respT').textContent='—';$('respQ').textContent='หมดกำลังเสริม — เกิดใหม่ไม่ได้ · รอดูผลการรบ';return;}
  G.deaths++;FL.pRespawn=FL.col&&FL.col[0]?20:queueTime(0);
  if(FL.col&&FL.col[0])addLog('💀 กองทัพแตก — เกิดใหม่ได้ที่ HQ ช้าลง (กองหนุนสุดท้าย)','r');
  $('hResp').classList.add('on');}
 function respawnPlayer(){
- $('hResp').classList.remove('on');
- var sp=flSpawnPoint(0),ps=calc();
+ if(!RC)$('hResp').classList.remove('on');
+ var sp=flSpawnPoint(0),ps=RC&&RC.st?JSON.parse(JSON.stringify(RC.st)):calc();
  var old=tanks.indexOf(P);
  var np=mkTank(sp.x,sp.y,ps,0,{a:FR.on?frFace(0):0,skin:SV.build.skin});supSpawnMark(0,sp.x,sp.y);infFill(np);
  if(old>=0)tanks[old]=np;else tanks.push(np);
  if(FR.on&&sp.craft)frCraftNew(sp.y,[np],0,0,frShoreU(sp.y)-1500,false);
- P=np;G.lock=null;aSel=firstAmmo();
- cam.x=P.x-innerWidth/2;cam.y=P.y-innerHeight/2;
+ if(RC)np.hum=RC;P=np;G.lock=null;aSel=firstAmmo();
+ if(!RC){cam.x=P.x-innerWidth/2;cam.y=P.y-innerHeight/2;}
  updAmmoUI();addLog('🔄 เกิดใหม่ที่ Zone '+(sp.z+1),'b');}
 function flSpawnQueue(dt){
  for(var i=FL.spawnQ.length-1;i>=0;i--){var q=FL.spawnQ[i];
@@ -5927,7 +5956,7 @@ function nearEngines(){var L=[],px=P&&!P.dead?P.x:cam.x+innerWidth/2,py=P&&!P.de
   L.push({x:t.x,y:t.y,d:d,sp:Math.abs(t.spd)/Math.max(t.st.sp,.1)*.8+Math.abs(t.thr||0)*.3,k:1.25-Math.min((t.st.W||30)/80,.6)});}
  L.sort(function(a,b){return a.d-b.d;});return L.slice(0,3);}
 function commonStart(mode){
- SFX.init();SFX.resume();
+ SFX.init();SFX.resume();if(typeof HUMS!=='undefined')HUMS.forEach(function(h){h.tank=null;h.acts=[];h.out=[];h.ctx={wSel:0,aSel:'ap',lock:null,scanning:false,scan:0,pRespawn:0};h.deaths=0;h.kills=0;});
  var s=document.querySelectorAll('.screen');
  for(var i=0;i<s.length;i++)s[i].classList.remove('on');
  $('hud').classList.add('on');
@@ -6055,11 +6084,10 @@ function flEnd(victory,hq){
 
 /* ═══════ UPDATE ═══════ */
 var scanTick=0;
-function update(dt){
- /* ── ผู้เล่น ── */
- if(P&&!P.dead&&!CINE.lock){
+function plCtl(dt){
+ if(P&&!P.dead&&(RC||!CINE.lock)){
   var th=0,sr=0;
-  if(PLAT==='mb'){th=-joyL.y;sr=joyL.x;}
+  if(RC){th=RC.cmd.th||0;sr=RC.cmd.sr||0;}else if(PLAT==='mb'){th=-joyL.y;sr=joyL.x;}
   else{if(kdown('fwd'))th+=1;if(kdown('back'))th-=1;
    if(kdown('left'))sr-=1;if(kdown('right'))sr+=1;}
   P.thr=clamp(th,-1,1);P.steer=clamp(sr,-1,1);
@@ -6067,7 +6095,7 @@ function update(dt){
   if(G.lock&&!G.lock.dead)P.ta+=clamp(angD(P.ta,Math.atan2(G.lock.y-P.y,G.lock.x-P.x)),-tv*1.15,tv*1.15);
   else if(PLAT==='mb')mobAim(dt);
   else P.ta+=clamp(angD(P.ta,Math.atan2(mouse.y+cam.y-P.y,mouse.x+cam.x-P.x)),-tv,tv);
-  if(mouse.down&&PLAT==='pc'&&!(FL.sup&&FL.sup.mark)&&!(FR.on&&FR.bSel))fire(P,wSel);
+  if(mouse.down&&PLAT==='pc'&&(RC||!(FL.sup&&FL.sup.mark)&&!(FR.on&&FR.bSel)))fire(P,wSel);
   if(G.scanning){
    G.scan=clamp(G.scan+dt*P.st.scanSp*runBuff.scan*.5,0,1);
    for(var i=0;i<tanks.length;i++){var e=tanks[i];
@@ -6080,10 +6108,14 @@ function update(dt){
     if(f){addLog('⚡ พบจุดอ่อน '+f+' เป้าหมาย','g');SFX.lockS(true);}
     G.scan=0;}
   }else G.scan=Math.max(0,G.scan-dt*.7);
-  if(runBuff.regen>0)P.hp=Math.min(P.mhp,P.hp+P.mhp*runBuff.regen*dt);
+  if(!RC&&runBuff.regen>0)P.hp=Math.min(P.mhp,P.hp+P.mhp*runBuff.regen*dt);
   if(G.lock&&G.lock.dead)G.lock=null;
-  $('hUse').classList.toggle('on',!!nearUse());
- }else{if(P)P.thr=0;$('hUse').classList.remove('on');}
+  if(!RC)$('hUse').classList.toggle('on',!!nearUse());
+ }else{if(P)P.thr=0;if(!RC)$('hUse').classList.remove('on');}
+}
+function update(dt){
+ /* ── ผู้เล่น (ในเครื่อง) + ผู้เล่นระยะไกล (โฮสต์) ── */
+ plCtl(dt);humTick(dt);
  if(G.alert>0)G.alert-=dt;
  if(FL.on){for(var s=0;s<2;s++)if(FL.intel[s]>0)FL.intel[s]-=dt;}
  scanTick-=dt;if(scanTick<=0){scanTick=.35;updScanList();}
@@ -6096,7 +6128,7 @@ function update(dt){
   var lod=false;if(t.team!==0&&!(lod&&(t.lodF=!t.lodF))){var adt=lod?dt*2:dt;updSpot(t,adt);cmdPre(t);ai(t,adt);if(FL.on)infVehAI(t,adt);cmdPost(t,adt);}
   var egd=t===P?(PLAT==='pc'?hyp(mouse.x+cam.x-P.x,mouse.y+cam.y-P.y):(P.asT&&!P.asT.dead?hyp(P.asT.x-P.x,P.asT.y-P.y):900)):(t.see&&t.seeT&&!t.seeT.dead?hyp(t.seeT.x-t.x,t.seeT.y-t.y):900);
   t.elev=lerp(t.elev||0,clamp((egd-520)/5000,-.07,.22),Math.min(1,dt*3));if(t.recoil>0)t.recoil=Math.max(0,t.recoil-dt*3.2);
-  moveTank(t,dt);if(t.hp<=0)killTank(t);}
+  if(t.hum&&t.hum.remote&&NET.mode==='host'&&RC!==t.hum){var hh=t.hum;humIn(hh);try{if(P===t){moveTank(t,dt);if(t.hp<=0)killTank(t);}}finally{humOut(hh);}}else{moveTank(t,dt);if(t.hp<=0)killTank(t);}}
  if((G.intT=(G.intT||0)+dt)>.25){G.intT=0;var nn=0,lx=P?P.x:cam.x+innerWidth/2,ly=P?P.y:cam.y+innerHeight/2;
   for(var i=0;i<shots.length;i++)if(Math.abs(shots[i].x-lx)<1300&&Math.abs(shots[i].y-ly)<900)nn++;
   G.boomAcc=(G.boomAcc||0)*.8;var chg=FL.on&&FL.ev&&(FL.ev.charge[0]>0||FL.ev.charge[1]>0)?.25:0;
@@ -7491,7 +7523,7 @@ function goFull(){if(!isPhone())return;var d=document.documentElement,rq=d.reque
  else lockLand();}
 function updOrient(){var b=document.body;b.classList.toggle('portrait',innerHeight>innerWidth);b.classList.toggle('mbl',isPhone());}
 addEventListener('resize',updOrient);addEventListener('orientationchange',function(){setTimeout(updOrient,120);});
-function vib(ms){try{if(isPhone()&&SV.mob&&SV.mob.haptic&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
+function vib(ms){if(typeof RC!=='undefined'&&RC)return;try{if(isPhone()&&SV.mob&&SV.mob.haptic&&navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 /* ช่วยเล็ง: หาศัตรูในกรวยรอบทิศที่โยกจอยขวา แล้วดึงเป้าไปหา (รวมการนำหน้าเป้าที่วิ่ง) */
 function aimAssist(want){if(!P||P.dead)return null;var best=null,bs=1e9,sv=Math.max(P.st.shellV/62,4);
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead||t.gone||t.team!==1)continue;
@@ -8248,7 +8280,7 @@ function cmdIssue(k,x,y,tgt){if(!P||P.dead||SPEC.on){return;}var C=cmdSpec(),L=c
  G.cmdM={k:k,x:x,y:y,tgt:tgt||null,t:G.t};SFX.radio('air');
  addLog('📻 สั่ง '+L.length+' คัน: '+CMDN[k]+' · ตอบรับใน ~'+C.dl.toFixed(1)+' วิ (เรดาร์ '+((P.b&&P.b.radar)||'rd0').toUpperCase()+')','b');}
 function cmdCancel(){var n=0;for(var i=0;i<tanks.length;i++)if(tanks[i].cmd){tanks[i].cmd=null;n++;}G.cmdM=null;if(n){addLog('📻 ยกเลิกคำสั่ง — หน่วยกลับไปปฏิบัติตามแผนรบ','b');SFX.ui(true);}}
-function cmdKey(k){if(!G.run||!P||P.dead||SPEC.on)return;var wx=mouse.x+cam.x,wy=mouse.y+cam.y;
+function cmdKey(k){if(!G.run||!P||P.dead||SPEC.on||RC)return;var wx=mouse.x+cam.x,wy=mouse.y+cam.y;
  if(k==='follow')cmdIssue('follow',P.x,P.y);
  else if(k==='attack'){if(PLAT==='mb'){G.cmdPick='attack';toast('แตะบนสนามรบ/แผนที่เพื่อเลือกจุดบุก');return;}cmdIssue('attack',wx,wy);}
  else if(k==='hold')cmdIssue('hold',P.x,P.y);
