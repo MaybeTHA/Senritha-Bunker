@@ -96,6 +96,12 @@ body.cine #hud .hb,body.cine #hAmmo,body.cine #specBar,body.cine #mob,body.cine 
 #hud .hb,#hAmmo,#hLog{transition:opacity .35s}
 #supBar{top:146px;left:50%;transform:translateX(-50%);display:none;pointer-events:auto;text-align:center;border-color:#f0b429;min-width:280px;font-size:11.5px}
 #supBar.on{display:block}
+#frBuild{bottom:64px;left:50%;transform:translateX(-50%);display:none;pointer-events:auto;border-color:#c8a050;padding:5px 7px}#frBuild.on{display:block}
+.frbT{font-size:11px;color:#f0c46a;font-weight:700;margin-bottom:4px}.frbT span{color:#93a181;font-weight:400;margin-left:6px}
+.frbR{display:flex;gap:4px}.frbI{width:62px;border:1px solid #4a5038;border-radius:6px;background:#1c2116cc;text-align:center;cursor:pointer;padding:3px 2px;line-height:1.15}
+.frbI b{display:block;font-size:17px}.frbI i{display:block;font-style:normal;font-size:8.5px;color:#cfd8bf}.frbI em{display:block;font-style:normal;font-size:9px;color:#9fe06a}
+.frbI.sel{border-color:#ffd27a;background:#4a3e1ccc}.frbI.no{opacity:.4}.frbI.no em{color:#e07050}
+body.mbl #frBuild{bottom:calc(58px + env(safe-area-inset-bottom));padding:3px 4px}body.mbl .frbI{width:46px}body.mbl .frbI b{font-size:14px}body.mbl .frbI i{font-size:7.5px}
 body.mbl #supBar{top:calc(96px + env(safe-area-inset-top));min-width:0;max-width:62vw;font-size:10.5px}
 body.spec #supBar{display:none!important}
 body.mbl #hSup{bottom:calc(112px + env(safe-area-inset-bottom));min-width:170px}
@@ -266,6 +272,9 @@ body.mbl #bPax{left:calc(120px + env(safe-area-inset-left));bottom:calc(146px + 
 body.mbl #bSkill{right:calc(66px + env(safe-area-inset-right));bottom:calc(200px + env(safe-area-inset-bottom));width:48px;height:48px}
 body.mbl #bRwsAm{right:calc(120px + env(safe-area-inset-right));bottom:calc(218px + env(safe-area-inset-bottom));width:44px;height:44px}
 #bCmd{left:26px;bottom:192px;width:44px;height:44px;background:#5a4a2acc}
+#bBuild{left:80px;bottom:192px;width:44px;height:44px;background:#6a5a2acc;display:none}#bArty{left:134px;bottom:192px;width:44px;height:44px;background:#8a3a2acc;display:none;font-size:9px}
+body.pfrd #bBuild{display:flex}body.pfr #bArty{display:flex}#bArty.cd{opacity:.45}
+body.mbl #bBuild{left:calc(228px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}body.mbl #bArty{left:calc(282px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
 body.mbl #bCmd{left:calc(174px + env(safe-area-inset-left));bottom:calc(146px + env(safe-area-inset-bottom));width:48px;height:48px}
 #cmdPanel{position:absolute;left:calc(236px + env(safe-area-inset-left));bottom:calc(60px + env(safe-area-inset-bottom));display:none;flex-direction:column;gap:4px;pointer-events:auto;background:#0c100ae6;border:1px solid #f0b429;border-radius:8px;padding:6px;width:170px;z-index:8}
 #cmdPanel.on{display:flex}#cmdPanel .btn{width:100%}#cmdInfo{font-size:10px;color:#c8b878;line-height:1.3}
@@ -335,7 +344,7 @@ details.rules .st{font-size:12px!important;line-height:1.85!important;margin-top
  .gSide{position:sticky;top:66px}
  .gQuick{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:900px){
- #scDuel .wrap,#scBattle .wrap,#scInf .wrap,#scFront .wrap{max-width:1240px}
+ #scDuel .wrap,#scBattle .wrap,#scInf .wrap,#scFront .wrap,#scFrontier .wrap{max-width:1240px}
  .mwrap{grid-template-columns:minmax(0,1fr) 330px;align-items:start;gap:14px}
  .mSide{position:sticky;top:66px;margin-top:14px}
  .lo .gQuick{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -418,6 +427,7 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="hb" id="hUse" onclick="useObj()">📻 วิทยุ (F)</div>
   <div class="hb" id="hSup"></div>
   <div class="hb" id="supBar"></div>
+  <div class="hb" id="frBuild"></div>
   <div class="hb" id="specStat"></div>
   <div class="hb" id="specFol"></div>
   <div id="specBar"></div>
@@ -459,6 +469,8 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="fbtn" id="bSkill">สกิล</div>
   <div class="fbtn" id="bRwsAm">AP/HE</div>
   <div class="fbtn" id="bCmd" onclick="cmdMenu()">สั่งการ</div>
+  <div class="fbtn" id="bBuild" onclick="frBuildToggle()">สร้าง</div>
+  <div class="fbtn" id="bArty" onclick="frArty()">ปืนใหญ่</div>
   <div id="cmdPanel"><div id="cmdInfo"></div><button class="btn sm" onclick="cmdBtn('follow')">🚩 ตามฉัน</button><button class="btn sm" onclick="cmdBtn('attack')">⚔️ บุกจุดที่ชี้</button><button class="btn sm" onclick="cmdBtn('hold')">🛡️ ตั้งรับตรงนี้</button><button class="btn sm" onclick="cmdBtn('focus')">🎯 ยิงเป้าเดียวกัน</button><button class="btn sm" onclick="cmdBtn('cancel')">✖ ยกเลิกคำสั่ง</button></div>
 </div>
 
@@ -493,6 +505,7 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <div class="grid g2" style="margin-top:8px">
     <button class="btn pri" onclick="show('scGarage')">🔧 โรงประกอบรถถัง</button>
     <button class="btn grn" onclick="show('scFront')">🌲 FRONTLINE (แนวรบ)</button>
+    <button class="btn grn" onclick="show('scFrontier')">🌊 FRONTIER (ยกพลขึ้นบก)</button>
     <button class="btn dan" onclick="show('scDuel')">🎯 ดวล (Duel)</button>
     <button class="btn blu" onclick="show('scBattle')">⚔️ ยึดจุด / เดธแมตช์</button>
     <button class="btn blu" onclick="show('scInf')">♾️ โหมด Infinity</button>
@@ -502,6 +515,28 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   </div>
   <p class="hint" id="mHint"></p>
 </div></div></div>
+
+<!-- FRONTIER -->
+<div class="screen" id="scFrontier"><div class="wrap">
+  <div class="topbar"><div class="res" id="resFR"></div>
+    <button class="btn sm" style="width:auto" onclick="show('scMenu')">← กลับ</button></div>
+  <h1 style="font-size:26px">🌊 FRONTIER</h1>
+  <p class="sub">MASSIVE AMPHIBIOUS WARFARE · บุก vs ป้องกัน · สนามรบชายฝั่งขนาดใหญ่<br>
+  ยกพลขึ้นบกจากเรือ → หาด A → สันเขา B (ขึ้นได้แค่ทางลาด) → แนวป้องกัน C → ฐานที่มั่น D → แนวรอบ E → ทำลาย HQ</p>
+  <canvas id="frPrev" width="900" height="230" style="width:100%;border-radius:9px;background:#141a12;border:1px solid #333c29"></canvas>
+<div class="mwrap"><div class="mMain">
+  <h2>เลือกฝ่าย</h2><div class="grid g2" id="frTeam"></div>
+  <h2>ขนาดสนามรบ</h2><div class="grid g4" id="frSize"></div>
+  <h2>ระดับศัตรู</h2><div class="grid g4" id="frLvl"></div>
+  <h2>เวลา & สภาพอากาศ</h2><div class="grid g4" id="frTod"></div>
+</div>
+<aside class="mSide"><div class="lo" id="loFR"></div>  <details class="card rules"><summary>📜 กติกา FRONTIER</summary><div class="st">
+   <b style="color:#f0b429">■ เปิดเกม</b><br>คัตซีนกองเรือ → <b>เตรียม 45 วิ</b>: ฝ่ายบุกอยู่ในเรือยกพลที่กำลังแล่นเข้าหาด · ฝ่ายป้องกันเกิดที่สันเขา B<br>ครบเวลา ประตูเรือเปิด รถถังและทหารลงหาด<br><br>
+   <b style="color:#f0b429">■ ฝ่ายบุก</b><br>มี <b>กำลังเสริม</b> จำกัด (ตาย 1 = หัก 1) · ยึดเป้าหมายได้ +25%<br>ยึดตามลำดับ B → C → D → แนวรอบ E · ยึดแนวรอบ E แล้ว HQ จึงเสียหายได้ · ทำลาย HQ = ชนะ<br>สันเขา B ชันมาก ขึ้นได้เฉพาะ <b>ทางลาด 3 เส้น</b> · ยิงจากล่างขึ้นบนมีโอกาสโดนขอบผา<br><br>
+   <b style="color:#f0b429">■ ฝ่ายป้องกัน</b><br>ได้เปรียบที่สูง · บังเกอร์ปืนคุมทางลาด/แนวป้องกัน<br>เสียเป้าหมายแล้วต้องถอยไปแนวถัดไป (มีเวลาถอย)<br>ชนะเมื่อ <b>หมดเวลา 20 นาที</b> หรือฝ่ายบุกหมดกำลังเสริมและถูกกวาดล้าง<br><br>
+   <b style="color:#f0b429">■ ยึดจุด</b><br>อยู่ในวงยึดโดยไม่มีฝ่ายป้องกัน (รวมบังเกอร์) · คนมากยึดเร็วขึ้น · มีฝ่ายป้องกันอยู่ = ชิงกัน (หยุด)</div></details>
+  <div style="margin-top:12px"><button class="btn grn" onclick="startFrontier()">🌊 เข้าสู่สมรภูมิ</button><button class="btn" style="margin-top:6px" onclick="specStart('startFrontier')">👁️ ดู AI สู้กันเอง</button></div></aside></div>
+</div></div>
 
 <!-- FRONTLINE -->
 <div class="screen" id="scFront"><div class="wrap">
@@ -980,7 +1015,7 @@ function creak(){if(!ok||ctx.state!=='running')return;var v=voice('amb',0,2.1,bA
  lf.connect(lg);lg.connect(o.frequency);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.03,t+.3);g.gain.exponentialRampToValueAtTime(.0001,t+1+Math.random()*.8);chain(o,f,g,v.g);}
 function gust(hp){if(!ok||ctx.state!=='running')return;var d=1.2+Math.random()*1.4,v=voice('amb',0,d+.2,bA);if(!v)return;var t=ctx.currentTime,n=N(v,'p',t,d+.1),f=F(hp?'highpass':'bandpass',hp?1500:500+Math.random()*400,.8),g=G();
  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(hp?.05:.045,t+d*.45);g.gain.exponentialRampToValueAtTime(.0001,t+d);chain(n,f,g,v.g);}
-var AMBK={field:{wind:.035,wf:420,birds:1},town:{wind:.04,wf:520,war:1,creak:1},cany:{wind:.05,wf:360,howl:1},
+var AMBK={coast:{wind:.045,wf:300,birds:1,war:1},field:{wind:.035,wf:420,birds:1},town:{wind:.04,wf:520,war:1,creak:1},cany:{wind:.05,wf:360,howl:1},
  base:{wind:.03,wf:480,war:1,hum:1},dune:{wind:.045,wf:700,sand:1},nord:{wind:.035,wf:440,birds:1,war:1}};
 function ambStart(key){if(!init())return;ambStop();res();var A=AMBK[key]||AMBK.field,t=ctx.currentTime;amb={on:true,key:key,A:A,nodes:[],next:{}};
  var n=N(null,'p',t,1e5),f=F('bandpass',A.wf,A.howl?3:.6),g=G(.0001);g.gain.setTargetAtTime(A.wind,t,1.5);chain(n,f,g,bA);if(A.howl){var e=G(.4);g.connect(e);e.connect(echoIn);}
@@ -995,7 +1030,9 @@ function ambTick(){if(!amb.on||!ctx)return;var now=performance.now(),A=amb.A,Nx=
  if(A.creak&&now>Nx.creak){Nx.creak=now+rnd(5000,12000);creak();}
  if(A.sand&&now>Nx.sand){Nx.sand=now+rnd(3000,8000);gust(true);}
  if(A.howl&&now>Nx.sand){Nx.sand=now+rnd(4000,9000);gust(false);}}
-function ambStop(){if(ambT){clearInterval(ambT);ambT=null;}if(!amb.on||!ctx)return;var t=ctx.currentTime,ns=amb.nodes;
+var rainN=null;function rainSet(lv){if(!ok||!ctx)return;var t=ctx.currentTime;if(!rainN){if(lv<=.02)return;var n=N(null,'p',t,1e5,1.6),hp=F('highpass',1100,.5),lp=F('lowpass',6500,.4),g=G(.0001);chain(n,hp,lp,g,bA);rainN={n:n,g:g};}
+ rainN.g.gain.setTargetAtTime(Math.max(.0001,lv*.075),t,1.2);if(lv<=.02){var rr=rainN;rainN=null;setTimeout(function(){try{rr.n.stop();}catch(e){}},4000);}}
+function ambStop(){if(rainN)rainSet(0);if(ambT){clearInterval(ambT);ambT=null;}if(!amb.on||!ctx)return;var t=ctx.currentTime,ns=amb.nodes;
  amb.wind.g.gain.setTargetAtTime(.0001,t,.4);setTimeout(function(){ns.forEach(function(n){try{n.stop();}catch(e){}});},1600);amb.on=false;}
 function setMap(key){if(!init())return;var Ex={field:[.3,.22],town:[.18,.32],cany:[.46,.42],base:[.16,.3],dune:[.38,.18],nord:[.28,.22]}[key]||[.3,.25];
  echoD.delayTime.value=Ex[0];echoFb.gain.value=Ex[1];ambStart(key);}
@@ -1209,7 +1246,7 @@ function supTick(){if(!live())return;var v=voice('ui',0,.15,bU);if(!v)return;var
 var api={init:init,resume:res,at:at,cannon:cannon,mg:mg,launch:launch,boom:boom,pen:pen,ric:ric,era:era,aps:aps,
  jam:jam,smoke:smoke,whistle:whistle,whoosh:whoosh,lwsBeep:lwsBeep,reload:reload,autoload:autoload,lockS:lockS,
  trackBreak:trackBreak,engineStart:engineStart,engineRPM:engineRPM,engineStop:engineStop,engines:engines,
- setMap:setMap,ambStop:ambStop,warn:warn,ui:ui,radio:radio,horn:horn,thunder:thunder,bombWhistle:bombWhistle,flare:flare,
+ setMap:setMap,ambStop:ambStop,rainSet:rainSet,warn:warn,ui:ui,radio:radio,horn:horn,thunder:thunder,bombWhistle:bombWhistle,flare:flare,
  loop:loop,loopPos:loopPos,loopStop:loopStop,music:music,setInt:setInt,crack:crack,airGun:airGun,sonicBoom:sonicBoom,
  win:function(){jing([523,659,784,1047],'triangle',.14);},
  lose:function(){jing([392,349,294,196],'triangle',.2);},
@@ -1618,7 +1655,8 @@ var MAPS={
  base :{n:'ฐานทัพร้าง',size:4600,ob:'base',den:70,g:'#1a1f21',g2:'#23292b',d:'คอนเทนเนอร์ + บังเกอร์'},
  dune :{n:'ทะเลทรายเดือด',size:5200,ob:'dune',den:48,g:'#2a2418',g2:'#362e1e',d:'ที่กำบังน้อย'},
  nord :{n:'สแกนดิเนเวีย (Frontline)',size:9100,sizeY:2100,ob:'nord',den:1,
-   g:'#1b2417',g2:'#233020',d:'ที่ราบยาว ป่าสน ทางหลวง'}};
+   g:'#1b2417',g2:'#233020',d:'ที่ราบยาว ป่าสน ทางหลวง'},
+ coast:{n:'ชายฝั่ง (FRONTIER)',size:13000,sizeY:3200,ob:'nord',den:1,g:'#1d2618',g2:'#26321f',d:'ทะเล หาด สันเขา ฐานทัพ'}};
 
 /* ─────────── รวมชิ้นส่วนทั้งหมด ─────────── */
 var PARTS={ch:CHASSIS,gun:ALLGUNS(),al:AUTOL,sec:SECS,atgm:ATGMS,fcs:FCSS,
@@ -1649,8 +1687,8 @@ var PARTS={ch:CHASSIS,gun:ALLGUNS(),al:AUTOL,sec:SECS,atgm:ATGMS,fcs:FCSS,
 
 /* ═══════ SAVE / KEYS / BUFFS (กู้คืนจาก v4) ═══════ */
 var DEFKEYS={fwd:'w',back:'s',left:'a',right:'d',brake:' ',w1:'1',w2:'2',w3:'3',ammo:'r',
- scan:'shift',lock:'q',smoke:'x',use:'f',ext:'e',map:'m',pax:'g',cmdF:'4',cmdA:'5',cmdH:'6',cmdT:'7',cmdX:'8',skill:'v',rwsAm:'t',quit:'escape'};
-var KEYLBL={fwd:'เดินหน้า',back:'ถอยหลัง',left:'เลี้ยวซ้าย',right:'เลี้ยวขวา',brake:'เบรก',
+ scan:'shift',lock:'q',smoke:'x',use:'f',ext:'e',map:'m',pax:'g',cmdF:'4',cmdA:'5',cmdH:'6',cmdT:'7',cmdX:'8',skill:'v',rwsAm:'t',build:'b',arty:'z',quit:'escape'};
+var KEYLBL={build:'FRONTIER: สร้างป้อม',arty:'FRONTIER: ปืนใหญ่',fwd:'เดินหน้า',back:'ถอยหลัง',left:'เลี้ยวซ้าย',right:'เลี้ยวขวา',brake:'เบรก',
  w1:'ปืนหลัก',w2:'ปืนรอง',w3:'ATGM',ammo:'สลับกระสุน',scan:'สแกน (กดค้าง)',lock:'ล็อกเป้า',
  smoke:'ควัน',use:'ใช้งาน',ext:'ดับเพลิง',map:'แผนที่ใหญ่',pax:'ทหาร ลง/ขึ้นรถ (IFV)',cmdF:'สั่ง: ตามฉัน',cmdA:'สั่ง: บุกจุดที่ชี้',cmdH:'สั่ง: ตั้งรับตรงนี้',cmdT:'สั่ง: ยิงเป้าเดียวกัน',cmdX:'สั่ง: ยกเลิก',skill:'สกิลพิเศษประจำรุ่น',rwsAm:'AbramsX: สลับกระสุน 30mm AP/HE',quit:'ออกจากการรบ'};
 var BUFFS=[
@@ -1711,7 +1749,7 @@ function loadSave(){
  if(d.plat!=='pc'&&d.plat!=='mb')d.plat=D.plat;
  /* ย้ายปุ่มสั่งการลูกน้องจาก Z/V/B/N/H → 4-8 (V = สกิลพิเศษ) */
  if(d.keys){var OK={cmdF:'z',cmdA:'v',cmdH:'b',cmdT:'n',cmdX:'h'};for(var o in OK)if(d.keys[o]===OK[o])d.keys[o]=DEFKEYS[o];
-  ['skill','rwsAm'].forEach(function(a){if(!d.keys[a]){for(var q in d.keys)if(d.keys[q]===DEFKEYS[a])d.keys[q]='';d.keys[a]=DEFKEYS[a];}});}
+  ['skill','rwsAm','build','arty'].forEach(function(a){if(!d.keys[a]){for(var q in d.keys)if(d.keys[q]===DEFKEYS[a])d.keys[q]='';d.keys[a]=DEFKEYS[a];}});}
  return d;}
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV));}catch(e){}}
 var SV=loadSave();
@@ -1822,10 +1860,11 @@ function show(id){SFX.ui(true);
  $('hud').classList.remove('on');$('mob').classList.remove('on');
  $('hResp').classList.remove('on');closeBigMap();closeModal();
  if(id==='scGarage')drawGarage();
- if(/^sc(Duel|Battle|Front|Inf)$/.test(id))drawLo();
+ if(/^sc(Duel|Battle|Front|Frontier|Inf)$/.test(id))drawLo();
  if(id==='scDuel')drawDuel();
  if(id==='scBattle')drawBattleSel();
  if(id==='scFront')drawFrontSel();
+ if(id==='scFrontier')drawFrontierSel();
  if(id==='scInf')drawInf();
  if(id==='scBox')drawBox();
  if(id==='scMenu')drawMenu();
@@ -3327,7 +3366,8 @@ function gridBuild(){
   var c=Math.floor((y1-OG.y0)/OG.cell),d=Math.floor((y2-OG.y0)/OG.cell);
   for(var gx=a;gx<=b;gx++)for(var gy=c;gy<=d;gy++)put(gx,gy,o);}}
 function gridAt(x,y){return OG.m[Math.floor((x-OG.x0)/OG.cell)+','+Math.floor((y-OG.y0)/OG.cell)];}
-function blocked(x,y){
+function blocked(x,y,shot){
+ if(FR.on&&!shot){var tr=frTerrain(x,y);if(tr)return tr;}
  var a=gridAt(x,y);
  if(a)for(var i=0;i<a.length;i++){var o=a[i];
   if(o.t==='c'){if(hyp(x-o.x,y-o.y)<o.r)return o;}
@@ -3355,9 +3395,10 @@ function pushOut(e,rad){
   var hw=s.w/2,hh=s.h/2,cxp=clamp(e.x,s.x-hw,s.x+hw),cyp=clamp(e.y,s.y-hh,s.y+hh);
   var dx=e.x-cxp,dy=e.y-cyp,d=hyp(dx,dy);
   if(d<rad&&d>.001){e.x=cxp+dx/d*rad;e.y=cyp+dy/d*rad;e.spd*=.4;}}
+ if(FR.on)frPush(e,rad);
  e.x=clamp(e.x,-AX+40,AX-40);e.y=clamp(e.y,-AY+40,AY-40);}
 function losClear(a,b){var dx=b.x-a.x,dy=b.y-a.y,d=hyp(dx,dy),st=Math.max(5,Math.min(48,d/38));
- for(var i=1;i<st;i++){var f=i/st;if(blocked(a.x+dx*f,a.y+dy*f))return false;}return true;}
+ for(var i=1;i<st;i++){var f=i/st;if(blocked(a.x+dx*f,a.y+dy*f,1))return false;}return true;}
 function inSmoke(x,y){for(var i=0;i<smokes.length;i++){var s=smokes[i];
  if(hyp(x-s.x,y-s.y)<s.r*(s.grow||1))return true;}return false;}
 function inBush(x,y){for(var i=0;i<bushes.length;i++){var b=bushes[i];
@@ -3365,7 +3406,7 @@ function inBush(x,y){for(var i=0;i<bushes.length;i++){var b=bushes[i];
 function losVision(a,b,thermal){
  var dx=b.x-a.x,dy=b.y-a.y,d=hyp(dx,dy),st=Math.max(5,Math.min(44,d/38));
  for(var i=1;i<st;i++){var f=i/st,px2=a.x+dx*f,py2=a.y+dy*f;
-  if(blocked(px2,py2))return false;
+  if(blocked(px2,py2,1))return false;
   if(smokes.length&&inSmoke(px2,py2))return false;}
  if(!thermal&&bushes.length&&inBush(b.x,b.y)&&d>420)return false;
  return true;}
@@ -3376,6 +3417,7 @@ function buildMap(key){
  var m=MAPS[key];AX=m.size;AY=m.sizeY||m.size;
  obst=[];marks=[];smokes=[];bushes=[];structs=[];arty=[];roads=[];
  if(key==='nord'){buildNord();gridBuild();gxBake(key);return;}
+ if(key==='coast'){buildFrontier();gridBuild();gxBake(key);return;}
  var n=m.den,ty=m.ob,A=AX;
  function R(x,y,r){obst.push({t:'c',x:x,y:y,r:r*SCL,col:'#333a2a',col2:'#4a5438',blockShot:1});}
  function B(x,y,w,h,c1,c2){obst.push({t:'r',x:x,y:y,w:w*SCL,h:h*SCL,col:c1||'#2c3128',col2:c2||'#454b3c',blockShot:1});}
@@ -3463,6 +3505,726 @@ function buildNord(){
  obst.push({t:'r',x:gz+180,y:220,w:150,h:70,col:'#2f3630',col2:'#4d564c',blockShot:1});
 }
 
+/* ═══════════════════════════════════════════════════════════
+   FRONTIER — สงครามยกพลขึ้นบกขนาดใหญ่ (บุก vs ป้องกัน)
+   แผนที่: ทะเล → หาด A → สันเขา B (ขึ้นได้แค่ทางลาด 3 เส้น) → แนวสนามเพลาะ C → ฐานที่มั่น D → HQ E
+   พิกัด u = ความลึกจากชายทะเล (0) ไปจนถึง HQ · x = frX(u) (กลับด้านเมื่อฝ่ายบุกเป็นฝั่งขวา)
+   ═══════════════════════════════════════════════════════════ */
+var FRC={len:26000,hw:3200,shore:3000,cliff:6600,cb:85,rampW:320,objU:[4400,7700,13300,18400,22700],hqU:24800,prep:45,limit:20*60,
+ capR:[0,780,690,720,760],capT:42,capMax:6,OBN:['หาดยกพลขึ้นบก','แนวสันเขาชายฝั่ง','แนวป้องกันส่วนหน้า','ฐานที่มั่นทางทหาร','แนวรอบกองบัญชาการ'],LET:['A','B','C','D','E']};
+var FRS={16:{n:'Small Battle',veh:6,inf:10,tk:500,cr:70000,box:'l'},32:{n:'Medium Battle',veh:10,inf:22,tk:800,cr:100000,box:'l'},
+ 64:{n:'Large Battle',veh:16,inf:48,tk:1300,cr:140000,box:'l'},128:{n:'Massive Battle',veh:26,inf:102,tk:2000,cr:190000,box:'l'}};
+var frSel={team:'atk',size:32,lvl:4,tod:'dyn'};
+var FR={on:false,crafts:[],ramps:[],obj:[],trench:[]};
+FR.W={t:'r',terrain:1,ns:1,water:1,x:0,y:0,w:0,h:0};FR.C={t:'r',terrain:1,ns:1,cliff:1,x:0,y:0,w:0,h:0};
+function frX(u){return FR.atk===0?-AX+u:AX-u;}
+function frU(x){return FR.atk===0?x+AX:AX-x;}
+function frZ(k){return FR.atk===0?k:FLZ-1-k;}
+function frDir(){return FR.atk===0?1:-1;}
+function frShoreU(y){return FRC.shore+Math.sin(y/760+.6)*110+Math.sin(y/230)*24;}
+function frCliffU(y){return FRC.cliff+Math.sin(y/900+.4)*190+Math.sin(y/330+1.7)*55;}
+function frRamp(y,m){for(var i=0;i<FR.ramps.length;i++){var r=FR.ramps[i];if(Math.abs(y-r.y)<r.w/2-(m||0))return r;}return null;}
+function frNearRamp(y){var b=null,bd=1e9;for(var i=0;i<FR.ramps.length;i++){var d=Math.abs(FR.ramps[i].y-y);if(d<bd){bd=d;b=FR.ramps[i];}}return b;}
+/* พื้นที่เดินไม่ได้: ทะเล + หน้าผา (ยกเว้นทางลาด) — กระสุน/สายตาผ่านได้ (ยิงจากที่สูงลงมาได้) */
+function frTerrain(x,y){var u=frU(x);if(u>FRC.cliff+340||(u>FRC.shore+160&&u<FRC.cliff-340))return null;
+ if(u<frShoreU(y))return FR.W;var cu=frCliffU(y);if(u>cu-FRC.cb&&u<cu+FRC.cb&&!frRamp(y))return FR.C;return null;}
+function frPush(e,rad){var u=frU(e.x);if(u>FRC.cliff+360)return;
+ if(!(e.wade>0)){var su=frShoreU(e.y);if(u<su+rad){u=su+rad;e.x=frX(u);e.spd*=.5;}}
+ var cu=frCliffU(e.y),lo=cu-FRC.cb-rad*.7,hi=cu+FRC.cb+rad*.7;if(u<=lo||u>=hi||frRamp(e.y,rad*.6))return;
+ var r=frNearRamp(e.y),dy=e.y-r.y,ed=Math.abs(dy)-(r.w/2-rad*.6);
+ if(ed<Math.min(u-lo,hi-u)){e.y=r.y+(dy<0?-1:1)*(r.w/2-rad*.6-.5);}else{u=(u-lo<hi-u)?lo:hi;e.x=frX(u);}e.spd*=.45;}
+/* ขอบสันเขา: ยิงจากด้านล่างขึ้นไปโดนขอบหน้าผา 40% */
+function frBelow(e){return frU(e.x)<frCliffU(e.y)+FRC.cb+40;}
+function frLip(s){var u=frU(s.x),cu=frCliffU(s.y);if(Math.abs(u-cu)>FRC.cb||frRamp(s.y,0))return false;s.lipD=1;
+ return (FR.atk===0?s.vx:-s.vx)>0&&Math.random()<.3;}
+/* ── สร้างแผนที่ ── */
+function buildFrontier(){var dir=frDir(),i,j,y,u,k;
+ FR.ramps=[{y:-AY*.6,w:FRC.rampW},{y:AY*.04,w:FRC.rampW},{y:AY*.58,w:FRC.rampW}];FR.trench=[];
+ function X(u){return frX(u);}
+ function OB(u,y,w,h,kind,c1,c2,ex){var o={t:'r',x:X(u),y:y,w:w,h:h,col:c1||'#2f3630',col2:c2||'#4d564c',blockShot:1,kind:kind};if(ex)for(var q in ex)o[q]=ex[q];obst.push(o);return o;}
+ function RK(u,y,r){obst.push({t:'c',x:X(u),y:y,r:r,col:'#38402e',col2:'#4e5840',blockShot:1});}
+ function BU(u,y,r){bushes.push({x:X(u),y:y,r:r,s:rnd(0,9)});}
+ function forest(u0,u1,n,clear){for(var f=0;f<n;f++){var fu=rnd(u0,u1),fy=rnd(-AY*.9,AY*.9);if(clear&&clear(fu,fy))continue;for(var q=0;q<ri(4,8);q++)BU(fu+rnd(-120,120),fy+rnd(-100,100),rnd(46,80));}}
+ function nearRoad(fu,fy){return Math.abs(fy-130)<240;}
+ function TR(u,y0,y1){var L=Math.abs(y1-y0),yc=(y0+y1)/2;FR.trench.push({x:X(u),y:yc,w:44,h:L});OB(u+dir*0,yc,14,L,'sandbag');}
+ function SB(u,y){var s={k:'turret',team:FR.def,x:X(u),y:y,w:62,h:62,hp:1800,mhp:1800,solid:1,ar:90,dead:false,ta:FR.atk===0?Math.PI:0,cd:rnd(0,2),n:'บังเกอร์ปืน'};structs.push(s);return s;}
+ /* ── A: หาด — เม่นเหล็กกันรถถัง 3 แถว (มีช่องผ่าน) + ซากรถ + กระสอบทราย ── */
+ for(k=0;k<3;k++){u=FRC.shore+420+k*640;for(y=-AY+140;y<AY-140;y+=rnd(150,230)){if(Math.random()<.22)continue;var yy=y+rnd(-30,30),uu=u+rnd(-90,90);if(frRamp(yy,-120)&&k===2)continue;OB(uu,yy,26,26,'hedge');}}
+ for(i=0;i<14;i++)OB(rnd(FRC.shore+300,FRC.cliff-500),rnd(-AY*.9,AY*.9),rnd(64,84),rnd(30,38),'wreck');
+ for(i=0;i<18;i++){var su=rnd(FRC.shore+500,FRC.cliff-420),sy=rnd(-AY*.9,AY*.9);OB(su,sy,rnd(70,120),14,'sandbag');}
+ for(i=0;i<10;i++)RK(rnd(FRC.shore+600,FRC.cliff-400),rnd(-AY*.9,AY*.9),rnd(24,44));
+ /* ── B: สันเขา — สนามเพลาะขนานขอบผา + บังเกอร์คุมทางลาด + ป่า/หิน ── */
+ for(y=-AY+120;y<AY-120;y+=240){var cu=frCliffU(y+65);if(Math.random()<.2)continue;TR(cu+340,y,y+130);}
+ FR.ramps.forEach(function(r,ix){var cu=frCliffU(r.y);SB(cu+420,r.y+(ix===0?260:ix===1?-280:-260));
+  OB(cu+520,r.y-200,90,14,'sandbag');OB(cu+520,r.y+200,90,14,'sandbag');});
+ forest(FRC.cliff+700,10200,16,nearRoad);for(i=0;i<22;i++){var ru=rnd(FRC.cliff+500,10300),ry=rnd(-AY*.9,AY*.9);if(nearRoad(ru,ry))continue;RK(ru,ry,rnd(26,58));}
+ /* ── C: แนวป้องกันส่วนหน้า — ฟันมังกร + สนามเพลาะ 2 ชั้น + บังเกอร์คอนกรีต + ซากอาคาร ── */
+ for(y=-AY+100;y<AY-100;y+=48){var gap=Math.abs(y-130)<170||Math.abs(y+1500)<150||Math.abs(y-1700)<150||Math.abs(y+700)<140||Math.abs(y-900)<140||Math.abs(y+2500)<140||Math.abs(y-2600)<140;if(!gap)OB(11300+((y/48|0)%2)*30,y,22,22,'teeth');}
+ [12050,12600].forEach(function(tu,li){for(y=-AY+140+li*150;y<AY-140;y+=300){if(Math.abs(y+80-130)<260)continue;if(Math.random()<.18)continue;TR(tu+rnd(-40,40),y,y+160);}});
+ [-1500,130,1500].forEach(function(by){SB(12800,by);OB(12960,by,24,120,'conc');});
+ for(i=0;i<9;i++){var bu=rnd(11600,15200),by2=rnd(-AY*.85,AY*.85);if(nearRoad(bu,by2))continue;OB(bu,by2,rnd(90,170),rnd(80,140),'ruin');}
+ forest(13600,15500,10,nearRoad);for(i=0;i<14;i++){var r2=rnd(10600,15500),y2=rnd(-AY*.9,AY*.9);if(nearRoad(r2,y2))continue;RK(r2,y2,rnd(26,54));}
+ /* ── D: ฐานที่มั่น — กำแพงล้อมรอบ (มีประตู) + โรงเก็บรถ + แบริเออร์คอนกรีต ── */
+ var d0=16900,d1=19900,dy0=-1900,dy1=1900;
+ function wallY(u,ya,yb){var L=Math.abs(yb-ya);if(L>8)OB(u,(ya+yb)/2,30,L,'conc');}
+ function wallU(ua,ub,y){var L=Math.abs(ub-ua);if(L>8)OB((ua+ub)/2,y,L,30,'conc');}
+ [[dy0,-1400],[-1100,-40],[300,1150],[1450,dy1]].forEach(function(s){wallY(d0,s[0],s[1]);wallY(d1,s[0],s[1]);});
+ wallU(d0,d0+1300,dy0);wallU(d0+1700,d1,dy0);wallU(d0,d0+1300,dy1);wallU(d0+1700,d1,dy1);
+ FR.walls=[{u:d0,y0:dy0,y1:dy1,g:[[-1400,-1100],[-40,300],[1150,1450]]},{u:d1,y0:dy0,y1:dy1,g:[[-1400,-1100],[-40,300],[1150,1450]]}];
+ [[17500,-760,320,220],[17500,820,320,220],[19250,-620,260,220],[19250,720,260,220],[18350,-480,220,160],[18350,740,220,160]].forEach(function(b){OB(b[0],b[1],b[2],b[3],'bld');});
+ for(i=0;i<16;i++){var jb=rnd(d0+200,d1-200),jy=rnd(dy0+150,dy1-150);if(Math.abs(jy-130)<200||Math.abs(jy+1250)<150||Math.abs(jy-1300)<150||Math.abs(jb-18400)<500&&Math.abs(jy)<500)continue;OB(jb,jy,Math.random()<.5?44:14,Math.random()<.5?14:44,'conc');}
+ [[17150,-700],[17150,900],[19650,-500],[19650,700]].forEach(function(p){SB(p[0],p[1]);});
+ forest(15700,16700,8,nearRoad);forest(20100,20800,6,nearRoad);
+ /* ── E: กองบัญชาการ — แนวบังเกอร์รอบนอก + กำแพงชั้นใน + HQ + สถานีสื่อสาร ── */
+ [-1300,-520,520,1300].forEach(function(by){SB(21980,by);});
+ for(y=-AY+140;y<AY-140;y+=280){if(Math.abs(y+75-130)<260)continue;if(Math.random()<.25)continue;TR(21900,y,y+150);}
+ var e0=23600,e1=25700,ey0=-1500,ey1=1500;FR.walls.push({u:e0,y0:ey0,y1:ey1,g:[[-300,560]]});[[ey0,-300],[560,ey1]].forEach(function(s){wallY(e0,s[0],s[1]);});wallY(e1,ey0,ey1);wallU(e0,e1,ey0);wallU(e0,e1,ey1);
+ forest(20900,23300,8,nearRoad);for(i=0;i<10;i++){var eu=rnd(20900,23300),eyy=rnd(-AY*.9,AY*.9);if(nearRoad(eu,eyy))continue;RK(eu,eyy,rnd(26,50));}
+ FR.hq={k:'hq',team:FR.def,x:X(FRC.hqU),y:0,w:300,h:380,hp:9000,mhp:9000,solid:1,ar:70,dead:false,inv:true,n:'กองบัญชาการ (HQ)'};structs.push(FR.hq);
+ structs.push({k:'radio',team:-1,x:X(24100),y:1050,w:110,h:110,hp:1800,mhp:1800,solid:1,ar:40,dead:false,r:340,n:'สถานีสื่อสาร'});
+ /* คลังเสบียง (ใครอยู่ใกล้ก็เติมได้) */
+ [[FRC.shore+900,-AY*.32],[FRC.shore+900,AY*.36],[9300,-600],[14000,700],[18400,-1450]].forEach(function(p){structs.push({k:'gas',team:-1,x:X(p[0]),y:p[1],w:200,h:100,hp:1500,mhp:1500,solid:1,ar:25,dead:false,r:420,n:'คลังเสบียง'});});
+ /* ถนน: จากยอดทางลาดกลางวิ่งยาวถึง HQ */
+ var ra=X(FRC.cliff+120),rb=X(FRC.hqU-500);roads.push({y:130,w:150,x0:Math.min(ra,rb),x1:Math.max(ra,rb)});
+ /* เป้าหมาย */
+ FR.obj=FRC.objU.map(function(ou,ix){return{k:ix,u:ou,x:X(ou),y:ix===0?0:ix===3?130:0,r:FRC.capR[ix],n:FRC.OBN[ix],L:FRC.LET[ix]};});
+ /* ล้างของที่ทับทางลาด/ถนน/จุดยึด */
+ obst=obst.filter(function(o){var ou=frU(o.x);if(o.kind!=='sandbag'||ou>FRC.cliff+200){var r=frRamp(o.y,-60);if(r&&Math.abs(ou-frCliffU(o.y))<520)return false;}
+  if(Math.abs(o.y-130)<110&&ou>FRC.cliff&&ou<FRC.hqU-450&&o.kind!=='conc')return false;
+  for(var q=1;q<FR.obj.length;q++){var ob=FR.obj[q];if(hyp(o.x-ob.x,o.y-ob.y)<220)return false;}return true;});
+ bushes=bushes.filter(function(b){var bu=frU(b.x);return bu>FRC.cliff+200&&Math.abs(b.y-130)>110;});}
+/* ── สไปรต์สิ่งกีดขวางเฉพาะ FRONTIER ── */
+function sprHedge(o){var w=o.w,h=o.h,B=sprBox(w,h,10),g=B.g,c=w/2,i;
+ g.save();g.translate(4,5);g.strokeStyle='rgba(0,0,0,.4)';g.lineWidth=4;for(i=0;i<3;i++){var a=i*1.047+.3;g.beginPath();g.moveTo(c-Math.cos(a)*c,c-Math.sin(a)*c);g.lineTo(c+Math.cos(a)*c,c+Math.sin(a)*c);g.stroke();}g.restore();
+ for(i=0;i<3;i++){var a2=i*1.047+.3;g.strokeStyle='#3a3530';g.lineWidth=4.2;g.beginPath();g.moveTo(c-Math.cos(a2)*c,c-Math.sin(a2)*c);g.lineTo(c+Math.cos(a2)*c,c+Math.sin(a2)*c);g.stroke();
+  g.strokeStyle='rgba(160,110,70,.55)';g.lineWidth=1.2;g.stroke();}return B;}
+function sprTeeth(o){var w=o.w,h=o.h,B=sprBox(w,h,10),g=B.g;g.fillStyle='rgba(0,0,0,.4)';g.fillRect(5,6,w,h);
+ g.fillStyle='#7a7a72';g.beginPath();g.moveTo(0,h);g.lineTo(w/2,0);g.lineTo(w,h);g.closePath();g.fill();g.fillStyle='#5a5a54';g.beginPath();g.moveTo(w/2,0);g.lineTo(w,h);g.lineTo(w*.55,h);g.closePath();g.fill();
+ g.fillStyle='#8a8a82';g.fillRect(0,h*.55,w,h*.45);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(0,h-2,w,2);return B;}
+function sprSandbag(o){var w=o.w,h=o.h,B=sprBox(w,h,10),g=B.g,horiz=w>=h,L=horiz?w:h,T=horiz?h:w,i,j;
+ g.fillStyle='rgba(0,0,0,.38)';g.fillRect(4,5,w,h);
+ for(j=0;j<2;j++)for(i=(j?-6:0);i<L;i+=12){var x=horiz?i:j*T/2,y=horiz?j*T/2:i,bw=horiz?12:T/2,bh=horiz?T/2:12;if(horiz&&(x<0||x>w-2))continue;if(!horiz&&(y<0||y>h-2))continue;
+  g.fillStyle=j?'#8a7a56':'#9c8a62';g.beginPath();g.ellipse(x+bw/2,y+bh/2,bw/2-.4,bh/2-.4,0,0,6.2832);g.fill();g.strokeStyle='rgba(50,40,24,.55)';g.lineWidth=.8;g.stroke();}
+ return B;}
+function sprWreck(o){var w=o.w,h=o.h,B=sprBox(w,h,14),g=B.g;g.fillStyle='rgba(0,0,0,.42)';g.fillRect(5,6,w,h);
+ g.fillStyle='#2e2a24';g.fillRect(0,0,w,h);g.fillStyle='#4a3a2a';g.fillRect(3,3,w-6,h-6);
+ g.fillStyle='#1c1a16';g.fillRect(0,0,w,5);g.fillRect(0,h-5,w,5);g.fillStyle='#5a4632';g.beginPath();g.arc(w*.45,h/2,h*.3,0,6.2832);g.fill();
+ g.strokeStyle='#2a2620';g.lineWidth=3;g.beginPath();g.moveTo(w*.45,h/2);g.lineTo(w*.45+w*.5*gr(.6,1),h/2+gr(-6,6));g.stroke();
+ for(var i=0;i<5;i++)blob(g,gr(0,w),gr(0,h),gr(5,12),'#000000',.35);blob(g,w*.5,h*.5,w*.4,'#6a3a1a',.25);return B;}
+function sprRuin(o){var B=sprBld(o),g=B.g,w=o.w,h=o.h;for(var i=0;i<6;i++)blob(g,gr(0,w),gr(0,h),gr(10,26),'#000000',.45);
+ g.fillStyle='rgba(60,54,46,.9)';for(i=0;i<5;i++)g.fillRect(gr(0,w-14),gr(0,h-14),gr(6,16),gr(6,16));return B;}
+
+/* ── วาดภูมิประเทศ: ทะเล · ฟองคลื่น · หาดทราย · หน้าผา · ทางลาด · สนามเพลาะ ── */
+function frPat(k){FR.pat=FR.pat||{};if(FR.pat[k])return FR.pat[k];var S=128,c=mkC(S,S),g=c.getContext('2d'),i,_s=_gs;_gs=k==='sand'?311:k==='rock'?733:k==='wet'?97:451;
+ if(k==='sand'||k==='wet'){g.fillStyle=k==='sand'?'#a8946a':'#7e6d4e';g.fillRect(0,0,S,S);for(i=0;i<900;i++){g.fillStyle=gpick(k==='sand'?['#b8a47a','#97845c','#c2ae84','#8e7c56']:['#6e5e42','#8a7854','#5e5038']);g.fillRect(gr(0,S),gr(0,S),gr(1,2.4),gr(1,2.4));}
+  for(i=0;i<10;i++)blob(g,gr(0,S),gr(0,S),gr(10,26),k==='sand'?'#6e5c3c':'#3e3426',.12);}
+ else if(k==='rock'){g.fillStyle='#5c564a';g.fillRect(0,0,S,S);for(i=0;i<26;i++){var x=gr(0,S),y=gr(0,S),r=gr(6,18);g.fillStyle=gpick(['#6e685a','#4a453c','#78705e','#544e44']);g.beginPath();
+   for(var q=0;q<7;q++){var a=q/7*6.2832,rr=r*gr(.7,1.1);q?g.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr):g.moveTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr);}g.closePath();g.fill();
+   g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=.8;g.stroke();}}
+ else{g.fillStyle='#6e5a3c';g.fillRect(0,0,S,S);for(i=0;i<500;i++){g.fillStyle=gpick(['#7e6a48','#5e4c32','#8a7650']);g.fillRect(gr(0,S),gr(0,S),gr(1,3),gr(1,3));}
+  g.strokeStyle='rgba(40,30,18,.4)';g.lineWidth=3;for(i=0;i<4;i++){g.beginPath();g.moveTo(0,i*32+8);g.lineTo(S,i*32+8);g.stroke();}}
+ _gs=_s;return FR.pat[k]=cx.createPattern(c,'repeat');}
+function frDrawTerrain(w,h,time){var y0=-50,y1=h+50,st=18,y,i,k,P1=[],dir=frDir(),edge=dir>0?-80:w+80;
+ var xS=[],xC=[],ys=[];for(y=y0;y<=y1+st;y+=st){var wy=y+cam.y;ys.push(y);xS.push(frX(frShoreU(wy))-cam.x);xC.push(frX(frCliffU(wy))-cam.x);}
+ var n=ys.length,minS=Math.min.apply(null,xS),maxS=Math.max.apply(null,xS),minC=Math.min.apply(null,xC),maxC=Math.max.apply(null,xC);
+ function poly(A,B,offA,offB){cx.beginPath();for(var q=0;q<n;q++){var xa=A===null?edge:A[q]+(offA||0)*dir;q?cx.lineTo(xa,ys[q]):cx.moveTo(xa,ys[q]);}for(q=n-1;q>=0;q--)cx.lineTo(B[q]+(offB||0)*dir,ys[q]);cx.closePath();}
+ var tx=-gmod(cam.x,128),ty=-gmod(cam.y,128);
+ /* ทราย: ชายฝั่ง → ตีนผา */
+ var sandL=dir>0?minS:minC-200,sandR=dir>0?maxC+200:maxS;
+ if(sandR>-60&&sandL<w+60){cx.save();poly(xS,xC,0,-FRC.cb*.6);cx.translate(tx,ty);cx.fillStyle=frPat('sand');cx.fill();cx.restore();
+  cx.save();poly(xS,xS,0,60);cx.translate(tx,ty);cx.fillStyle=frPat('wet');cx.fill();cx.restore();
+  /* ทางวิ่งรถบนหาดไปยังทางลาด */
+  for(i=0;i<FR.ramps.length;i++){var r=FR.ramps[i],ry=r.y-cam.y;if(ry<-300||ry>h+300)continue;var cxR=frX(frCliffU(r.y)-FRC.cb)-cam.x,sxR=frX(frShoreU(r.y))-cam.x;
+   cx.fillStyle='rgba(70,56,36,.12)';cx.beginPath();cx.moveTo(sxR,ry-r.w*.36);cx.lineTo(cxR,ry-r.w*.3);cx.lineTo(cxR,ry+r.w*.3);cx.lineTo(sxR,ry+r.w*.36);cx.closePath();cx.fill();
+   cx.strokeStyle='rgba(40,30,18,.35)';cx.lineWidth=3;for(k=-1;k<=1;k+=2){cx.beginPath();cx.moveTo(sxR,ry+k*28);cx.lineTo(cxR,ry+k*22);cx.stroke();}}}
+ /* ทะเล */
+ if((dir>0&&minS>-80)||(dir<0&&maxS<w+80)){cx.save();poly(null,xS);var gx0=frX(FRC.shore-1500)-cam.x,gx1=frX(FRC.shore)-cam.x,gd=cx.createLinearGradient(gx0,0,gx1,0);
+  gd.addColorStop(0,'#123342');gd.addColorStop(.7,'#1d4a5a');gd.addColorStop(1,'#2c6670');cx.fillStyle=gd;cx.fill();cx.clip();
+  /* คลื่นเคลื่อนเข้าฝั่ง */
+  cx.lineWidth=2;for(k=0;k<9;k++){var off=gmod(time*46+k*170,1530);cx.strokeStyle='rgba(200,230,235,'+(.05+.1*(1-off/1530))+')';cx.beginPath();
+   for(var q=0;q<n;q++){var xw=xS[q]-dir*(off+20)+Math.sin(ys[q]*.02+k)*6;q?cx.lineTo(xw,ys[q]):cx.moveTo(xw,ys[q]);}cx.stroke();}
+  cx.restore();
+  /* ฟองคลื่นริมฝั่ง */
+  cx.strokeStyle='rgba(236,244,240,.55)';cx.lineWidth=5;cx.beginPath();for(var q2=0;q2<n;q2++){var xf=xS[q2]-dir*(6+Math.sin(time*1.6+ys[q2]*.03)*7);q2?cx.lineTo(xf,ys[q2]):cx.moveTo(xf,ys[q2]);}cx.stroke();
+  cx.strokeStyle='rgba(236,244,240,.22)';cx.lineWidth=10;cx.stroke();}
+ /* หน้าผา + ทางลาด */
+ if(maxC+FRC.cb>-80&&minC-FRC.cb<w+80){cx.save();poly(xC,xC,-FRC.cb,FRC.cb);cx.save();cx.translate(tx,ty);cx.fillStyle=frPat('rock');cx.fill();cx.restore();
+  var gc=cx.createLinearGradient(minC-FRC.cb*dir,0,minC+FRC.cb*dir,0);gc.addColorStop(0,'rgba(0,0,0,.45)');gc.addColorStop(.6,'rgba(0,0,0,.12)');gc.addColorStop(1,'rgba(255,240,200,.1)');
+  cx.fillStyle=gc;cx.fill();cx.restore();
+  /* ขอบบนผา (หญ้า) + เงาตีนผา */
+  cx.strokeStyle='rgba(90,110,60,.85)';cx.lineWidth=4;cx.beginPath();for(var q3=0;q3<n;q3++){var xt=xC[q3]+FRC.cb*dir;q3?cx.lineTo(xt,ys[q3]):cx.moveTo(xt,ys[q3]);}cx.stroke();
+  cx.strokeStyle='rgba(0,0,0,.35)';cx.lineWidth=8;cx.beginPath();for(q3=0;q3<n;q3++){var xb=xC[q3]-FRC.cb*dir-4*dir;q3?cx.lineTo(xb,ys[q3]):cx.moveTo(xb,ys[q3]);}cx.stroke();
+  for(i=0;i<FR.ramps.length;i++){var R=FR.ramps[i],sy=R.y-cam.y;if(sy<-R.w||sy>h+R.w)continue;var cu=frCliffU(R.y),xa=frX(cu-FRC.cb-30)-cam.x,xb2=frX(cu+FRC.cb+30)-cam.x,L=Math.min(xa,xb2),Wd=Math.abs(xb2-xa);
+   cx.save();cx.translate(tx,ty);cx.fillStyle=frPat('dirt');cx.fillRect(L-tx,sy-R.w/2-ty,Wd,R.w);cx.restore();
+   var gr2=cx.createLinearGradient(xa,0,xb2,0);gr2.addColorStop(0,'rgba(0,0,0,.25)');gr2.addColorStop(1,'rgba(255,240,200,.12)');cx.fillStyle=gr2;cx.fillRect(L,sy-R.w/2,Wd,R.w);
+   cx.fillStyle='rgba(30,26,20,.7)';cx.fillRect(L,sy-R.w/2-5,Wd,6);cx.fillRect(L,sy+R.w/2-1,Wd,6);
+   cx.strokeStyle='rgba(30,22,12,.4)';cx.lineWidth=3;for(k=-1;k<=1;k+=2){cx.beginPath();cx.moveTo(xa,sy+k*30);cx.lineTo(xb2,sy+k*30);cx.stroke();}
+   cx.fillStyle='rgba(255,210,120,.75)';cx.font='700 12px Kanit, Tahoma';cx.textAlign='center';cx.fillText('▲ ทางลาด',(xa+xb2)/2,sy-R.w/2-10);cx.textAlign='left';}}
+ /* สนามเพลาะ (ร่องดิน) */
+ for(i=0;i<FR.trench.length;i++){var T=FR.trench[i],x=T.x-T.w/2-cam.x,y2=T.y-T.h/2-cam.y;if(x>w||y2>h||x+T.w<0||y2+T.h<0)continue;
+  cx.fillStyle='#2a2318';cx.fillRect(x,y2,T.w,T.h);cx.fillStyle='rgba(0,0,0,.35)';cx.fillRect(x+6,y2+4,T.w-12,T.h-8);cx.strokeStyle='rgba(120,100,70,.5)';cx.lineWidth=2;cx.strokeRect(x,y2,T.w,T.h);}}
+/* เรือรบนอกชายฝั่ง (บรรยากาศ) */
+function frDrawFleet(w,h,time){if(!FR.fleet)return;for(var i=0;i<FR.fleet.length;i++){var f=FR.fleet[i],x=f.x-cam.x,y=f.y-cam.y;if(x<-500||x>w+500||y<-250||y>h+250)continue;
+ cx.save();cx.translate(x,y+Math.sin(time*.6+f.ph)*1.6);frDrawShip(f,time);cx.restore();}}
+/* เรือยกพล */
+function frDrawCraft(w,h,time){var i,j;for(i=0;i<FR.crafts.length;i++){var c=FR.crafts[i],x=c.x-cam.x,y=c.y-cam.y;if(x<-400||x>w+400||y<-200||y>h+200)continue;
+ var bob=Math.sin(time*1.7+c.seed)*1.2;cx.save();cx.translate(x,y+bob);cx.rotate(c.a);var L=c.L,W=c.W;
+ if(c.st==='sail'||c.st==='back'){cx.strokeStyle='rgba(230,240,240,.35)';cx.lineWidth=3;cx.beginPath();cx.moveTo(-L,-W*.8);cx.lineTo(-L-90,-W*1.9);cx.moveTo(-L,W*.8);cx.lineTo(-L-90,W*1.9);cx.stroke();
+  cx.fillStyle='rgba(230,240,240,.22)';cx.fillRect(-L-60,-W*.7,60,W*1.4);}
+ cx.fillStyle='rgba(0,0,0,.3)';cx.fillRect(-L+8,-W+10,L*2,W*2);
+ cx.fillStyle='#3b4441';cx.fillRect(-L,-W,L*2,W*2);cx.fillStyle='#2a302d';cx.fillRect(-L+8,-W+8,L*2-22,W*2-16);
+ cx.strokeStyle='#59625c';cx.lineWidth=2;cx.strokeRect(-L+1,-W+1,L*2-2,W*2-2);
+ cx.fillStyle='#4a524c';cx.fillRect(-L,-W,22,W*2);cx.fillStyle='#22282a';cx.fillRect(-L+4,-W*.4,12,W*.8);
+ var rp=c.ramp||0;if(rp<1){cx.fillStyle='#4e5852';cx.fillRect(L-10,-W,10+rp*30,W*2);cx.strokeStyle='rgba(0,0,0,.4)';cx.strokeRect(L-10,-W,10+rp*30,W*2);}
+ else{cx.fillStyle='#4e5852';cx.fillRect(L-4,-W*.92,58,W*1.84);cx.strokeStyle='rgba(0,0,0,.45)';cx.lineWidth=1.2;for(j=0;j<6;j++){cx.beginPath();cx.moveTo(L+4+j*9,-W*.9);cx.lineTo(L+4+j*9,W*.9);cx.stroke();}}
+ for(j=0;j<c.pax.length;j++){var px=-L*.62+(j%4)*12,py=-W*.55+Math.floor(j/4)*14;cx.fillStyle=teamSide(c.team)===0?'#7fa8d8':'#d88a7a';cx.beginPath();cx.arc(px,py+(j%2)*4,3.2,0,6.2832);cx.fill();}
+ cx.fillStyle=teamSide(c.team)===0?'#4fa0e0':'#e05a3c';cx.fillRect(-L+3,-W+3,6,6);cx.restore();}}
+/* เป้าหมายบนสนาม */
+function frDrawObj(w,h,time){var atkC=FR.atk===0?'#8fd44a':'#e05a3c',defC=FR.atk===0?'#e05a3c':'#8fd44a';
+ for(var k=0;k<FR.obj.length;k++){var o=FR.obj[k],x=o.x-cam.x,y=o.y-cam.y;if(x<-o.r-200||x>w+o.r+200||y<-o.r-200||y>h+o.r+200)continue;
+  var cap=k<FR.next,act=k===FR.next,col=cap?atkC:act?(FR.cst==='cont'?'#ffcf5a':'#f0f0e0'):'rgba(170,170,160,.6)';
+  cx.save();if(k>0){cx.strokeStyle=col;cx.globalAlpha=act?.55+Math.sin(time*4)*.2:cap?.35:.25;cx.lineWidth=act?4:2.5;cx.setLineDash(act?[22,12]:[10,14]);cx.lineDashOffset=-time*20;
+   cx.beginPath();cx.arc(x,y,o.r,0,6.2832);cx.stroke();cx.setLineDash([]);
+   if(act&&FR.prog>0){cx.globalAlpha=.85;cx.strokeStyle=atkC;cx.lineWidth=8;cx.beginPath();cx.arc(x,y,o.r,-1.5708,-1.5708+FR.prog/100*6.2832);cx.stroke();}
+   if(act){cx.globalAlpha=.06;cx.fillStyle=FR.cst==='cont'?'#ffcf5a':atkC;cx.beginPath();cx.arc(x,y,o.r,0,6.2832);cx.fill();}}
+  cx.globalAlpha=cap||act?1:.6;cx.textAlign='center';cx.font='800 34px Teko, Kanit, sans-serif';cx.lineWidth=5;cx.strokeStyle='rgba(0,0,0,.7)';cx.strokeText(o.L,x,y-6);cx.fillStyle=k===0||cap?atkC:act?'#fff2c0':defC;cx.fillText(o.L,x,y-6);
+  cx.font='600 12px Kanit, Tahoma';cx.lineWidth=3;var sub=o.n+(act?(FR.cst==='cont'?' · ⚔️ ชิงกันอยู่':FR.prog>0?' · '+Math.round(FR.prog)+'%':''):cap?' · ยึดแล้ว':k>FR.next?' · 🔒':'');
+  cx.strokeText(sub,x,y+14);cx.fillStyle='#e8e2d0';cx.fillText(sub,x,y+14);cx.restore();}
+ if(FR.hq&&!FR.hq.dead&&FR.next>4){var hx=FR.hq.x-cam.x,hy=FR.hq.y-cam.y;if(hx>-300&&hx<w+300&&hy>-300&&hy<h+300){cx.save();cx.strokeStyle='rgba(255,90,60,'+(.5+Math.sin(time*6)*.3)+')';cx.lineWidth=3;cx.strokeRect(hx-180,hy-220,360,440);cx.restore();}}}
+/* กติกาเขต: ฝ่ายป้องกันห้ามเข้าเขตที่ถูกยึด · ฝ่ายบุกมีลูกศรชี้เป้าหมาย */
+function frDrawRules(w,h){if(!P||SPEC.on||CINE.k)return;var rl=flRole(0),i;
+ if(teamSide(0)!==FR.atk&&(rl==='def'||rl==='prep')){for(var z=0;z<FLZ;z++){if(FL.own[z]===0)continue;var x0=(-AX+z*ZL)-cam.x;if(x0>w||x0+ZL<0)continue;
+   cx.fillStyle='rgba(220,50,30,.08)';cx.fillRect(x0,-40,ZL,h+80);}
+  var xb=ownEdgeX(0)-cam.x;if(xb>-20&&xb<w+20){cx.strokeStyle='rgba(255,80,50,'+(.55+Math.sin(G.t*5)*.25)+')';cx.lineWidth=4;cx.setLineDash([18,12]);cx.beginPath();cx.moveTo(xb,-40);cx.lineTo(xb,h+40);cx.stroke();cx.setLineDash([]);}}
+ if(teamSide(0)===FR.atk&&P&&!P.dead&&!FL.prep){var g=frGoalPt(P);var dx=g.x-P.x,dy=g.y-P.y,d=hyp(dx,dy);if(d>500){var a=Math.atan2(dy,dx),sx=P.x-cam.x+Math.cos(a)*Math.min(260,h*.38),sy=P.y-cam.y+Math.sin(a)*Math.min(200,h*.3);
+   cx.save();cx.translate(sx,sy);cx.rotate(a);cx.fillStyle='rgba(255,200,90,.85)';cx.beginPath();cx.moveTo(18,0);cx.lineTo(-8,-10);cx.lineTo(-3,0);cx.lineTo(-8,10);cx.closePath();cx.fill();cx.restore();
+   cx.fillStyle='#ffcf7a';cx.font='700 12px Kanit, Tahoma';cx.textAlign='center';cx.fillText(g.lb+' · '+Math.round(d/10)+' ม.',sx,sy-16);cx.textAlign='left';}}}
+/* ซ้อนบนแผนที่เล็ก/ใหญ่ */
+function frMapOv(g,W,H,sc,mp,big){var x0=W/2-AX*sc,dir=frDir(),i;
+ var sx=W/2+frX(FRC.shore)*sc;g.fillStyle='rgba(30,80,100,.55)';if(dir>0)g.fillRect(x0,H/2-AY*sc,sx-x0,AY*2*sc);else g.fillRect(sx,H/2-AY*sc,W/2+AX*sc-sx,AY*2*sc);
+ var cx1=W/2+frX(FRC.cliff)*sc;g.fillStyle='rgba(168,148,106,.4)';g.fillRect(Math.min(sx,cx1),H/2-AY*sc,Math.abs(cx1-sx),AY*2*sc);
+ g.strokeStyle='rgba(150,140,120,.9)';g.lineWidth=big?3:1.5;g.beginPath();for(var y=-AY;y<=AY;y+=AY/20){var q=mp({x:frX(frCliffU(y)),y:y});y===-AY?g.moveTo(q[0],q[1]):g.lineTo(q[0],q[1]);}g.stroke();
+ for(i=0;i<FR.ramps.length;i++){var r=FR.ramps[i],q2=mp({x:frX(frCliffU(r.y)),y:r.y});g.fillStyle='#e8c070';g.fillRect(q2[0]-(big?5:2),q2[1]-r.w*sc/2,big?10:4,r.w*sc);}
+ for(i=0;i<FR.obj.length;i++){var o=FR.obj[i],q3=mp(o),cap=i<FR.next,act=i===FR.next;g.strokeStyle=cap?(FR.atk===0?'#8fd44a':'#e05a3c'):act?'#ffe08a':'#8a8a80';g.lineWidth=big?2.5:1.3;
+  g.beginPath();g.arc(q3[0],q3[1],Math.max(big?8:4,(o.r||300)*sc),0,6.2832);g.stroke();
+  if(big||act){g.fillStyle=g.strokeStyle;g.font='bold '+(big?14:9)+'px Tahoma';g.textAlign='center';g.fillText(o.L,q3[0],q3[1]+(big?5:3));g.textAlign='left';}}
+ for(i=0;i<FR.crafts.length;i++){var c=FR.crafts[i],q4=mp(c);g.fillStyle=teamSide(c.team)===0?'#7fc0ff':'#ff8a6a';g.fillRect(q4[0]-(big?4:2),q4[1]-(big?2:1),big?8:4,big?4:2);}}
+
+/* ── เรือยกพล: แล่นเข้าฝั่ง → เปิดประตู → รถถัง/ทหารลง → ถอยกลับ ── */
+FRC.poolA=['mbt','mbt','medium','light','ifv','ifv','heavy'];FRC.poolD=['mbt','heavy','medium','ifv','light','mbt'];
+function frCraftNew(y,veh,nPax,team,u0,wave){var L=150,su=frShoreU(y),c={x:0,y:y,u:u0,u0:u0,u1:su-L-12,L:L,W:58,a:FR.atk===0?0:Math.PI,veh:[],pax:[],st:'sail',ramp:0,t:0,team:team,seed:rnd(0,9),spd:125,wave:!!wave};
+ veh.forEach(function(t,i){t.craft=c;t.slot=i;t.a=c.a;t.ta=c.a;t.spd=0;c.veh.push(t);});
+ for(var i=0;i<nPax;i++)c.pax.push(mkSoldier(team,i%3===1?'at':'rifle'));
+ FR.crafts.push(c);frCraftPos(c);return c;}
+function frCraftPos(c){c.x=frX(c.u);for(var i=0;i<c.veh.length;i++){var t=c.veh[i];if(t.craft!==c)continue;t.x=frX(c.u+(t.slot===0?c.L*.42:-c.L*.42));t.y=c.y;t.a=c.a;t.spd=0;t.thr=0;}}
+function frRelease(c,t){t.craft=null;t.wade=5;t.spd=.3;var i=c.veh.indexOf(t);if(t===P&&!SPEC.on){addLog('🚪 ประตูเรือเปิด — ลงหาด! หาทางลาดขึ้นสันเขา','g');vib(20);}}
+function frCraftTick(dt){for(var i=FR.crafts.length-1;i>=0;i--){var c=FR.crafts[i],j;c.t+=dt;
+ if(c.st==='sail'){if(c.wave){var p=FL.prep?1-clamp(FR.prepT/FRC.prep,0,1):1;c.u=lerp(c.u0,c.u1,p);if(!FL.prep){c.u=c.u1;c.st='open';c.t=0;}}
+  else{c.u=Math.min(c.u1,c.u+c.spd*dt);if(c.u>=c.u1){c.st='open';c.t=0;}}}
+ else if(c.st==='open'){c.ramp=Math.min(1,c.ramp+dt/1.1);if(c.ramp>=1){c.st='unload';c.t=0;
+   for(j=0;j<c.pax.length;j++){var s=c.pax[j];s.x=frX(c.u+c.L+40+rnd(0,50));s.y=c.y+rnd(-46,46);s.veh=null;inf.push(s);}c.pax=[];
+   var pd=P?hyp(c.x-P.x,c.y-P.y):0;if(pd<1400)SFX.at(c.x,c.y).ric();}}
+ else if(c.st==='unload'){for(j=0;j<c.veh.length;j++){var t=c.veh[j];if(t.craft===c&&c.t>=.15+t.slot*1.3)frRelease(c,t);}
+  var busy=c.veh.some(function(v){return v.craft===c||(!v.dead&&Math.abs(frU(v.x)-(c.u+c.L))<70&&Math.abs(v.y-c.y)<c.W+20);});if(!busy&&c.t>3.5){c.st='back';c.t=0;}}
+ else if(c.st==='back'){c.ramp=Math.max(0,c.ramp-dt/1.1);c.u-=75*dt;if(c.u<c.u1-1500){FR.crafts.splice(i,1);continue;}}
+ frCraftPos(c);}}
+/* ── จุดเกิด ── */
+function frSpawnPoint(team){var sd=teamSide(team),tries,u,y,x;
+ if(sd===FR.atk){var k=FR.next-1;
+  if(k<=0)return{craft:true,x:frX(FRC.shore-1300),y:clamp(rnd(-AY*.82,AY*.82),-AY+260,AY-260),z:frZ(0)};
+  var ob=FR.obj[Math.min(k,4)];for(tries=0;tries<24;tries++){u=ob.u-rnd(480,1150);y=clamp(ob.y+rnd(-AY*.6,AY*.6),-AY+220,AY-220);x=frX(u);
+   if(!blocked(x,y)&&u>frCliffU(y)+FRC.cb+80)return{x:x,y:y,z:zoneOf(x)};}
+  return{x:frX(ob.u-700),y:ob.y+rnd(-200,200),z:zoneOf(frX(ob.u-700))};}
+ var od=FR.obj[Math.min(FR.next,4)],bu=FR.next>4?FRC.hqU-650:FR.next<4&&Math.random()<.4?FR.obj[FR.next+1].u-rnd(200,900):od.u+rnd(1500,2300);
+ for(tries=0;tries<24;tries++){y=clamp(rnd(-AY*.75,AY*.75),-AY+220,AY-220);u=bu+rnd(-220,220);x=frX(u);if(!blocked(x,y))return{x:x,y:y,z:zoneOf(x)};}
+ return{x:frX(bu),y:rnd(-300,300),z:zoneOf(frX(bu))};}
+function frFace(sd){return sd===FR.atk?(FR.atk===0?0:Math.PI):(FR.atk===0?Math.PI:0);}
+function frSpawnQueue(dt){
+ for(var i=FL.spawnQ.length-1;i>=0;i--){var q=FL.spawnQ[i],sd=teamSide(q.team);if(q.t===0)q.t=queueTime(q.team);q.t-=dt;
+  if(q.t>0)continue;if(sd===FR.atk&&FR.tk<=0){FL.spawnQ.splice(i,1);continue;}
+  var sp=frSpawnPoint(q.team);if(sp.craft){FR.lq.push(q.team);FL.spawnQ.splice(i,1);continue;}
+  var st=foeStat(G.lvl,pick(sd===FR.atk?FRC.poolA:FRC.poolD),false),
+   nt=mkTank(sp.x,sp.y,st,q.team,{a:frFace(sd),skin:q.team===2?'nordic':st.skinKey});tanks.push(nt);infFill(nt);
+  if(sp.craft)frCraftNew(sp.y,[nt],0,q.team,frShoreU(sp.y)-1500,false);else supSpawnMark(sd,sp.x,sp.y);FL.spawnQ.splice(i,1);}
+ if(FL.pRespawn>0){FL.pRespawn-=dt;var qn=0;for(var k=0;k<FL.spawnQ.length;k++)if(teamSide(FL.spawnQ[k].team)===0)qn++;
+  $('respT').textContent=Math.ceil(FL.pRespawn);var us=teamSide(0)===FR.atk;
+  $('respQ').textContent=(us?'🎟️ กำลังเสริม '+fmt(FR.tk)+' · '+(FR.next<=1?'เกิดในเรือยกพล':'เกิดที่ '+FRC.LET[FR.next-1]):'เกิดที่แนวป้องกัน '+FRC.LET[Math.min(FR.next,4)])+' · คิว '+qn;
+  if(FL.pRespawn<=0)respawnPlayer();}}
+function frInfSpawn(dt){FR.infT=(FR.infT||6)-dt;if(FR.infT>0)return;FR.infT=13;FR.infN=(FR.infN||0)+1;
+ for(var sd=0;sd<2;sd++){if(FL.prep)continue;if(sd===FR.def&&FR.infN%3===2)continue;if(sd===FR.atk&&FR.tk<=0)continue;var room=infQuota()-infCount(sd);if(room<3)continue;
+  var n=Math.min(4+Math.round(FR.size/16),room),team=sd===0?2:1,sp=frSpawnPoint(team);
+  if(sp.craft){FR.lqI+=n;FR.lqT=team;}else{infFoot(team,n,sp.x,sp.y);supSpawnMark(sd,sp.x,sp.y);}}}
+/* ระลอกยกพล: รวมกำลังเสริมที่รอขึ้นฝั่งแล้วส่งเรือออกพร้อมกันทุก ~15 วิ (ขึ้นหาดเป็นกลุ่ม ไม่ทยอย) */
+function frLandWave(dt){FR.lwT-=dt;if(FR.lwT>0||FL.prep)return;FR.lwT=15;var nv=FR.lq.length,ni=FR.lqI;if(!nv&&ni<3)return;
+ var tk=FR.lq.splice(0,6),nc=Math.max(Math.ceil(tk.length/2),Math.min(FR.size>=64?5:3,Math.ceil(ni/(FR.size>=64?8:6)))),ri0=ri(0,2),i,tm=FR.atk===0?2:1;
+ for(i=0;i<nc;i++){var r=FR.ramps[(ri0+i)%3],y=clamp(r.y+rnd(-420,420),-AY+260,AY-260),vs=[];
+  for(var j=0;j<2&&tk.length;j++){var team=tk.shift(),st=foeStat(G.lvl,pick(FRC.poolA),false),nt=mkTank(0,y,st,team,{a:frFace(FR.atk),skin:team===2?'nordic':st.skinKey});tanks.push(nt);infFill(nt);vs.push(nt);}
+  var np=Math.min(FR.size>=64?8:6,FR.lqI);FR.lqI-=np;frCraftNew(y,vs,np,tm,frShoreU(y)-1450-rnd(0,200),false);}
+ if(teamSide(0)===FR.atk&&!SPEC.on)addLog('🚤 ระลอกยกพลใหม่ '+nc+' ลำ กำลังเข้าหาด','b');}
+/* เรือรบยิงสนับสนุน: ถล่มฝ่ายป้องกันแถบหาด–สันเขา B (เฉพาะก่อนยึด B) */
+function frNavalFire(dt){if(FL.prep||FR.next>1||!FR.fleet)return;for(var i=0;i<FR.fleet.length;i++){var f=FR.fleet[i];if(f.ty==='cv'||f.ty==='lst')continue;f.ncd=(f.ncd===undefined?rnd(6,12):f.ncd)-dt;if(f.ncd>0)continue;f.ncd=rnd(8,13);
+  var best=null,bs=-1,k,c=[];for(k=0;k<tanks.length;k++){var t=tanks[k];if(!t.dead&&!t.craft&&teamSide(t.team)===FR.def){var u=frU(t.x);if(u>FRC.cliff-250&&u<FRC.cliff+2300)c.push(t);}}
+  for(k=0;k<inf.length;k++){var q=inf[k];if(!q.dead&&teamSide(q.team)===FR.def){var uq=frU(q.x);if(uq>FRC.cliff-250&&uq<FRC.cliff+2300)c.push(q);}}
+  for(k=0;k<6&&c.length;k++){var o=c[ri(0,c.length-1)],safe=true;for(var m=0;m<tanks.length&&safe;m++){var a=tanks[m];if(!a.dead&&teamSide(a.team)===FR.atk&&hyp(a.x-o.x,a.y-o.y)<300)safe=false;}if(safe){best=o;break;}}
+  if(!best)continue;f.fl=1;for(k=0;k<2;k++)arty.push({x:best.x+rnd(-70,70),y:best.y+rnd(-70,70),t:2.4+k*.35,r:140,dmg:480,side:FR.atk,sup:1});
+  if(P&&hyp(f.x-P.x,f.y-P.y)<3000)SFX.at(f.x,f.y).cannon(1.7,hyp(f.x-P.x,f.y-P.y));}}
+/* ── ยึดจุด ── */
+function frCount(o){var a=0,d=0,i,t,R=o.r;
+ for(i=0;i<tanks.length;i++){t=tanks[i];if(t.dead||t.craft)continue;if(hyp(t.x-o.x,t.y-o.y)>R)continue;if(teamSide(t.team)===FR.atk)a+=2;else d+=2;}
+ if(inf.length)infNear(o.x,o.y,R,function(q){if(q.dead||hyp(q.x-o.x,q.y-o.y)>R)return;if(teamSide(q.team)===FR.atk)a++;else d++;});
+ for(i=0;i<structs.length;i++){var s=structs[i];if(s.k==='turret'&&!s.dead&&s.team===FR.def&&hyp(s.x-o.x,s.y-o.y)<R)d+=3;}
+ return[a,d];}
+function frAlert(t,s,c){cineCard(t,s,c||'#ffc46a',2.8);}
+function frCapture(dt){if(FL.prep||FR.next>4){FR.cst='';return;}var o=FR.obj[FR.next],c=frCount(o),a=c[0],d=c[1],prev=FR.cst;FR.na=a;FR.nd=d;
+ if(a>0&&d>0){FR.cst='cont';if(a>=d*1.5)FR.prog=Math.min(100,FR.prog+100/FRC.capT*.5*dt);else if(d>=a*1.5)FR.prog=Math.max(0,FR.prog-100/60*dt);}
+ else if(a>0){FR.cst='cap';FR.prog=Math.min(100,FR.prog+100/FRC.capT*(1+(Math.min(a,FRC.capMax*2)-1)*.14)*dt);}
+ else{FR.cst=d>0?'hold':'';FR.prog=Math.max(0,FR.prog-(d>0?100/28:100/75)*dt);}
+ if(FR.cst==='cont'&&prev!=='cont'&&G.t-(FR.contT||-99)>30){FR.contT=G.t;frAlert('OBJECTIVE CONTESTED','เป้าหมาย '+o.L+' — '+o.n+' กำลังถูกแย่งชิง','#ffcf5a');}
+ if(FR.cst==='hold'&&prev==='cap'&&FR.prog>30&&G.t-(FR.caT||-99)>40){FR.caT=G.t;frAlert('ENEMY COUNTERATTACK',teamSide(0)===FR.atk?'ศัตรูตีโต้ที่ '+o.L+' — กลับไปยึดต่อ!':'ตีโต้สำเร็จ — ผลักศัตรูออกจาก '+o.L,'#ff9a4a');}
+ if(FR.prog>=100)frCaptured(FR.next);}
+function frCaptured(k){frStCap(FR.obj[k]);var o=FR.obj[k],us=teamSide(0)===FR.atk,add=FR.bonus,i;FR.next=k+1;FR.prog=0;FR.cst='';
+ FR.tk=Math.min(FR.tkMax,FR.tk+add);FR.tkPop={v:add,t:3};SFX.cap();SFX.radio(us?'good':'bad');SFX.horn();
+ if(k<4){var z=frZ(k);FL.own[z]=FR.atk;flUpdateFront();var eb=ownEdgeX(FR.def);
+  for(i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)===FR.def&&zoneOf(t.x)===z){t.oobMax=clamp(Math.abs(t.x-eb)/80,14,50);t.oob=0;}}
+  if(FL.ev&&k<3)flAirStrike(FR.atk,frZ(k+1));}
+ else if(FR.hq)FR.hq.inv=false;
+ if(k+1<=4)FR.abQ.push({k:k+1,t:6});if(FR.bOpen)frBuildUI();
+ var who=SPEC.on?(FR.atk===0?'น้ำเงิน':'แดง'):'';
+ frAlert(k<4?'OBJECTIVE '+o.L+' CAPTURED':'HQ UNDER ATTACK',k<4?(SPEC.on?who+'ยึด '+o.n+' · กำลังเสริม +'+add:us?'ยึด '+o.n+' · กำลังเสริม +'+add+' · จุดเกิดย้ายมาที่ '+o.L:'เสีย '+o.n+' — ถอยไปตั้งรับแนว '+FRC.LET[k+1]):(us?'ยึดแนวรอบ HQ ได้ — ทำลายกองบัญชาการ!':'ศัตรูถึงกองบัญชาการ — ป้องกัน HQ!'),us||SPEC.on?'#9fe06a':'#ff6a4a');
+ addLog(k<4?(us?'🚩 ยึดเป้าหมาย '+o.L+' สำเร็จ · กำลังเสริม +'+add:'❌ เสียเป้าหมาย '+o.L+' — ถอยไปแนว '+FRC.LET[k+1]):(us?'🏁 ยึดแนวรอบ HQ ได้ — ยิง HQ ให้พัง!':'🚨 HQ UNDER ATTACK — ศัตรูยึดแนวรอบนอกได้แล้ว'),us?'g':'r');
+ if(us&&!SPEC.on)SV.stat.caps++;}
+/* ── กำลังเสริม (ตั๋ว) ฝ่ายบุก: ตาย 1 = หัก 1 ── */
+function frTkLose(side){if(FL.prep||G.over||side!==FR.atk)return;FR.tk=Math.max(0,FR.tk-1);FR.tkFl=.35;FR.tkLost=(FR.tkLost||0)+1;
+ if(FR.tk===0&&!FR.tk0W){FR.tk0W=1;frAlert('NO REINFORCEMENTS','ฝ่ายบุกหมดกำลังเสริม — เกิดใหม่ไม่ได้อีกแล้ว','#ff6a4a');SFX.radio('bad');}
+ else if(FR.tk<=FR.tk0*.15&&FR.tk>0&&!FR.lowW){FR.lowW=1;frAlert('REINFORCEMENTS LOW','กำลังเสริมฝ่ายบุกเหลือ '+FR.tk,'#ffb347');SFX.radio('bad');}}
+function frLand(){FL.prep=false;FR.prepT=0;FL.phaseT=0;FR.landT=G.t;var us=teamSide(0)===FR.atk;
+ frAlert('ยกพลขึ้นบก!',SPEC.on?'ประตูเรือเปิด — การบุกเริ่มแล้ว':us?'ประตูเรือเปิด — ลงหาด แล้วหาทางลาดขึ้นสันเขา B':'ศัตรูขึ้นฝั่งแล้ว — ยันแนวสันเขา B ไว้!','#ffc46a');SFX.horn();SFX.radio('air');
+ if(FL.ev)flAirStrike(FR.atk,frZ(1));}
+function frAlive(sd){var n=0,i;for(i=0;i<tanks.length;i++)if(!tanks[i].dead&&teamSide(tanks[i].team)===sd)n++;for(i=0;i<inf.length;i++)if(!inf[i].dead&&teamSide(inf[i].team)===sd)n++;
+ for(i=0;i<FR.crafts.length;i++){var c=FR.crafts[i];if(teamSide(c.team)===sd)n+=c.pax.length;}
+ for(i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&t.pax&&teamSide(t.team)===sd)n+=t.pax.length;}return n;}
+function frTick(dt){var i,us=teamSide(0)===FR.atk;if(FR.tkFl>0)FR.tkFl-=dt;if(FR.tkPop)FR.tkPop.t-=dt;
+ if(FL.prep){if(!CINE.k){var pt=FR.prepT;FR.prepT-=dt;FL.phaseT=FR.prepT;if(FR.prepT>0&&FR.prepT<=5&&Math.ceil(FR.prepT)!==Math.ceil(pt))SFX.lwsBeep(false);
+   if(Math.ceil(FR.prepT)===30&&Math.ceil(pt)===31&&!SPEC.on)addLog(us?'⏳ อีก 30 วิ เรือถึงฝั่ง — เตรียมลงหาด':'⏳ อีก 30 วิ ศัตรูขึ้นฝั่ง — เข้าประจำแนวสันเขา','b');
+   if(FR.prepT<=0)frLand();}}
+ else if(!G.over){FR.time-=dt;FL.rt+=dt;if(FR.time<=0){FR.time=0;flEnd(!us,null);}
+  if(FR.time<=120&&!FR.t2W){FR.t2W=1;frAlert('เหลือ 2 นาที',us?'ต้องทำลาย HQ ให้ได้ก่อนหมดเวลา':'ยันไว้อีก 2 นาทีเพื่อชนะ','#ffb347');}}
+ frCraftTick(dt);frInfSpawn(dt);frRampWaves(dt);frLandWave(dt);frNavalFire(dt);frUnstick(dt);frFortTick(dt);frWxTick(dt);frAIArty(dt);frArtyWarn(dt);
+ for(i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead)continue;if(t.wade>0)t.wade-=dt;if(t.craft){t.oob=0;continue;}var sd=teamSide(t.team),rl=flRole(sd);
+  if(rl==='prep'){if(!zoneOwnOK(sd,t.x)){var xb=ownEdgeX(sd);t.x=sd===0?Math.min(t.x,xb-30):Math.max(t.x,xb+30);t.spd*=.4;}t.oob=0;continue;}
+  if(rl==='def'&&!zoneHoldOK(sd,t.x)){t.oob=(t.oob||0)+dt;if(t===P&&Math.floor(t.oob)!==Math.floor(t.oob-dt))SFX.lwsBeep(true);if(t.oob>=(t.oobMax||FLR.oob))selfDestruct(t);}
+  else{t.oob=0;t.oobMax=FLR.oob;}}
+ if(FL.ev){FL.ev.charge[FR.atk]=FL.prep?0:1;FL.ev.charge[FR.def]=0;}
+ if(FR.hq&&!FR.hq.inv&&!FR.hq.dead&&FR.hq.hp<FR.hq.mhp*.5&&!FR.hqW){FR.hqW=1;frAlert('HQ CRITICAL','กองบัญชาการเสียหายเกินครึ่ง','#ff6a4a');}
+ FR.elT=(FR.elT||0)-dt;if(FR.elT<=0&&!FL.prep&&FR.tk<=0&&!G.over){FR.elT=1;if(frAlive(FR.atk)===0){frAlert('ATTACKERS ELIMINATED','ฝ่ายบุกถูกกวาดล้าง','#ff6a4a');flEnd(!us,null);}}
+ /* เรือรบยิงสนับสนุน (บรรยากาศ): แฟลชปากกระบอก + เสียงไกล */
+ frAtmo(dt,G.t);frPerfTick(dt);}
+function frUnstick(dt){FR.usT=(FR.usT||0)-dt;if(FR.usT>0)return;FR.usT=2;
+ for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead||t.craft||t===P&&!SPEC.on||t.team===0&&!SPEC.on)continue;
+  if(t.usX===undefined||hyp(t.x-t.usX,t.y-t.usY)>55){t.usX=t.x;t.usY=t.y;t.usN=0;continue;}
+  if(Math.abs(t.thr)<.3||t.see&&t.seeT&&hyp(t.seeT.x-t.x,t.seeT.y-t.y)<900)continue;t.usN++;
+  if(t.usN===3){t.unT=1.8;t.unS=Math.random()<.5?-1:1;t.navSd=-(t.navSd||1);}
+  else if(t.usN>=6){var g=frGoalPt(t),a=Math.atan2(g.y-t.y,g.x-t.x);for(var k=0;k<8;k++){var aa=a+(k%2?1:-1)*Math.ceil(k/2)*.5,nx=t.x+Math.cos(aa)*70,ny=t.y+Math.sin(aa)*70;if(!blocked(nx,ny)&&!blocked(nx+Math.cos(aa)*30,ny+Math.sin(aa)*30)){t.x=nx;t.y=ny;t.a=aa;break;}}t.usN=0;t.usX=t.x;t.usY=t.y;}}}
+function frRampWaves(dt){FR.rwT=(FR.rwT||0)-dt;for(var i=0;i<FR.ramps.length;i++){var r=FR.ramps[i];if(r.goT>0)r.goT-=dt;}
+ if(FR.rwT>0)return;FR.rwT=.5;if(FL.prep||FR.next>1)return;
+ for(i=0;i<FR.ramps.length;i++){var r2=FR.ramps[i],cu=frCliffU(r2.y),sx=frX(cu-FRC.cb-280),n=0,ni=0,k;
+  for(k=0;k<tanks.length;k++){var t=tanks[k];if(!t.dead&&!t.craft&&teamSide(t.team)===FR.atk&&hyp(t.x-sx,t.y-r2.y)<520)n++;}
+  if(inf.length)infNear(sx,r2.y,520,function(q){if(!q.dead&&teamSide(q.team)===FR.atk)ni++;});
+  if(n+ni>0)r2.gT=(r2.gT||0)+.5;else r2.gT=0;
+  if(!(r2.goT>0)&&(n>=3||(n>=2&&ni>=4)||(r2.gT>=24&&n+ni>=2))){r2.goT=22;r2.gT=0;r2.waves=(r2.waves||0)+1;
+   if(teamSide(0)===FR.atk&&!SPEC.on&&P&&!P.dead&&hyp(P.x-sx,P.y-r2.y)<1400)addLog('📣 ระลอกบุกขึ้นทางลาด — ไปพร้อมกัน!','b');}}}
+function frRetreat(e){var sd=teamSide(e.team),best=null,bd=1e9,i;for(i=0;i<structs.length;i++){var s=structs[i];if(s.dead||s.k!=='gas')continue;if(sd!==FR.atk&&!zoneHoldOK(sd,s.x))continue;var d=hyp(s.x-e.x,s.y-e.y);if(d<bd){bd=d;best=s;}}
+ if(best&&bd<4500)return{x:best.x+Math.cos(e.seed)*120,y:best.y+Math.sin(e.seed)*90};var od=FR.obj[Math.min(FR.next,4)];return{x:frX(od.u+900),y:e.y*.7};}
+/* ── เป้าหมาย AI (รถ + ทหาร) ── */
+/* นำทางผ่านประตูกำแพง (ฐาน D / HQ) */
+function frRoute(e,gx,gy){var u0=frU(e.x),u1=frU(gx),i,W=FR.walls||[];for(i=0;i<W.length;i++){var w=W[i];if((u0-w.u)*(u1-w.u)>=0||Math.abs(u1-u0)<1)continue;
+  var f=(w.u-u0)/(u1-u0),yc=e.y+(gy-e.y)*f;if(yc<w.y0-40||yc>w.y1+40)continue;
+  if(w.g.some(function(q){return yc>q[0]+45&&yc<q[1]-45;}))continue;
+  var best=0,bd=1e9;w.g.forEach(function(q){var c=(q[0]+q[1])/2,d=Math.abs(c-yc)+Math.abs(c-e.y)*.6;if(d<bd){bd=d;best=c;}});
+  var sd=u1>u0?1:-1;if(Math.abs(e.y-best)<80&&Math.abs(u0-w.u)<320)return{x:frX(w.u+sd*240),y:best};return{x:frX(w.u-sd*170),y:best};}
+ return null;}
+function frGoalPt(e){var g=frGoalPt0(e),r=frRoute(e,g.x,g.y);if(r){g.x=r.x;g.y=r.y;}return g;}
+function frGoalPt0(e){var sd=teamSide(e.team),k=FR.next,sdn=(e.seed|0);
+ if(sd===FR.atk){
+  if(k>4&&FR.hq&&!FR.hq.dead)return{x:FR.hq.x-frDir()*430+Math.cos(e.seed*1.3)*140,y:FR.hq.y+Math.sin(e.seed*1.7)*320,lb:'🎯 ทำลาย HQ'};
+  var o=FR.obj[Math.min(k,4)],u=frU(e.x),cu=frCliffU(e.y);
+  if(u<cu+FRC.cb+40){var r=FR.ramps[sdn%3],rn=frNearRamp(e.y);if(Math.abs(rn.y-e.y)<700)r=rn;var cur=frCliffU(r.y);
+   if(u<cur-FRC.cb-120&&!(r.goT>0)&&FR.next<=1)return{x:frX(cur-FRC.cb-260-(sdn%3)*60),y:r.y+((sdn%5)-2)*40,lb:'⏸ รวมพลตีนทางลาด'};
+   if(u<cur-FRC.cb-120)return{x:frX(cur-FRC.cb-110),y:r.y+((sdn%5)-2)*26,lb:'▲ บุกขึ้นทางลาด!'};
+   return{x:frX(cur+FRC.cb+300),y:r.y+((sdn%5)-2)*22,lb:'▲ ขึ้นทางลาด'};}
+  var sp=o.r*.55;return{x:o.x+Math.cos(e.seed*2.1)*sp,y:o.y+Math.sin(e.seed*1.3)*sp,lb:'⚔️ ยึด '+o.L};}
+ var kd=Math.min(k,4),od=FR.obj[kd],rear=kd<4&&(sdn%9)>=5;
+ if(k>4&&FR.hq)return{x:FR.hq.x-frDir()*(380+(sdn%4)*90),y:FR.hq.y+Math.sin(e.seed)*520,lb:'🛡️ ป้องกัน HQ'};
+ if(rear){var on=FR.obj[kd+1],yr2=(((sdn*389)%1000)/1000-.5)*AY*1.3;return{x:frX(on.u-on.r*.8-(sdn%3)*120),y:on.y+yr2,lb:'🛡️ แนวหลัง '+on.L};}
+ if(!FL.prep&&(FR.cst==='cap'||FR.cst==='cont')&&(sdn%3)!==0)return{x:od.x+Math.cos(e.seed)*od.r*.5,y:od.y+Math.sin(e.seed*1.7)*od.r*.5,lb:'🛡️ ชิงคืน '+od.L};
+ if(kd===1){var r2=FR.ramps[sdn%3];if((sdn%7)<2){var c2=frCliffU(r2.y);return{x:frX(c2+FRC.cb+320+(sdn%3)*90),y:r2.y+((sdn%9)-4)*55,lb:'🛡️ คุมทางลาด'};}
+  var yy=(((sdn*977)%1000)/1000-.5)*AY*1.6;return{x:frX(frCliffU(yy)+FRC.cb+280),y:yy,lb:'🛡️ แนวสันเขา'};}
+ var yy2=(((sdn*613)%1000)/1000-.5)*AY*1.3;return{x:frX(od.u-od.r*.9-(sdn%4)*130),y:od.y+yy2,lb:'🛡️ ตั้งรับหน้า '+od.L};}
+function frGoal(e){var g=frGoalPt(e);return{x:g.x,y:g.y,thr:teamSide(e.team)===FR.atk?1:.9};}
+
+/* ── เริ่มแมตช์ ── */
+function frFree(x,y){for(var r=0;r<600;r+=40)for(var a=0;a<6.28;a+=r?40/r:7){var px=x+Math.cos(a)*r,py=clamp(y+Math.sin(a)*r,-AY+150,AY-150);if(!blocked(px,py)&&!blocked(px+30,py)&&!blocked(px-30,py))return{x:px,y:py};}return{x:x,y:y};}
+function startFrontier(){var S=FRS[frSel.size]||FRS[32],i;
+ FR.on=true;FR.atk=frSel.team==='def'?1:0;FR.def=1-FR.atk;FR.size=FRS[frSel.size]?frSel.size:32;FR.crafts=[];FR.next=1;FR.prog=0;FR.cst='';FR.prepT=FRC.prep;FR.time=FRC.limit;
+ FR.tk0=S.tk;FR.tk=S.tk;FR.bonus=Math.round(S.tk*.25);FR.tkMax=S.tk*2;FR.infQ=S.inf;FR.tk0W=0;FR.lowW=0;FR.hqW=0;FR.t2W=0;FR.tkLost=0;FR.elT=1;FR.infT=8;FR.contT=-99;FR.caT=-99;FR.tkPop=null;FR.tkFl=0;FR.hudL=-1;FR.invT=-9;FR.lq=[];FR.lqI=0;FR.lwT=8;FR.rwT=0;
+ FLZ=5;ZL=FRC.len/5;G.map='coast';G.teamSize=S.veh;G.lvl=frSel.lvl;G.sub='fr'+FR.size;
+ FL.on=true;flEvStop();FL.own=[];FL.prog=[];FL.capT=[];for(i=0;i<FLZ;i++){FL.own.push(FR.def);FL.prog.push(0);FL.capT.push(0);}FL.own[frZ(0)]=FR.atk;
+ FL.hq=[0,0];FL.spawnQ=[];FL.artyT=[10,13];FL.intel=[0,0];FL.pRespawn=0;FL.col=[false,false];FL.tk=null;FL.sq=null;
+ commonStart('fl');flUpdateFront();
+ FL.rt=0;FL.prep=true;FL.to=false;FL.atk=FR.atk;FL.phaseT=FRC.prep;FL.warned=true;FL.swapN=0;FL.sgA={};
+ GX.decals=GX.decals.filter(function(d){return frU(d.x)>frShoreU(d.y)+40;});GX.decor=GX.decor.filter(function(d){return frU(d.x)>frCliffU(d.y)+FRC.cb+20;});
+ frFleetInit();frStInit();frPerfInit();
+ var us=FR.atk===0,atkT=FR.atk===0?2:1,defT=FR.atk===0?1:2,units=[];
+ for(i=0;i<S.veh;i++){if(i===0&&us){units.push(P);continue;}var st=foeStat(G.lvl,pick(FRC.poolA),false),t=mkTank(0,0,st,atkT,{a:frFace(FR.atk),skin:atkT===2?'nordic':st.skinKey});tanks.push(t);units.push(t);}
+ var pcap=FR.size>=64?8:6,nc=Math.ceil(units.length/2),mid=Math.floor(nc/2),gap=(AY*1.7)/Math.max(1,nc),pax=Math.min(S.inf,nc*pcap);
+ if(us){units.splice(units.indexOf(P),1);units.splice(Math.min(units.length,mid*2),0,P);}
+ for(i=0;i<nc;i++){var y=-AY*.85+gap*(i+.5)+rnd(-36,36),np=Math.max(0,Math.min(pcap,pax-i*pcap));frCraftNew(y,units.slice(i*2,i*2+2),np,atkT,FRC.shore-1750-rnd(0,240)-(i%2)*140,true);}
+ for(i=0;i<S.veh;i++){var tt;if(i===0&&!us)tt=P;else{var s2=foeStat(G.lvl,pick(FRC.poolD),false);tt=mkTank(0,0,s2,defT,{a:frFace(FR.def),skin:defT===2?'nordic':s2.skinKey});tanks.push(tt);}
+  var g=frGoalPt0(tt),p=frFree(g.x,g.y);tt.x=p.x;tt.y=p.y;tt.a=frFace(FR.def);tt.ta=tt.a;infFill(tt);}
+ INF.init=1;var nDi=Math.max(0,Math.min(S.inf,infQuota()-infCount(FR.def)));
+ for(i=0;i<nDi;i+=4){var yy=rnd(-AY*.8,AY*.8),pp=frFree(frX(frCliffU(yy)+FRC.cb+360+rnd(0,900)),yy);infFoot(defT,Math.min(4,nDi-i),pp.x,pp.y);}
+ cam.x=P.x-innerWidth/2;cam.y=P.y-innerHeight/2;
+ frFortReset();frWxInit(frSel.tod);RS.arty.cd=90;FR.aaT=null;
+ var bk=flSel.tod;flSel.tod=FL.tod;flEvInit();flSel.tod=bk;frWxVig();frAIBuild(1);
+ $('hInfo').textContent='FRONTIER — '+FR.size+' v '+FR.size;
+ addLog('🌊 FRONTIER — '+FRS[FR.size].n+' · '+FR.wxT.n+(FR.wx.dyn?' (เปลี่ยนระหว่างเกม)':''),'b');
+ addLog(SPEC.on?'ดู AI ยกพลขึ้นบก — ฝ่ายบุกต้องยึด A→E แล้วทำลาย HQ':us?'⚔️ ฝ่ายบุก: ลงหาด → หาทางลาด 3 เส้นขึ้นสันเขา B → ยึด C, D, แนวรอบ E → ทำลาย HQ · กำลังเสริม '+fmt(FR.tk):'🛡️ ฝ่ายป้องกัน: ตั้งรับบนสันเขา B (ได้เปรียบที่สูง) · ยันให้ครบ 20 นาที หรือทำให้ศัตรูหมดกำลังเสริม','');
+ frIntro();}
+/* ── คัตซีนเปิด ── */
+function frIntro(){var c0=FR.crafts[Math.floor(FR.crafts.length/2)]||{x:frX(1500),y:0},pc=P&&P.craft?P.craft:c0,dir=frDir(),us=teamSide(0)===FR.atk,b=FR.obj[1];
+ CINE.k='intro';CINE.t=0;CINE.lock=true;document.body.classList.add('cine');
+ CINE.shots=[{t0:0,t1:3.8,a:{x:frX(FRC.shore-2050),y:-AY*.5},b:{x:frX(FRC.shore-1650),y:AY*.25},title:'FRONTIER',sub:'MASSIVE AMPHIBIOUS WARFARE · '+FRS[FR.size].n+' · '+FR.size+' v '+FR.size},
+  {t0:3.8,t1:6.8,a:{x:pc.x-dir*700,y:pc.y-260},b:{x:pc.x+dir*60,y:pc.y},title:'กองเรือยกพล',sub:'รถถังและทหารราบเตรียมลงหาด · '+FR.wxT.n},
+  {t0:6.8,t1:10,a:{x:frX(FRC.shore+300),y:pc.y*.5},b:{x:frX(FRC.cliff+250),y:FR.ramps[1].y},title:'OBJECTIVE A → B',sub:'หาดยกพลขึ้นบก · สันเขาชันขึ้นได้เฉพาะทางลาด 3 เส้น'},
+  {t0:10,t1:13.2,a:{x:b.x,y:b.y},b:{x:P?P.x:pc.x,y:P?P.y:pc.y},title:SPEC.on?'ดู AI สู้กันเอง':us?'ฝ่ายบุก':'ฝ่ายป้องกัน',sub:SPEC.on?'WARFARE WITHOUT BORDERS':us?'ยึด B → C → D → แนวรอบ E แล้วทำลาย HQ · กำลังเสริม '+fmt(FR.tk):'ยันไว้ 20 นาที หรือทำให้ศัตรูหมดกำลังเสริม'}];
+ CINE.T=13.2;CINE.cam={x:CINE.shots[0].a.x,y:CINE.shots[0].a.y};cam.x=CINE.cam.x-innerWidth/2;cam.y=CINE.cam.y-innerHeight/2;SFX.braam(1);
+ var E=FL.ev;if(E)for(var i=0;i<3;i++){var pl={k:'jet',ty:acType('jet',FR.atk),side:FR.atk,x:frX(FRC.shore-4200-i*500),y:rnd(-AY*.5,AY*.5),vx:dir*1250,vy:rnd(-60,60),h:240,hp:100,drops:[],id:++E.uid};pl.snd=i===0?SFX.loop(pl.ty):null;E.air.push(pl);}}
+/* ── HUD ── */
+function frHUD(){if(G.t-FR.hudL<.2&&FR.hudL<=G.t)return;FR.hudL=G.t;
+ var us=teamSide(0)===FR.atk,atkC=FR.atk===0?'#8fd44a':'#e05a3c',defC=FR.atk===0?'#e05a3c':'#8fd44a',hqp=FR.hq?Math.max(0,Math.round(FR.hq.hp/FR.hq.mhp*100)):0,k;
+ $('scTxt').innerHTML='🎟️ <b style="color:'+(FR.tkFl>0?'#ff6a4a':atkC)+'">'+fmt(Math.ceil(FR.tk))+'</b>'+(FR.tkPop&&FR.tkPop.t>0?' <b style="color:#9fe06a">+'+FR.tkPop.v+'</b>':'')+
+  ' · 🏠 <b style="color:'+defC+'">'+hqp+'%</b>'+(FR.hq&&FR.hq.inv?' 🔒':'');
+ var h='';for(k=0;k<5;k++){var bg,lb=FRC.LET[k],bx='';
+  if(k<FR.next)bg=atkC;else if(k===FR.next){bg=FR.cst==='cont'?'#ffcf5a':FR.prog>0?'#efe6b8':defC;bx=';box-shadow:0 0 0 1.5px #fff';if(FR.cst==='cont')lb='⚔'+lb;else if(FR.prog>1)lb=lb+Math.round(FR.prog);}
+  else{bg='#4e5646';lb='🔒'+lb;}
+  h+='<div class="fz" style="background:'+bg+bx+';width:auto;min-width:24px;padding:0 3px">'+lb+'</div>';}
+ if(FR.next>4)h+='<div class="fz" style="background:#ff5a3c;width:auto;padding:0 4px">HQ</div>';
+ $('flBar').innerHTML=h;
+ var bd=document.body,pa=!SPEC.on&&P&&!P.dead;bd.classList.toggle('pfr',!!pa);bd.classList.toggle('pfrd',!!(pa&&teamSide(0)===FR.def));
+ var ab=$('bArty');if(ab){var acd=FL.sup?Math.ceil(FL.sup.cd.arty[0]):0;ab.classList.toggle('cd',acd>0||FL.prep);ab.textContent=acd>0?'ปืนใหญ่ '+acd:'ปืนใหญ่';}
+ if(FR.bOpen&&!frCanPlayerBuild()){FR.bOpen=false;FR.bSel=null;frBuildUI();}
+ var ln=FL.prep?'<b style="color:#f0c43a">'+(CINE.k?'🎬 FRONTIER':(us?'🚤 ขึ้นฝั่งใน ':'⏳ ศัตรูขึ้นฝั่งใน ')+mmss(FR.prepT))+'</b>':(SPEC.on?(FR.atk===0?'<b class="sb">⚔️ น้ำเงินบุก</b>':'<b class="sr">⚔️ แดงบุก</b>'):us?'<b style="color:#ffb347">⚔️ ฝ่ายบุก</b>':'<b style="color:#7fc8ff">🛡️ ฝ่ายป้องกัน</b>')+' · ⏱️ '+mmss(FR.time);
+ var ob=FR.next>4?'🎯 ทำลาย HQ':'เป้าหมาย '+FRC.LET[FR.next]+(FR.cst==='cont'?' ⚔️ ชิงกัน':FR.cst==='cap'?' ▲ '+Math.round(FR.prog)+'%':'');
+ var ac=FL.sup?Math.ceil(FL.sup.cd.arty[0]):0,kh=isPhone()||SPEC.on?'':' · <span style="color:#c8b878">['+(SV.keys.arty||'z').toUpperCase()+'] ปืนใหญ่ '+(FL.prep?'⏳':ac>0?ac+'s':'✅')+(teamSide(0)===FR.def?' · ['+(SV.keys.build||'b').toUpperCase()+'] สร้างป้อม':'')+'</span>';
+ $('flRole').innerHTML=ln+' · '+ob+'<br><span style="color:#93a181">เรา '+frAlive(0)+' · ศัตรู '+frAlive(1)+' · '+(FR.wxT?FR.wxT.n:'')+(P&&P.craft?' · 🚤 อยู่ในเรือยกพล':'')+'</span>'+kh;
+ hudLogPos();}
+function frEndSub(hq){return hq?'กองบัญชาการถูกทำลาย — ฝ่ายบุกชนะ':FR.tk<=0?'ฝ่ายบุกหมดกำลังเสริม — ฝ่ายป้องกันชนะ':'หมดเวลา — HQ ยังอยู่ ฝ่ายป้องกันชนะ';}
+/* ── หน้าเลือกโหมด ── */
+function drawFrontierSel(){refreshAll();var h='';
+ [['atk','⚔️ ฝ่ายบุก (ATTACKERS)','ยกพลจากเรือ · ยึด A→E · ทำลาย HQ · กำลังเสริมจำกัด'],['def','🛡️ ฝ่ายป้องกัน (DEFENDERS)','ตั้งรับบนสันเขา B · ได้เปรียบที่สูง · ยันจนหมดเวลา']].forEach(function(a){
+  h+='<div class="card'+(frSel.team===a[0]?' sel':'')+'" onclick="frSel.team=\''+a[0]+'\';SFX.ui(1);drawFrontierSel()"><div class="nm">'+a[1]+'</div><div class="st">'+a[2]+'</div></div>';});
+ $('frTeam').innerHTML=h;h='';
+ [16,32,64,128].forEach(function(n){var f=FRS[n];h+='<div class="card'+(frSel.size===n?' sel':'')+'" onclick="frSel.size='+n+';SFX.ui(1);drawFrontierSel()"><div class="nm">'+f.n+'</div><div class="st">'+n+' v '+n+'<br>รถ '+f.veh+' คัน + ทหาร '+f.inf+' นาย ต่อฝ่าย<br>กำลังเสริมฝ่ายบุก '+fmt(f.tk)+' (+'+fmt(Math.round(f.tk*.25))+'/จุด)<br><span class="tag">💰 '+fmt(f.cr)+'</span>'+(n>=64?'<span class="tag" style="border-color:#a04030;color:#e09080">แนะนำกราฟิกต่ำ</span>':'')+'</div></div>';});
+ $('frSize').innerHTML=h;h='';
+ [[2,'🟢 ง่าย'],[4,'🟡 ปานกลาง'],[6,'🟠 ยาก'],[9,'🔴 โหด']].forEach(function(a){h+='<div class="card'+(frSel.lvl===a[0]?' sel':'')+'" onclick="frSel.lvl='+a[0]+';SFX.ui(1);drawFrontierSel()"><div class="nm">'+a[1]+'</div><div class="st">×'+(1+a[0]*.14).toFixed(2)+'</div></div>';});
+ $('frLvl').innerHTML=h;h='';
+ if(!FRW[frSel.tod])frSel.tod='dyn';
+ [['dyn','🎲 สุ่ม + เปลี่ยนระหว่างเกม','ทุก 4–6 นาที เปลี่ยนนุ่มนวล']].concat(FRWK.map(function(k){return[k,FRW[k].n+' (คงที่)',FRW[k].d];})).forEach(function(a){
+  h+='<div class="card'+(frSel.tod===a[0]?' sel':'')+'" onclick="frSel.tod=\''+a[0]+'\';SFX.ui(1);drawFrontierSel()"><div class="nm">'+a[1]+'</div><div class="st">'+a[2]+'</div></div>';});
+ $('frTod').innerHTML=h;drawFrPrev();}
+function drawFrPrev(){var c=$('frPrev');if(!c)return;var g=c.getContext('2d'),W=900,H=230,i,x;g.fillStyle='#141a12';g.fillRect(0,0,W,H);
+ var sx=W*.11,cxp=W*.25;g.fillStyle='#1d4a5a';g.fillRect(0,18,sx,H-40);g.fillStyle='#a8946a';g.fillRect(sx,18,cxp-sx,H-40);g.fillStyle='#24301e';g.fillRect(cxp,18,W-cxp,H-40);
+ g.strokeStyle='rgba(230,240,240,.5)';g.lineWidth=2;for(i=0;i<5;i++){g.beginPath();g.moveTo(sx-12-i*14,20);g.lineTo(sx-12-i*14,H-24);g.stroke();}
+ g.fillStyle='#5c564a';g.fillRect(cxp-8,18,16,H-40);[.2,.52,.8].forEach(function(f){g.fillStyle='#8a7650';g.fillRect(cxp-10,18+(H-40)*f-10,20,20);});
+ var U=[4400,8900,13300,18400,22700],L=['A','B','C','D','E'];
+ for(i=0;i<5;i++){x=U[i]/26000*W;g.strokeStyle=i===0?'#8fd44a':'#f0b429';g.lineWidth=2;g.beginPath();g.arc(x,H/2,i===0?14:20,0,6.2832);g.stroke();g.fillStyle='#fff2c0';g.font='bold 16px Tahoma';g.textAlign='center';g.fillText(L[i],x,H/2+6);
+  g.fillStyle='#93a181';g.font='10px Tahoma';g.fillText(FRC.OBN[i],x,H/2+36);}
+ x=24800/26000*W;g.fillStyle='#e05a3c';g.fillRect(x-10,H/2-14,20,28);g.fillStyle='#fff';g.font='bold 10px Tahoma';g.fillText('HQ',x,H/2+4);
+ g.fillStyle='#7fc8ff';g.font='bold 11px Tahoma';g.fillText('🚤 เรือยกพล',sx*.5,14);g.fillStyle='#e8c070';g.fillText('▲ ทางลาด 3 เส้น',cxp,H-6);
+ g.fillStyle='#7c876a';g.fillText('แผนที่ '+FRC.len+' × '+(FRC.hw*2)+' หน่วย (ใหญ่กว่า Frontline ~2.2 เท่า)',W*.62,H-6);g.textAlign='left';}
+
+/* ═══ FRONTIER เฟส 2: ระบบสร้างป้อมฝ่ายป้องกัน ═══
+   ทุ่นระเบิด AT/AP · ลวดหนาม · กระสอบทราย · เม่นกันรถถัง · ด่านกั้นถนน · บังเกอร์ · รังปืนกล
+   วางได้เฉพาะเขตที่ฝ่ายป้องกันยังครอง · จำกัดจำนวน/ระยะห่าง · ห้ามปิดทางลาดและประตูกำแพง · ถูกทำลายได้ */
+var FRB={atm:{n:'ทุ่นระเบิดต่อต้านรถถัง',s:'AT Mine',ic:'💣',max:5,blk:0,d:'รถถังศัตรูเหยียบ = ระเบิดแรง + สายพานขาด'},
+ apm:{n:'ทุ่นระเบิดสังหารบุคคล',s:'AP Mine',ic:'✴️',max:6,blk:0,d:'ทหารราบศัตรูเหยียบ = ระเบิด'},
+ wire:{n:'ลวดหนาม',s:'Wire',ic:'〰️',max:5,blk:0,d:'ทหารราบเดินช้าลง 65% · รถถังทับขาดได้'},
+ sand:{n:'กระสอบทราย',s:'Sandbag',ic:'🧱',max:6,blk:1,hp:700,d:'ที่กำบังทหาร กันกระสุน'},
+ hedge:{n:'เม่นกันรถถัง',s:'Hedgehog',ic:'✖️',max:6,blk:1,hp:1100,d:'กั้นรถถัง'},
+ road:{n:'ด่านกั้นถนน',s:'Roadblock',ic:'🚧',max:2,blk:1,hp:1500,d:'ปิด/เบี่ยงทางรถ'},
+ bunk:{n:'บังเกอร์',s:'Bunker',ic:'🏠',max:1,blk:1,d:'ป้อมปืนใหญ่ประจำที่'},
+ mg:{n:'รังปืนกล',s:'MG Nest',ic:'🔫',max:2,blk:1,d:'ยิงกราดทหารราบ/รถเบา'}};
+var FRBK=['atm','apm','wire','sand','hedge','road','bunk','mg'];
+function frFortReset(){FR.mines=[];FR.wires=[];FR.bUsed={};FR.bOpen=false;FR.bSel=null;FR.bCd=0;FR.abQ=[];FR.fortN=0;}
+/* ── กริดสิ่งกีดขวาง: เพิ่ม/ลบทีละชิ้น ── */
+function gridAdd(o){var x1,y1,x2,y2;if(o.t==='c'){x1=o.x-o.r;x2=o.x+o.r;y1=o.y-o.r;y2=o.y+o.r;}else{x1=o.x-o.w/2;x2=o.x+o.w/2;y1=o.y-o.h/2;y2=o.y+o.h/2;}
+ for(var gx=Math.floor((x1-OG.x0)/OG.cell);gx<=Math.floor((x2-OG.x0)/OG.cell);gx++)for(var gy=Math.floor((y1-OG.y0)/OG.cell);gy<=Math.floor((y2-OG.y0)/OG.cell);gy++){var k=gx+','+gy;(OG.m[k]=OG.m[k]||[]).push(o);}}
+function gridDel(o){for(var k in OG.m){var a=OG.m[k],i=a.indexOf(o);if(i>=0)a.splice(i,1);}}
+function frObRemove(o){var i=obst.indexOf(o);if(i<0)return;obst.splice(i,1);gridDel(o);FR.fortN--;burst(o.x,o.y,Math.round(16*GFX.parts),'#9a8a70');burst(o.x,o.y,Math.round(8*GFX.parts),'#5a5650');}
+/* ── กติกาการวาง ── */
+function frCanBuild(k,x,y,byP){var B=FRB[k],u=frU(x),i,o;if(!B)return{ok:false,why:'ไม่รู้จักชนิด'};
+ if(!FR.on||FL.own[zoneOf(x)]!==FR.def||u<FRC.shore+200)return{ok:false,why:'วางได้เฉพาะเขตที่ฝ่ายป้องกันยังครอง'};
+ if(Math.abs(y)>AY-120||Math.abs(x)>AX-120)return{ok:false,why:'นอกพื้นที่'};
+ if(byP){if(hyp(x-P.x,y-P.y)>400)return{ok:false,why:'ไกลเกินไป (≤ 400)'};if((FR.bUsed[k]||0)>=B.max)return{ok:false,why:B.s+' ครบจำนวนแล้ว ('+B.max+')'};}
+ if(FR.fortN>=260)return{ok:false,why:'สิ่งก่อสร้างในสนามเต็มแล้ว'};
+ if(blocked(x,y))return{ok:false,why:'พื้นที่ถูกกีดขวาง'};
+ if(B.blk){for(i=0;i<FR.ramps.length;i++){var r=FR.ramps[i];if(Math.abs(y-r.y)<r.w/2+80&&Math.abs(u-frCliffU(r.y))<440)return{ok:false,why:'ห้ามปิดทางลาด'};}
+  var W=FR.walls||[];for(i=0;i<W.length;i++){var w=W[i];if(Math.abs(u-w.u)<240&&w.g.some(function(q){return y>q[0]-60&&y<q[1]+60;}))return{ok:false,why:'ห้ามปิดประตูกำแพง'};}
+  for(i=1;i<FR.obj.length;i++){var ob=FR.obj[i];if(hyp(x-ob.x,y-ob.y)<160)return{ok:false,why:'ห้ามวางกลางจุดยึด'};}
+  if(k!=='road'&&Math.abs(y-130)<95&&u>FRC.cliff&&u<FRC.hqU-450)return{ok:false,why:'ห้ามวางบนถนน (ใช้ด่านกั้นถนน)'};
+  for(i=-1;i<=1;i++)for(var j=-1;j<=1;j++)if(blocked(x+i*34,y+j*34))return{ok:false,why:'ชิดสิ่งกีดขวางเกินไป'};}
+ for(i=0;i<FR.mines.length;i++){o=FR.mines[i];if(hyp(o.x-x,o.y-y)<70)return{ok:false,why:'ใกล้ของเดิมเกินไป'};}
+ for(i=0;i<FR.wires.length;i++){o=FR.wires[i];if(hyp(o.x-x,o.y-y)<90)return{ok:false,why:'ใกล้ของเดิมเกินไป'};}
+ for(i=0;i<structs.length;i++){o=structs[i];if(!o.dead&&hyp(o.x-x,o.y-y)<(o.w||60)/2+70)return{ok:false,why:'ใกล้สิ่งก่อสร้างเกินไป'};}
+ for(i=0;i<tanks.length;i++){o=tanks[i];if(!o.dead&&B.blk&&hyp(o.x-x,o.y-y)<70)return{ok:false,why:'มีรถอยู่ตรงนั้น'};}
+ return{ok:true};}
+function frBuild(k,x,y,byP){var B=FRB[k],o,s=FR.def,face=frFace(s);
+ if(k==='atm'||k==='apm')FR.mines.push({x:x,y:y,k:k,side:s,seed:rnd(0,9),byP:!!byP});
+ else if(k==='wire')FR.wires.push({x:x,y:y,w:24,h:150,side:s});
+ else if(k==='sand'||k==='hedge'||k==='road'){o={t:'r',x:x,y:y,w:k==='sand'?16:k==='hedge'?26:30,h:k==='sand'?120:k==='hedge'?26:130,col:'#5a5e58',col2:'#6a6e66',blockShot:1,kind:k==='road'?'rblock':k==='sand'?'sandbag':'hedge',fort:1,hp:B.hp,mhp:B.hp};
+  o.spr=bakeOb25(o,'nord',GX.th);obst.push(o);gridAdd(o);}
+ else if(k==='bunk')structs.push({k:'turret',team:s,x:x,y:y,w:58,h:58,hp:1500,mhp:1500,solid:1,ar:80,dead:false,ta:face,cd:rnd(0,2),n:'บังเกอร์',fort:1});
+ else if(k==='mg')structs.push({byP:!!byP,k:'mg',team:s,x:x,y:y,w:54,h:54,hp:700,mhp:700,solid:1,ar:30,dead:false,ta:face,cd:0,burst:0,bT:0,n:'รังปืนกล',fort:1});
+ FR.fortN++;if(byP){FR.bUsed[k]=(FR.bUsed[k]||0)+1;}
+ burst(x,y,Math.round(8*GFX.parts),'#b9a98a');}
+/* ── ผู้เล่น: แถบสร้าง (B) ── */
+function frCanPlayerBuild(){return FR.on&&!SPEC.on&&P&&!P.dead&&teamSide(0)===FR.def&&!CINE.k;}
+function frBuildToggle(){if(!frCanPlayerBuild()){if(FR.on&&!SPEC.on&&teamSide(0)!==FR.def)toast('สร้างป้อมได้เฉพาะฝ่ายป้องกัน');return;}
+ FR.bOpen=!FR.bOpen;FR.bSel=null;SFX.ui(true);frBuildUI();if(FR.bOpen)toast(isPhone()?'แตะไอคอนเพื่อวางตรงหน้ารถ':'เลือก 1–8 แล้วคลิกบนพื้นเพื่อวาง · คลิกขวา/B ปิด');}
+function frBuildKey(k){if(k==='escape'||k===(SV.keys.build||'b')){FR.bOpen=false;FR.bSel=null;frBuildUI();return true;}
+ var n=parseInt(k,10);if(n>=1&&n<=8){frPick(FRBK[n-1]);return true;}return false;}
+function frPick(k){if(!frCanPlayerBuild())return;if(isPhone()||PLAT==='mb'){frPlaceFront(k);return;}FR.bSel=FR.bSel===k?null:k;SFX.ui(true);frBuildUI();}
+function frAimPt(){if(PLAT==='pc'&&!isPhone()){var mx=mouse.x+cam.x,my=mouse.y+cam.y,d=hyp(mx-P.x,my-P.y);if(d>390){mx=P.x+(mx-P.x)/d*390;my=P.y+(my-P.y)/d*390;}return{x:mx,y:my};}
+ var M=mdl(P.b),dd=M.L+90;return{x:P.x+Math.cos(P.ta)*dd,y:P.y+Math.sin(P.ta)*dd};}
+function frPlaceAt(k,x,y){if(FR.bCd>0)return;var c=frCanBuild(k,x,y,true);if(!c.ok){toast('⛔ '+c.why);SFX.ui(false);return;}
+ frBuild(k,x,y,true);FR.bCd=.35;SFX.ui(true);frBuildUI();}
+function frPlaceFront(k){if(!frCanPlayerBuild())return;var p=frAimPt();frPlaceAt(k,p.x,p.y);}
+function frBuildUI(){var el=$('frBuild');if(!el)return;var on=FR.on&&FR.bOpen&&frCanPlayerBuild();el.classList.toggle('on',on);if(!on)return;var h='<div class="frbT">🧱 สร้างป้อม <span>'+(isPhone()?'แตะเพื่อวางตรงหน้ารถ':'1–8 เลือก · คลิกวาง · B ปิด')+'</span></div><div class="frbR">';
+ FRBK.forEach(function(k,i){var B=FRB[k],u=FR.bUsed[k]||0,left=B.max-u;h+='<div class="frbI'+(FR.bSel===k?' sel':'')+(left<=0?' no':'')+'" onclick="frPick(\''+k+'\')" title="'+B.n+' — '+B.d+'"><b>'+B.ic+'</b><i>'+(isPhone()?'':(i+1)+' · ')+B.s+'</i><em>'+left+'/'+B.max+'</em></div>';});
+ el.innerHTML=h+'</div>';}
+function frDrawGhost(w,h){if(!FR.bOpen||!FR.bSel||!frCanPlayerBuild()||PLAT!=='pc')return;var p=frAimPt(),c=frCanBuild(FR.bSel,p.x,p.y,true),x=p.x-cam.x,y=p.y-cam.y,B=FRB[FR.bSel];
+ cx.save();cx.globalAlpha=.75;cx.strokeStyle=c.ok?'#8fe06a':'#ff5a40';cx.fillStyle=c.ok?'rgba(140,220,100,.18)':'rgba(255,80,60,.18)';cx.lineWidth=2;cx.setLineDash([6,5]);
+ var gw=FR.bSel==='sand'?16:FR.bSel==='road'?30:FR.bSel==='wire'?24:FR.bSel==='hedge'?26:54,gh=FR.bSel==='sand'?120:FR.bSel==='road'?130:FR.bSel==='wire'?150:FR.bSel==='hedge'?26:54;
+ if(FR.bSel==='atm'||FR.bSel==='apm'){cx.beginPath();cx.arc(x,y,FR.bSel==='atm'?30:34,0,6.2832);cx.fill();cx.stroke();}else{cx.fillRect(x-gw/2,y-gh/2,gw,gh);cx.strokeRect(x-gw/2,y-gh/2,gw,gh);}
+ cx.setLineDash([]);cx.globalAlpha=1;cx.font='700 12px Kanit, Tahoma';cx.textAlign='center';cx.lineWidth=3;cx.strokeStyle='rgba(0,0,0,.7)';var t=B.ic+' '+B.s+(c.ok?'':' · '+c.why);cx.strokeText(t,x,y-Math.max(gh/2,30)-8);cx.fillStyle=c.ok?'#cfffb0':'#ffb0a0';cx.fillText(t,x,y-Math.max(gh/2,30)-8);
+ cx.strokeStyle='rgba(255,255,255,.18)';cx.beginPath();cx.arc(P.x-cam.x,P.y-cam.y,400,0,6.2832);cx.stroke();cx.restore();}
+/* ── AI ฝ่ายป้องกันวางป้อมที่แนวรับ ── */
+function frAIBuild(k){if(!FR.on||k>4)return;var sz={16:.6,32:1,64:1.3,128:1.6}[FR.size]||1,od=FR.obj[k],n=0;
+ function put(kind,cnt,gen){for(var c=0;c<Math.round(cnt*sz);c++)for(var t=0;t<8;t++){var p=gen();if(frCanBuild(kind,p.x,p.y,false).ok){frBuild(kind,p.x,p.y,false);n++;break;}}}
+ if(k===1){FR.ramps.forEach(function(r){var cu=frCliffU(r.y);
+   put('atm',2,function(){return{x:frX(cu+FRC.cb+rnd(120,380)),y:r.y+rnd(-r.w*.4,r.w*.4)};});
+   put('apm',1.5,function(){return{x:frX(cu+FRC.cb+rnd(80,420)),y:r.y+rnd(-r.w*.6,r.w*.6)};});
+   put('hedge',1,function(){return{x:frX(cu+FRC.cb+rnd(160,420)),y:r.y+(Math.random()<.5?-1:1)*(r.w/2+rnd(110,220))};});
+   put('mg',.7,function(){return{x:frX(cu+FRC.cb+rnd(260,480)),y:r.y+(Math.random()<.5?-1:1)*rnd(r.w/2+120,r.w/2+300)};});});
+  put('wire',4,function(){var y=rnd(-AY*.85,AY*.85);return{x:frX(frCliffU(y)+FRC.cb+rnd(140,320)),y:y};});
+  put('apm',4,function(){var y=rnd(-AY*.85,AY*.85);return{x:frX(frCliffU(y)+FRC.cb+rnd(100,500)),y:y};});
+  put('sand',4,function(){var y=rnd(-AY*.85,AY*.85);return{x:frX(frCliffU(y)+FRC.cb+rnd(200,520)),y:y};});}
+ else{var fu=od.u-od.r;
+  put('atm',5,function(){return{x:frX(fu-rnd(150,900)),y:rnd(-AY*.8,AY*.8)};});
+  put('apm',5,function(){return{x:frX(fu-rnd(100,800)),y:rnd(-AY*.8,AY*.8)};});
+  put('wire',4,function(){return{x:frX(fu-rnd(100,600)),y:rnd(-AY*.8,AY*.8)};});
+  put('sand',4,function(){return{x:frX(fu-rnd(0,450)),y:rnd(-AY*.8,AY*.8)};});
+  put('hedge',4,function(){return{x:frX(fu-rnd(300,1000)),y:rnd(-AY*.8,AY*.8)};});
+  put('road',1,function(){return{x:frX(fu-rnd(500,1100)),y:130+rnd(-30,30)};});
+  put('mg',1.4,function(){return{x:frX(fu+rnd(-200,250)),y:rnd(-AY*.7,AY*.7)};});
+  if(k>=3)put('bunk',1,function(){return{x:frX(fu+rnd(-150,200)),y:rnd(-AY*.6,AY*.6)};});}
+ return n;}
+/* ── ผลของทุ่นระเบิด/ลวดหนาม + รังปืนกล ── */
+function frInWire(s){for(var i=0;i<FR.wires.length;i++){var w=FR.wires[i];if(Math.abs(s.x-w.x)<w.w/2+6&&Math.abs(s.y-w.y)<w.h/2+6&&teamSide(s.team)!==w.side)return true;}return false;}
+function frFortTick(dt){if(FR.bCd>0)FR.bCd-=dt;
+ if(FR.abQ.length){for(var q=FR.abQ.length-1;q>=0;q--){FR.abQ[q].t-=dt;if(FR.abQ[q].t<=0){frAIBuild(FR.abQ[q].k);FR.abQ.splice(q,1);}}}
+ FR.mnT=(FR.mnT||0)-dt;if(FR.mnT<=0){FR.mnT=.1;var i,j,t;
+  for(i=FR.mines.length-1;i>=0;i--){var m=FR.mines[i],boom=false;
+   if(m.k==='atm'){for(j=0;j<tanks.length;j++){t=tanks[j];if(t.dead||t.craft||teamSide(t.team)===m.side)continue;if(Math.abs(t.x-m.x)<34&&Math.abs(t.y-m.y)<34&&hyp(t.x-m.x,t.y-m.y)<32){boom=t;break;}}}
+   else if(inf.length)infNear(m.x,m.y,36,function(s){if(!boom&&!s.dead&&teamSide(s.team)!==m.side&&hyp(s.x-m.x,s.y-m.y)<30)boom=s;});
+   if(boom){FR.mines.splice(i,1);FR.bo=m.byP?'P':'F'+m.side;if(m.k==='atm'){explodeAt(m.x,m.y,80,540,1.3);if(boom.mods&&!boom.dead){dmgMod(boom,Math.random()<.5?'trkL':'trkR',120);dmgMod(boom,'eng',60);applyFx(boom);}
+     if(boom===P)addLog('💣 เหยียบทุ่นระเบิดต่อต้านรถถัง!','r');else if(boom.team===1&&teamSide(0)===FR.def&&Math.random()<.5)addLog('💣 รถศัตรูเหยียบทุ่นระเบิด!','g');}
+    else explodeAt(m.x,m.y,70,150,.7);FR.bo=null;}}
+  for(i=FR.wires.length-1;i>=0;i--){var w=FR.wires[i];for(j=0;j<tanks.length;j++){t=tanks[j];if(t.dead||t.craft||teamSide(t.team)===w.side)continue;if(Math.abs(t.x-w.x)<w.w/2+20&&Math.abs(t.y-w.y)<w.h/2+10&&Math.abs(t.spd)>.3){FR.wires.splice(i,1);burst(w.x,w.y,Math.round(6*GFX.parts),'#8a8478');break;}}}}
+ for(var k=0;k<structs.length;k++){var s=structs[k];if(s.k!=='mg'||s.dead)continue;if(s.cd>0)s.cd-=dt;s.tT=(s.tT||0)-dt;
+  if(s.tT<=0){s.tT=.4;var best=null,bd=650*frVisMul(),sd=s.team;if(inf.length)infNear(s.x,s.y,bd,function(q){if(q.dead||teamSide(q.team)===sd)return;var d=hyp(q.x-s.x,q.y-s.y);if(d<bd&&losClear(s,q)){bd=d;best=q;}});
+   if(!best)for(var jj=0;jj<tanks.length;jj++){var o=tanks[jj];if(o.dead||o.craft||teamSide(o.team)===sd||(o.st.cls!=='light'&&o.st.cls!=='ifv'))continue;var d2=hyp(o.x-s.x,o.y-s.y);if(d2<Math.min(bd,520)&&losClear(s,o)){bd=d2;best=o;}}
+   s.tg=best;}
+  var tg=s.tg&&!s.tg.dead?s.tg:null;if(!tg)continue;var aim=Math.atan2(tg.y-s.y,tg.x-s.x);s.ta+=clamp(angD(s.ta,aim),-3*dt,3*dt);
+  if(Math.abs(angD(s.ta,aim))<.08){if(s.burst>0){s.bT-=dt;if(s.bT<=0){s.bT=.1;s.burst--;var a=s.ta+rnd(-.035,.035);
+     shots.push({x:s.x+Math.cos(a)*30,y:s.y+Math.sin(a)*30,a:a,vx:Math.cos(a)*15,vy:Math.sin(a)*15,dmg:26,pen:24,ammo:'ap',own:{team:sd===0?2:1,x:s.x,y:s.y,dead:false,isTurret:1,rec:s.byP?FR.me:(FR.fortRec?FR.fortRec[sd]:null),b:{atgm:'aNone'},st:{cls:'heavy'}},kind:1,life:52,col:sd===1?'#ff9a7a':'#ffe8c0',r:1.8,dist:0,cal:12.7});
+     if(P&&hyp(s.x-P.x,s.y-P.y)<1300&&s.burst%3===0)SFX.at(s.x,s.y).mg(12.7,hyp(s.x-P.x,s.y-P.y));}}
+   else if(s.cd<=0){s.burst=9;s.cd=rnd(1,1.6);}}}}
+/* ── วาดป้อม ── */
+function sprRoadblock(o){var w=o.w,h=o.h,B=sprBox(w,h,10),g=B.g,horiz=w>=h,L=horiz?w:h;g.fillStyle='rgba(0,0,0,.4)';g.fillRect(4,5,w,h);
+ g.fillStyle='#d8d4c8';g.fillRect(0,0,w,h);g.fillStyle='#c0402e';for(var t=0;t<L;t+=22){if(horiz)g.fillRect(t,0,11,h);else g.fillRect(0,t,w,11);}
+ g.strokeStyle='rgba(0,0,0,.55)';g.lineWidth=1.2;g.strokeRect(.5,.5,w-1,h-1);return B;}
+function frDrawFort(w,h){var i,x,y,seeAll=SPEC.on||teamSide(0)===FR.def;
+ for(i=0;i<FR.wires.length;i++){var W=FR.wires[i];x=W.x-cam.x;y=W.y-cam.y;if(x<-100||x>w+100||y<-120||y>h+120)continue;
+  cx.strokeStyle='rgba(60,58,50,.9)';cx.lineWidth=1.2;cx.beginPath();for(var k=-W.h/2;k<W.h/2;k+=7){cx.moveTo(x-W.w/2,y+k);cx.bezierCurveTo(x-W.w/2,y+k-6,x+W.w/2,y+k-6,x+W.w/2,y+k+3);}cx.stroke();
+  cx.strokeStyle='rgba(150,140,120,.6)';cx.lineWidth=.8;cx.beginPath();cx.moveTo(x,y-W.h/2);cx.lineTo(x,y+W.h/2);cx.stroke();
+  cx.fillStyle='#3a3226';cx.fillRect(x-2,y-W.h/2-2,4,4);cx.fillRect(x-2,y+W.h/2-2,4,4);}
+ for(i=0;i<FR.mines.length;i++){var m=FR.mines[i];x=m.x-cam.x;y=m.y-cam.y;if(x<-30||x>w+30||y<-30||y>h+30)continue;
+  var vis=seeAll||(P&&hyp(m.x-P.x,m.y-P.y)<200)||(FL.intel[0]>0);if(!vis)continue;
+  cx.globalAlpha=seeAll?.9:.65;cx.fillStyle=m.k==='atm'?'#3a3a2e':'#4a4436';cx.beginPath();cx.arc(x,y,m.k==='atm'?7:4.5,0,6.2832);cx.fill();
+  cx.strokeStyle=m.k==='atm'?'#7a7458':'#8a7a50';cx.lineWidth=1;cx.stroke();if(m.k==='apm'){cx.beginPath();cx.moveTo(x-6,y);cx.lineTo(x+6,y);cx.moveTo(x,y-6);cx.lineTo(x,y+6);cx.stroke();}
+  else{cx.fillStyle='#8a8460';cx.beginPath();cx.arc(x,y,2.4,0,6.2832);cx.fill();}cx.globalAlpha=1;}}
+function frDrawMG(s,time){var x=s.x-cam.x,y=s.y-cam.y;if(x<-80||x>innerWidth+80||y<-80||y>innerHeight+80)return;
+ cx.save();cx.translate(x,y);if(s.dead){cx.fillStyle='rgba(30,26,20,.8)';cx.beginPath();cx.arc(0,0,24,0,6.2832);cx.fill();cx.restore();return;}
+ cx.fillStyle='rgba(0,0,0,.35)';cx.beginPath();cx.arc(4,5,28,0,6.2832);cx.fill();
+ for(var i=0;i<14;i++){var a=i/14*6.2832;cx.fillStyle=i%2?'#8a7a56':'#9c8a62';cx.beginPath();cx.ellipse(Math.cos(a)*22,Math.sin(a)*22-3,7,5,a,0,6.2832);cx.fill();cx.strokeStyle='rgba(50,40,24,.55)';cx.lineWidth=.8;cx.stroke();}
+ cx.fillStyle='#3a3a30';cx.beginPath();cx.arc(0,-3,13,0,6.2832);cx.fill();cx.rotate(s.ta);cx.fillStyle='#22241e';cx.fillRect(-4,-5,12,10);cx.fillRect(4,-1.6,24,3.2);
+ if(s.burst>0&&s.bT>.05){cx.globalCompositeOperation='lighter';cx.fillStyle='rgba(255,210,120,.8)';cx.beginPath();cx.arc(30,0,4,0,6.2832);cx.fill();}
+ cx.restore();var hr=clamp(s.hp/s.mhp,0,1);if(hr<1){cx.fillStyle='#00000090';cx.fillRect(x-20,y-38,40,4);cx.fillStyle=teamSide(0)===s.team?'#8fd44a':'#e05a3c';cx.fillRect(x-20,y-38,40*hr,4);}}
+/* ── ระเบิดทำลายป้อม/สิ่งก่อสร้าง ── */
+function frBlastFort(x,y,r,dmg){var i,o;
+ for(i=FR.mines.length-1;i>=0;i--){o=FR.mines[i];if(hyp(o.x-x,o.y-y)<r*.55)FR.mines.splice(i,1);}
+ for(i=FR.wires.length-1;i>=0;i--){o=FR.wires[i];if(hyp(o.x-x,o.y-y)<r*.7+40)FR.wires.splice(i,1);}
+ var seen=[],gx0=Math.floor((x-r-OG.x0)/OG.cell),gx1=Math.floor((x+r-OG.x0)/OG.cell),gy0=Math.floor((y-r-OG.y0)/OG.cell),gy1=Math.floor((y+r-OG.y0)/OG.cell);
+ for(var gx=gx0;gx<=gx1;gx++)for(var gy=gy0;gy<=gy1;gy++){var a=OG.m[gx+','+gy];if(!a)continue;for(i=0;i<a.length;i++){o=a[i];if(!o.fort||seen.indexOf(o)>=0)continue;seen.push(o);
+  var d=hyp(o.x-x,o.y-y);if(d<r+20){o.hp-=dmg*(1-d/(r+20))*1.2;if(o.hp<=0)frObRemove(o);}}}
+ for(i=0;i<structs.length;i++){o=structs[i];if(o.dead||o.inv||o.team===-1&&o.k!=='radio')continue;var d2=hyp(o.x-x,o.y-y);if(d2<r+(o.w||60)/2){var f=1-d2/(r+(o.w||60)/2);hitStruct({x:o.x,y:o.y,dmg:dmg*f*.45,pen:9999,ammo:'ap',own:{team:-1}},o);}}}
+
+/* ═══ FRONTIER เฟส 2: สภาพอากาศเปลี่ยนระหว่างเกม (ทุก 4–6 นาที · เปลี่ยนนุ่มนวล ~30 วิ) ═══
+   ผลจริง: หมอก/ฝนหนัก/กลางคืน ลดระยะมองของ AI ทั้งสองฝ่ายเท่ากัน (กล้องความร้อนช่วยได้บางส่วน) */
+var FRW={clear:{n:'☀️ แจ่มใส',d:'ทัศนวิสัยเต็ม',dark:0,col:[0,0,0],rain:0,fog:0,wind:.3,cloud:.15,vis:1,th:0,tint:[255,225,160,.045]},
+ cloudy:{n:'☁️ มีเมฆมาก',d:'แดดน้อยลง',dark:.16,col:[22,26,32],rain:0,fog:.06,wind:.55,cloud:.38,vis:.95,th:0,tint:[150,165,180,.08]},
+ lrain:{n:'🌦️ ฝนตกเบา',d:'พื้นเปียก มองเห็นลดลงเล็กน้อย',dark:.24,col:[14,20,28],rain:.35,fog:.14,wind:.65,cloud:.42,vis:.85,th:0,tint:[120,140,160,.1]},
+ hrain:{n:'🌧️ ฝนตกหนัก',d:'ฟ้าร้อง ทัศนวิสัยต่ำ',dark:.4,col:[8,12,18],rain:1,fog:.32,wind:.95,cloud:.5,vis:.66,th:.45,tint:[90,110,130,.14]},
+ fog:{n:'🌫️ หมอกหนา',d:'มองเห็นใกล้มาก',dark:.1,col:[60,66,70],rain:0,fog:1,wind:.15,cloud:.2,vis:.45,th:0,tint:[200,205,210,.1]},
+ storm:{n:'⛈️ พายุ',d:'ฝน ลมแรง ฟ้าผ่า',dark:.56,col:[8,12,18],rain:1,fog:.26,wind:1.7,cloud:.55,vis:.6,th:1,tint:[90,110,130,.14]},
+ sunset:{n:'🌇 พระอาทิตย์ตก',d:'แสงส้ม เงายาว',dark:.36,col:[46,20,8],rain:0,fog:.05,wind:.4,cloud:.22,vis:.9,th:0,tint:[255,120,40,.12]},
+ night:{n:'🌙 กลางคืน',d:'มืด ไฟหน้ารถ/ไฟฉายค่าย',dark:.9,col:[5,12,34],rain:0,fog:.1,wind:.3,cloud:.2,vis:.62,th:0,tint:[40,70,150,.14]}};
+var FRWK=['clear','cloudy','lrain','hrain','fog','storm','sunset','night'];
+var FRWN={clear:['cloudy','sunset','fog','cloudy'],cloudy:['lrain','clear','fog','hrain'],lrain:['hrain','cloudy','cloudy'],hrain:['storm','lrain','lrain'],
+ storm:['hrain','lrain'],fog:['cloudy','clear','lrain'],sunset:['night','night','cloudy'],night:['fog','clear','cloudy','lrain']};
+function frWxTodKey(k){return k==='night'?'night':k==='storm'||k==='hrain'?'storm':k==='sunset'?'dusk':'day';}
+function frWxInit(sel){var dyn=!sel||sel==='dyn'||sel==='rand'||!FRW[sel];
+ FR.wx={dyn:dyn,cur:dyn?pick(['clear','clear','cloudy','lrain','fog','sunset','night','hrain']):sel,nxt:null,t:0,hold:rnd(240,360),dir:rnd(0,6.2832),vigT:0,thT:rnd(6,14)};
+ FL.tod=frWxTodKey(FR.wx.cur);frWxBlend();frWxVig();}
+function frWxBlend(){var W=FR.wx,A=FRW[W.cur],B=W.nxt?FRW[W.nxt]:A,e=W.nxt?W.t*W.t*(3-2*W.t):0,o={};
+ ['dark','rain','fog','wind','cloud','vis','th'].forEach(function(k){o[k]=lerp(A[k],B[k],e);});
+ var c=[0,1,2].map(function(i){return Math.round(lerp(A.col[i],B.col[i],e));}),tn=[0,1,2,3].map(function(i){return lerp(A.tint[i],B.tint[i],e);});
+ o.col=c.join(',');o.tint='rgba('+Math.round(tn[0])+','+Math.round(tn[1])+','+Math.round(tn[2])+','+tn[3].toFixed(3)+')';o.n=(e>.5?B:A).n;o.night=o.dark>.6;FR.wxT=o;
+ var sp=6+o.wind*34;GX.wx=Math.cos(W.dir)*sp;GX.wy=Math.sin(W.dir)*sp*.5+3;}
+function frWxVig(){var vg=$('vig');if(vg&&FR.wxT)vg.style.background='radial-gradient(ellipse at center,rgba(0,0,0,0) 46%,rgba(0,0,0,.6) 100%),linear-gradient('+FR.wxT.tint+','+FR.wxT.tint+')';}
+function frWxTick(dt){var W=FR.wx;if(!W)return;
+ if(W.nxt){W.t=Math.min(1,W.t+dt/30);W.vigT-=dt;if(W.vigT<=0){W.vigT=1;frWxVig();}if(W.t>=1){W.cur=W.nxt;W.nxt=null;W.t=0;W.hold=rnd(240,360);FL.tod=frWxTodKey(W.cur);frWxVig();}}
+ else if(W.dyn&&!FL.prep&&!G.over){W.hold-=dt;if(W.hold<=0){W.nxt=pick(FRWN[W.cur]);W.t=0;var n=FRW[W.nxt];addLog('🌦️ สภาพอากาศกำลังเปลี่ยน: '+n.n+' — '+n.d,'b');
+   if(W.nxt==='fog'||W.nxt==='storm'||W.nxt==='night')cineCard(n.n,n.d,'#9fc8ff',2.4);}}
+ frWxBlend();
+ if(SFX.rainSet){W.rT=(W.rT||0)-dt;if(W.rT<=0){W.rT=.5;SFX.rainSet(FR.wxT.rain);}}}
+function frVisMul(){return FR.on&&FR.wxT?FR.wxT.vis:1;}
+function frVis(e){var v=frVisMul();return e&&e.st&&e.st.thermal?Math.max(v,.82):v;}
+/* ฝน · หมอก · ฟ้าแลบ (พิกัดจอ) */
+function frWxFx(w,h,dt){var T=FR.wxT;if(!T)return;var i;
+ if(T.fog>.02){var px=P&&!P.dead?P.x-cam.x:w/2,py=P&&!P.dead?P.y-cam.y:h/2,R0=190+(1-T.fog)*1150,g=cx.createRadialGradient(px,py,R0,px,py,R0+430);
+  g.addColorStop(0,'rgba(196,202,206,0)');g.addColorStop(1,'rgba(196,202,206,'+(T.fog*.84).toFixed(3)+')');cx.fillStyle=g;cx.fillRect(0,0,w,h);
+  cx.fillStyle='rgba(196,202,206,'+(T.fog*.22).toFixed(3)+')';cx.fillRect(0,0,w,h);}
+ if(T.rain>.02){var n=Math.round(T.rain*(60+170*GFX.parts)),sl=.12+T.wind*.18;GX.rain=GX.rain||[];
+  while(GX.rain.length<n)GX.rain.push({x:rnd(0,w),y:rnd(0,h),v:rnd(900,1300),l:rnd(14,26)});
+  cx.strokeStyle='rgba(180,200,230,'+(.2+T.rain*.18).toFixed(3)+')';cx.lineWidth=1;cx.beginPath();
+  for(i=0;i<n;i++){var r=GX.rain[i];r.y+=r.v*dt;r.x+=r.v*sl*dt;if(r.y>h+20){r.y=-20;r.x=rnd(-80,w);}if(r.x>w+40)r.x-=w+100;cx.moveTo(r.x,r.y);cx.lineTo(r.x-r.l*sl,r.y-r.l);}cx.stroke();
+  if(T.rain>.5&&GFX.parts>.5){cx.fillStyle='rgba(200,215,235,.25)';for(i=0;i<Math.round(T.rain*14);i++)cx.fillRect(rnd(0,w),rnd(0,h),3,1);}}
+ if(T.th>.05){FR.wx.thT-=dt*T.th;if(FR.wx.thT<=0){FR.wx.thT=rnd(6,14);G.flash=Math.max(G.flash||0,rnd(.45,.8)*T.th);var dl=rnd(.3,1.6);setTimeout(function(){SFX.thunder();},dl*1000);}}}
+/* ไฟฉายค่ายกลางคืน: ลำแสงกวาดจากบังเกอร์/HQ/สถานีของฝ่ายป้องกัน */
+function frSearchHoles(hole){for(var i=0;i<structs.length;i++){var s=structs[i];if(s.dead||s.team!==FR.def||(s.k!=='turret'&&s.k!=='hq'&&s.k!=='mg'))continue;
+ var a=frFace(FR.def)+Math.sin(G.t*.35+i*1.7)*1.1;for(var k=1;k<=5;k++)hole(s.x+Math.cos(a)*k*130,s.y+Math.sin(a)*k*130,46+k*20,.55);}}
+function frDrawBeams(w,h){var T=FR.wxT;if(!T||T.dark<.55)return;cx.save();cx.globalCompositeOperation='lighter';
+ for(var i=0;i<structs.length;i++){var s=structs[i];if(s.dead||s.team!==FR.def||(s.k!=='turret'&&s.k!=='hq'&&s.k!=='mg'))continue;var x=s.x-cam.x,y=s.y-cam.y;if(x<-800||x>w+800||y<-800||y>h+800)continue;
+  var a=frFace(FR.def)+Math.sin(G.t*.35+i*1.7)*1.1,L=700,sp=.16,g=cx.createLinearGradient(x,y,x+Math.cos(a)*L,y+Math.sin(a)*L);g.addColorStop(0,'rgba(255,250,220,.16)');g.addColorStop(1,'rgba(255,250,220,0)');
+  cx.fillStyle=g;cx.beginPath();cx.moveTo(x,y);cx.lineTo(x+Math.cos(a-sp)*L,y+Math.sin(a-sp)*L);cx.lineTo(x+Math.cos(a+sp)*L,y+Math.sin(a+sp)*L);cx.closePath();cx.fill();}
+ cx.restore();}
+/* ═══ ปืนใหญ่ (ALTY): เรียกได้ทุกที่ ═══ */
+function frArty(){if(!FR.on||SPEC.on||!P||P.dead)return;if(FL.prep){toast('⏳ ยังอยู่ช่วงเตรียมพร้อม');return;}var S=FL.sup;if(!S)return;
+ if(S.mark){supCancel();return;}if(!supReady(0,'arty')){toast('💥 ปืนใหญ่ '+(supBusy(0,'arty')?'กำลังยิง':'คูลดาวน์ '+Math.ceil(S.cd.arty[0])+' วิ'));SFX.ui(false);return;}
+ FR.bOpen=false;FR.bSel=null;frBuildUI();radioPick('arty');}
+function frAIArty(dt){FR.aaT=FR.aaT||[rnd(40,60),rnd(50,70)];if(FL.prep)return;
+ for(var sd=0;sd<2;sd++){FR.aaT[sd]-=dt;if(FR.aaT[sd]>0)continue;FR.aaT[sd]=rnd(38,58);if(sd===0&&!SPEC.on)continue;if(!supReady(sd,'arty'))continue;
+  var od=FR.obj[Math.min(FR.next,4)],best=null,bs=0,C=[],i,j;
+  for(i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&!t.craft&&teamSide(t.team)!==sd&&hyp(t.x-od.x,t.y-od.y)<2600)C.push(t);}
+  for(i=0;i<inf.length;i++){var q=inf[i];if(!q.dead&&teamSide(q.team)!==sd&&hyp(q.x-od.x,q.y-od.y)<2600)C.push(q);}
+  for(i=0;i<Math.min(C.length,24);i++){var c=C[ri(0,C.length-1)],n=0,fr=0;for(j=0;j<C.length;j++)if(hyp(C[j].x-c.x,C[j].y-c.y)<300)n+=C[j].inf?1:2;
+   for(j=0;j<tanks.length;j++){var o=tanks[j];if(!o.dead&&teamSide(o.team)===sd&&hyp(o.x-c.x,o.y-c.y)<320)fr++;}if(fr===0&&n>bs){bs=n;best=c;}}
+  if(best&&bs>=3){var p=supAIPos(sd,best.x,best.y,'arty');if(p)supRequest(sd,'arty',p.x,p.y);}}}
+function frArtyWarn(dt){FR.awT=(FR.awT||0)-dt;if(FR.awT>0||!P||P.dead||SPEC.on)return;
+ for(var i=0;i<arty.length;i++){var a=arty[i];if(a.side!==0&&a.t<2.4&&hyp(a.x-P.x,a.y-P.y)<a.r+160){FR.awT=4;addLog('⚠️ ปืนใหญ่ศัตรูกำลังตกใกล้คุณ — หลบ!','r');SFX.lwsBeep(true);return;}}}
+
+/* ═══ FRONTIER เฟส 3: สเกลเต็ม + ระบบรักษาความลื่นอัตโนมัติ ═══
+   วัดเวลาเฟรมจริง → ถ้าช้า ลดอนุภาค / อัปเดตหน่วยที่อยู่ไกลกล้องครึ่งความถี่ / ลดทหารราบ · เร็วขึ้นแล้วคืนค่า */
+function frPerfInit(){FR.ft=16;FR.pl=0;FR.plT=4;FR.plUp=0;FR.gp0=GFX.parts;FR.infQ0=FR.infQ;}
+function frPerfTick(dt){FR.plT-=dt;if(FR.plT>0)return;FR.plT=2;var ft=FR.ft||16;
+ if(ft>27&&FR.pl<3){FR.pl++;FR.plUp=0;frPerfApply();}else if(ft<17.5&&FR.pl>0){if(++FR.plUp>=4){FR.pl--;FR.plUp=0;frPerfApply();}}else FR.plUp=0;}
+function frPerfApply(){GFX.parts=FR.gp0*[1,.72,.52,.4][FR.pl];FR.infQ=Math.round(FR.infQ0*[1,1,.85,.7][FR.pl]);}
+function frPerfRestore(){if(FR.gp0!==undefined){GFX.parts=FR.gp0;FR.gp0=undefined;}}
+function frFar(x,y,r){return Math.abs(x-cam.x-innerWidth/2)>r||Math.abs(y-cam.y-innerHeight/2)>r*.8;}
+/* ═══ บรรยากาศสนามรบ ═══ */
+function frFleetInit(){FR.fleet=[];var L=[['cv',-AY*.55,1150,230,46],['dd',-AY*.12,2350,150,26],['cg',AY*.18,1600,190,32],['lst',AY*.55,2000,170,34],['dd',AY*.8,900,150,26],['cg',-AY*.82,1900,190,32],['lst',-AY*.32,2650,170,34]];
+ L.forEach(function(s,i){FR.fleet.push({ty:s[0],x:frX(FRC.shore-s[2]),y:s[1],L:s[3],W:s[4],cd:rnd(2,8),fl:0,ph:rnd(0,6)});});
+ FR.burns=[];obst.forEach(function(o){var u=frU(o.x);if((o.kind==='wreck'&&Math.random()<.55)||(o.kind==='ruin'&&Math.random()<.5))FR.burns.push({x:o.x,y:o.y,s:o.kind==='ruin'?1.3:1,t:rnd(0,3)});});
+ FR.atT=rnd(4,8);FR.flyT=rnd(25,40);FR.ferT=20;FR.edge=[];}
+function frDrawShip(f,time){var L=f.L,W=f.W;cx.fillStyle='rgba(0,0,0,.28)';cx.beginPath();cx.ellipse(12,12,L,W*.9,0,0,6.2832);cx.fill();
+ cx.strokeStyle='rgba(230,240,240,.25)';cx.lineWidth=3;cx.beginPath();cx.moveTo(-L,-W*.6);cx.lineTo(-L-120,-W*1.6);cx.moveTo(-L,W*.6);cx.lineTo(-L-120,W*1.6);cx.stroke();
+ cx.fillStyle=f.ty==='cv'?'#4c545a':'#4a5258';cx.beginPath();cx.moveTo(-L,-W*.62);cx.lineTo(L*.72,-W*.62);cx.lineTo(L,0);cx.lineTo(L*.72,W*.62);cx.lineTo(-L,W*.62);cx.closePath();cx.fill();cx.strokeStyle='#2e3438';cx.lineWidth=1.5;cx.stroke();
+ if(f.ty==='cv'){cx.fillStyle='#3e4448';cx.fillRect(-L*.95,-W*.9,L*1.8,W*1.5);cx.strokeStyle='rgba(230,230,220,.6)';cx.lineWidth=1.4;cx.setLineDash([10,8]);cx.beginPath();cx.moveTo(-L*.9,0);cx.lineTo(L*.8,-W*.4);cx.stroke();cx.setLineDash([]);
+  cx.fillStyle='#5a6268';cx.fillRect(L*.1,W*.35,L*.25,W*.32);for(var i=0;i<4;i++){cx.save();cx.translate(-L*.6+i*L*.32,-W*.42);cx.fillStyle='#6a7278';cx.beginPath();cx.moveTo(10,0);cx.lineTo(-7,-7);cx.lineTo(-4,0);cx.lineTo(-7,7);cx.closePath();cx.fill();cx.restore();}}
+ else if(f.ty==='lst'){cx.fillStyle='#525a50';cx.fillRect(-L*.7,-W*.42,L*1.2,W*.84);cx.fillStyle='#3e463c';for(var j=0;j<3;j++)cx.fillRect(-L*.6+j*L*.36,-W*.3,L*.26,W*.6);cx.fillStyle='#5e665c';cx.fillRect(-L*.95,-W*.3,L*.22,W*.6);}
+ else{cx.fillStyle='#5c656b';cx.fillRect(-L*.35,-W*.36,L*.55,W*.72);cx.fillStyle='#3a4146';cx.fillRect(-L*.15,-W*.22,L*.2,W*.44);cx.fillStyle='#2e3438';
+  [[L*.48,W*.24],[-L*.66,W*.22]].concat(f.ty==='cg'?[[L*.3,W*.2]]:[]).forEach(function(q){cx.beginPath();cx.arc(q[0],0,q[1],0,6.2832);cx.fill();cx.fillRect(q[0],-1.5,L*.22,3);});}
+ if(f.fl>0){cx.globalCompositeOperation='lighter';cx.fillStyle='rgba(255,200,120,'+f.fl.toFixed(2)+')';cx.beginPath();cx.arc(L*.75,0,16,0,6.2832);cx.fill();cx.globalCompositeOperation='source-over';}}
+function frAtmo(dt,time){var i,pd=P&&!P.dead?P:{x:cam.x+innerWidth/2,y:cam.y+innerHeight/2};
+ /* ควันพวยพุ่งจากซากรถ/อาคารที่ไหม้ (เฉพาะที่ใกล้กล้อง) */
+ FR.smT=(FR.smT||0)-dt;if(FR.smT<=0&&GFX.parts>.2){FR.smT=.22/Math.max(.4,GFX.parts);
+  for(i=0;i<parts.length;i++){var p=parts[i];if(!p.wreck||p.l<30||frFar(p.x,p.y,1100))continue;pAdd({t:'s',x:p.x+rnd(-8,8),y:p.y+rnd(-8,8),vx:rnd(-.2,.2),vy:rnd(-.2,.2),l:rnd(4.5,6.5),ml:6.5,c:p.l>70?'#24221e':'#46443e',r:rnd(12,18),g:2.8,a:.52,v:0,up:30});}
+  for(i=0;i<FR.burns.length;i++){var b=FR.burns[i];if(frFar(b.x,b.y,1100))continue;for(var q=0;q<2;q++)pAdd({t:'s',x:b.x+rnd(-14,14),y:b.y+rnd(-10,10),vx:rnd(-.2,.2),vy:rnd(-.2,.2),l:rnd(5,7.5),ml:7.5,c:q?'#3a3834':'#24221e',r:rnd(13,20)*b.s,g:3,a:.55,v:0,up:34});}}
+ /* ระเบิดปืนใหญ่ไกล ๆ ตามแนวหน้า (เสียง + แสงสะท้อนขอบจอ) */
+ FR.atT-=dt;if(FR.atT<=0&&!FL.prep){FR.atT=rnd(3,7);var od=FR.obj[Math.min(FR.next,4)],x=od.x+rnd(-1600,1600),y=rnd(-AY*.85,AY*.85),d=hyp(x-pd.x,y-pd.y);
+  if(d>1500){SFX.at(x,y).boom(rnd(.9,1.5),d);var a=Math.atan2(y-pd.y,x-pd.x);FR.edge.push({a:a,t:.45,s:clamp(1-(d-1500)/6000,.25,1)});if(Math.random()<.4)setTimeout(function(){if(FR.on&&P)SFX.at(x+rnd(-300,300),y).rifle();},rnd(200,900));}}
+ for(i=FR.edge.length-1;i>=0;i--){FR.edge[i].t-=dt;if(FR.edge[i].t<=0)FR.edge.splice(i,1);}
+ /* เครื่องบินผ่านเหนือสนามรบ (ไม่โจมตี) */
+ FR.flyT-=dt;if(FR.flyT<=0&&FL.ev){FR.flyT=rnd(30,55);var side=Math.random()<.6?FR.atk:FR.def,E=FL.ev,fx=FR.obj[Math.min(FR.next,4)].x+rnd(-1800,1800),dir=Math.random()<.5?1:-1;
+  for(var k=0;k<2;k++){var pl={k:'jet',ty:acType('jet',side),side:side,x:fx+k*140,y:-dir*(AY+700+k*160),vx:rnd(-40,40),vy:dir*1300,h:260,hp:100,drops:[],id:++E.uid};pl.snd=k===0?SFX.loop(pl.ty):null;E.air.push(pl);}}
+ /* เรือยกพลส่งเสบียงไป-กลับ (หลังยึด B) */
+ if(FR.next>1){FR.ferT-=dt;if(FR.ferT<=0){FR.ferT=rnd(22,34);var fy=clamp(rnd(-AY*.8,AY*.8),-AY+300,AY-300);frCraftNew(fy,[],0,FR.atk===0?2:1,frShoreU(fy)-1600,false);}}
+ /* เรือรบยิงปืน (แสงวาบ) */
+ for(i=0;i<FR.fleet.length;i++){var f=FR.fleet[i];if(f.fl>0)f.fl-=dt*2.5;if(f.ty!=='lst'&&f.ty!=='cv'){f.cd-=dt;if(f.cd<=0){f.cd=rnd(7,15);f.fl=1;if(P&&hyp(f.x-P.x,f.y-P.y)<3200)SFX.at(f.x,f.y).cannon(1.7,hyp(f.x-P.x,f.y-P.y));}}}}
+function frDrawAtmo(w,h,time){var i;
+ for(i=0;i<FR.burns.length;i++){var b=FR.burns[i],x=b.x-cam.x,y=b.y-cam.y;if(x<-60||x>w+60||y<-60||y>h+60)continue;var fl=.55+Math.sin(time*9+b.t)*.2+Math.random()*.15;
+  cx.globalCompositeOperation='lighter';cx.globalAlpha=fl;cx.drawImage(glowSpr('#ff6a20'),x-26*b.s,y-30*b.s,52*b.s,52*b.s);cx.globalAlpha=1;cx.globalCompositeOperation='source-over';
+  cx.fillStyle='rgba(255,170,70,'+(fl*.8).toFixed(2)+')';for(var k=0;k<3;k++){cx.beginPath();cx.ellipse(x+(k-1)*7*b.s,y-6-Math.random()*6,3*b.s,6*b.s+Math.random()*3,0,0,6.2832);cx.fill();}}}
+function frDrawEdge(w,h){if(!FR.edge.length)return;cx.save();cx.globalCompositeOperation='lighter';
+ for(var i=0;i<FR.edge.length;i++){var e=FR.edge[i],k=e.t/.45*e.s,ex=w/2+Math.cos(e.a)*w*.62,ey=h/2+Math.sin(e.a)*h*.62,g=cx.createRadialGradient(ex,ey,0,ex,ey,Math.max(w,h)*.45);
+  g.addColorStop(0,'rgba(255,170,90,'+(k*.16).toFixed(3)+')');g.addColorStop(1,'rgba(255,170,90,0)');cx.fillStyle=g;cx.fillRect(0,0,w,h);}cx.restore();}
+
+/* ═══ FRONTIER เฟส 3: สถิติรายคน + ทีม ═══ */
+var FRCS=['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Ghost','Hawk','Iron','Jackal','Kilo','Lancer','Mako','Nomad','Onyx','Python','Raven','Saber','Titan','Viper','Wolf','Zulu'];
+function frStInit(){FR.recs=[];FR.me={nm:'คุณ',me:1,side:0,k:0,ki:0,a:0,c:0,s:0,d:0,dt:0};FR.bo=null;FR.dead=[0,0];FR.deadI=[0,0];
+ FR.infRec=[0,1].map(function(s){return{nm:'ทหารราบ',grp:1,side:s,k:0,ki:0,a:0,c:0,s:0,d:0,dt:0};});
+ FR.fortRec=[0,1].map(function(s){return{nm:'ป้อม/บังเกอร์',grp:1,side:s,k:0,ki:0,a:0,c:0,s:0,d:0,dt:0};});
+ FR.supRec=[0,1].map(function(s){return{nm:'ปืนใหญ่/กองเรือ/อากาศ',grp:1,side:s,k:0,ki:0,a:0,c:0,s:0,d:0,dt:0};});
+ FR.recs.push(FR.me);FR.recs=FR.recs.concat(FR.infRec,FR.fortRec,FR.supRec);FR.csN=0;}
+function frRec(u){if(!FR.recs)return null;if(!u)return null;if(u===P&&!SPEC.on||u.team===0||u.hero)return FR.me;if(u.rec)return u.rec;
+ var sd=teamSide(u.team);if(u.inf)return FR.infRec[sd];if(u.isTurret)return FR.fortRec[sd];if(!u.st||!u.b)return null;
+ var r={nm:FRCS[FR.csN%FRCS.length]+'-'+(1+Math.floor(FR.csN/FRCS.length)),veh:u.st.name,side:sd,k:0,ki:0,a:0,c:0,s:0,d:0,dt:0};FR.csN++;u.rec=r;FR.recs.push(r);return r;}
+function frBoRec(){var b=FR.bo;if(!b)return null;if(b==='P')return FR.me;if(b.charAt(0)==='S')return FR.supRec[+b.charAt(1)];if(b.charAt(0)==='F')return FR.fortRec[+b.charAt(1)];return null;}
+function frScore(r){return r.k*100+r.ki*20+r.a*40+r.c*150+r.s*50+Math.round(r.d/20);}
+function frStHit(s,t,r){var d=r.dmg||0;if(d<=0||!s.own)return;var rc=frRec(s.own);if(!rc||rc.side===teamSide(t.team))return;rc.d+=d;
+ var L=t.dmgBy||(t.dmgBy=[]),e=null;for(var i=0;i<L.length;i++)if(L[i].r===rc){e=L[i];break;}if(!e){e={r:rc,d:0,t:0};L.push(e);}e.d+=d;e.t=G.t;}
+function frStKill(t){var sd=teamSide(t.team);FR.dead[sd]++;var vr=frRec(t);if(vr)vr.dt++;
+ var kr=frBoRec(),sup=!!kr;if(!kr){var b=t.lastBy&&G.t-(t.lastByT||0)<20?t.lastBy:null;kr=frRec(b);}
+ if(kr&&kr.side!==sd){kr.k++;if(sup||kr.grp&&kr!==FR.infRec[kr.side])kr.s++;}
+ (t.dmgBy||[]).forEach(function(e){if(e.r!==kr&&e.r.side!==sd&&G.t-e.t<30&&e.d>=t.mhp*.15)e.r.a++;});}
+function frStInf(s,by){var sd=teamSide(s.team);FR.deadI[sd]++;var kr=frBoRec(),sup=!!kr;if(!kr)kr=frRec(by);if(kr&&kr.side!==sd){kr.ki++;if(sup)kr.s++;}}
+function frStCap(o){var a=FR.atk,inf=false;for(var i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&teamSide(t.team)===a&&hyp(t.x-o.x,t.y-o.y)<o.r){var r=frRec(t);if(r)r.c++;}}
+ for(i=0;i<inf.length;i++){var q=inf[i];if(!q.dead&&teamSide(q.team)===a&&hyp(q.x-o.x,q.y-o.y)<o.r){inf=true;break;}}if(inf)FR.infRec[a].c++;}
+function frStatsHTML(){if(!FR.recs)return '';var me=FR.me,us=teamSide(0)===FR.atk,i,s;
+ function tot(sd,k){var n=0;FR.recs.forEach(function(r){if(r.side===sd)n+=r[k];});return n;}
+ var h='<div class="card" style="cursor:default;text-align:left"><div class="st" style="font-size:12px;line-height:1.75">';
+ h+='<b style="color:#f0c46a">🎖️ สถิติของคุณ</b> · คะแนน <b>'+fmt(frScore(me))+'</b><br>ทำลายรถ <b>'+me.k+'</b> · ทหาร <b>'+me.ki+'</b> · ช่วยทำลาย <b>'+me.a+'</b> · ร่วมยึดจุด <b>'+me.c+'</b> · สนับสนุน (ปืนใหญ่/ป้อม) <b>'+me.s+'</b><br>ดาเมจรวม <b>'+fmt(Math.round(me.d))+'</b> · ถูกทำลาย <b>'+G.deaths+'</b> ครั้ง<br>';
+ h+='<b style="color:#f0c46a">⚔️ ภาพรวมทีม</b><table style="width:100%;font-size:11.5px;margin-top:2px"><tr><td></td><td style="color:#8fd44a">ฝ่ายเรา'+(us?' (บุก)':' (ป้องกัน)')+'</td><td style="color:#e05a3c">ศัตรู'+(us?' (ป้องกัน)':' (บุก)')+'</td></tr>';
+ [['ทำลายรถ','k'],['ทำลายทหาร','ki'],['ร่วมยึดจุด','c'],['คะแนนสนับสนุน','s']].forEach(function(q){h+='<tr><td>'+q[0]+'</td><td>'+tot(0,q[1])+'</td><td>'+tot(1,q[1])+'</td></tr>';});
+ h+='<tr><td>สูญเสีย (รถ/ทหาร)</td><td>'+FR.dead[0]+' / '+FR.deadI[0]+'</td><td>'+FR.dead[1]+' / '+FR.deadI[1]+'</td></tr></table>';
+ h+='<div style="margin-top:2px">เป้าหมายที่ยึดได้: <b>'+(FR.next-1)+'/4</b>'+(FR.next>4?' + แนวรอบ HQ':'')+' · กำลังเสริมฝ่ายบุกใช้ไป <b>'+fmt(FR.tkLost||0)+'</b> · เหลือ <b>'+fmt(FR.tk)+'</b></div>';
+ for(s=0;s<2;s++){var L=FR.recs.filter(function(r){return r.side===s&&!r.grp;}).sort(function(a,b){return frScore(b)-frScore(a);}).slice(0,5);
+  h+='<b style="color:'+(s===0?'#8fd44a':'#e05a3c')+'">🏅 ยอดเยี่ยม'+(s===0?'ฝ่ายเรา':'ฝ่ายศัตรู')+'</b><br>';
+  L.forEach(function(r,ix){h+=(ix+1)+'. '+(r.me?'<b style="color:#ffd27a">คุณ</b>':esc(r.nm))+(r.veh?' <span style="color:#93a181">('+esc(r.veh)+')</span>':'')+' — รถ '+r.k+' · ทหาร '+r.ki+' · ช่วย '+r.a+' · ยึด '+r.c+' · <b>'+fmt(frScore(r))+'</b><br>';});}
+ return h+'</div></div>';}
+
 /* ═══════ FRONTLINE STATE ═══════ */
 var FL={on:false,own:[],prog:[],capT:[],hq:[6000,6000],front:[1,5],
  spawnQ:[],lastBrain:0,artyT:[6,9],msg:'',intel:[0,0],pRespawn:0,pQueue:0};
@@ -3494,6 +4256,7 @@ function turretsAlive(z){var n=0;
   if(s.k==='turret'&&!s.dead&&zoneOf(s.x)===z)n++;}
  return n;}
 function flSpawnPoint(team){
+ if(FR.on)return frSpawnPoint(team);
  var side=teamSide(team);
  var lastStand=!!(FL.col&&FL.col[side]);
  for(var i=0;i<tanks.length;i++){var t=tanks[i];
@@ -3710,10 +4473,10 @@ function updSpot(e,dt){
  if(recompute)e.losT=.22+Math.random()*.12;
  var foes=enemyOf(e.team),best=null,bd=1e9;
  for(var i=0;i<tanks.length;i++){var o=tanks[i];
-  if(o.dead||foes.indexOf(o.team)<0||o.cloakT>0||o.dropT>0||(o.adpT>0&&hyp(o.x-e.x,o.y-e.y)>380))continue;
+  if(o.dead||foes.indexOf(o.team)<0||o.cloakT>0||o.dropT>0||o.craft||(o.adpT>0&&hyp(o.x-e.x,o.y-e.y)>380))continue;
   var d=hyp(o.x-e.x,o.y-e.y);if(d<bd){bd=d;best=o;}}
  if(!best){e.see=false;e.seeT=null;return;}
- var tgt=best,d=bd,view=e.st.view*(FL.on?1.5:1);
+ var tgt=best,d=bd,view=e.st.view*(FL.on?1.5:1)*(FR.on?frVis(e):1);
  if(recompute)e.losOK=losVision(e,tgt,e.st.thermal);
  var los=e.losOK;
  if(tgt.marked||(tgt.hkT>0&&tgt.hkS===teamSide(e.team)))los=true;                        /* ล้ำเขต = เห็นตลอด */
@@ -3798,7 +4561,7 @@ function takeShell(t,am){
  var order=t.st.alRack==='car'?['car']:t.st.alRack==='bus'?['bus']:['r1','r3','r2'];
  for(var i=0;i<order.length;i++)if(t.racks[order[i]]>0){t.racks[order[i]]--;return;}}
 function fire(t,kind){
- if(t.dead||t.dropT>0)return;
+ if(t.dead||t.dropT>0||t.craft)return;
  if(t.noFire&&kind!==1){if(t.team===0&&(!t._nfL||G.t-t._nfL>2)){t._nfL=G.t;addLog(t.mods.gun.st===2?'❌ ปืนใหญ่พัง — กำลังซ่อม':'❌ ไม่มีพลยิง — รอสลับลูกเรือ','r');}return;}
  var s=t.st,isP=t.team===0,M=mdl(t.b);
  var bD=isP?runBuff.dmg:1,bP=isP?runBuff.pen:1;
@@ -4044,7 +4807,7 @@ function innerPath(t,x,y,dx,dy,A,s,over,mainOn){var cs=clamp((s.cal||75)/90,.5,1
    if(e.k==='eng'&&Math.random()<(r.main?t.st.fireCh:t.st.fireCh*.3))out.fire='เครื่องยนต์';}});
  return out;}
 /* ── ผลการยิงหนึ่งนัด (จริง) ── */
-function hitTank(s,t,step){if(t.cloakT>0||t.dropT>0)return null;var A=AMMOT[s.ammo]||AMMOT.ap,sl=hyp(s.vx,s.vy)||1,dx=s.vx/sl,dy=s.vy/sl;
+function hitTank(s,t,step){if(t.cloakT>0||t.dropT>0||t.craft)return null;var A=AMMOT[s.ammo]||AMMOT.ap,sl=hyp(s.vx,s.vy)||1,dx=s.vx/sl,dy=s.vy/sl;
  if(s.zH===undefined)s.zH=Math.random();
  var g=geoHit(t,s.x-dx*60,s.y-dy*60,dx,dy,s.zH,61);if(!g)return null;
  var isPT=t.team===0,dist=P?hyp(t.x-P.x,t.y-P.y):0,R={x:g.x,y:g.y,mods:[],crew:[],zone:'',dmg:0};
@@ -4146,6 +4909,7 @@ function burst(x,y,n,c){var n0=n/Math.max(GFX.parts,.05),gl=isGlow(c);n=Math.rou
  else if(!gl&&n0>=6)fxDust(x,y,clamp(n0/20,.2,1));
  else if(gl)GX.lights.push({x:x,y:y,r:60,l:.1,ml:.1,c:c});}
 function hitStruct(s,st){
+ if(st.inv){burst(s.x,s.y,Math.round(8*GFX.parts),'#b9a98a');if(s.own===P&&G.t-(FR.invT||-9)>4){FR.invT=G.t;addLog('🔒 HQ ยังเสียหายไม่ได้ — ต้องยึดแนวรอบ E ก่อน','r');}return 0;}
  var A=AMMOT[s.ammo]||AMMOT.ap;
  var pen=s.pen*(A.pM>=1?1:1);
  var eff=st.ar;
@@ -4227,12 +4991,13 @@ function strategicBrain(){
 function nearStruct(e,range){
  var side=teamSide(e.team),best=null,bd=range||1400;
  for(var i=0;i<structs.length;i++){var s=structs[i];
-  if(s.dead||s.team===-1||s.team===side)continue;
+  if(s.dead||s.team===-1||s.team===side||s.inv)continue;
   var d=hyp(s.x-e.x,s.y-e.y);
   if(d<bd){bd=d;best=s;}}
  return best;}
 /* ── เป้าหมายตำแหน่งจาก Strategic Brain ── */
 function flGoal(e){
+ if(FR.on)return frGoal(e);
  var side=teamSide(e.team);
  if(e.obj===-2){
   var gs=null;
@@ -4320,6 +5085,7 @@ function findCover(e,th){var best=null,bs=1e9,gx=Math.floor((e.x-OG.x0)/OG.cell)
    if(de<bs){bs=de;best={x:px,y:py};}}}
  return best;}
 function retreatGoal(e,th){
+ if(FR.on)return frRetreat(e);
  if(FL.on){var side=teamSide(e.team),gs=null,hq=null;
   for(var i=0;i<structs.length;i++){var s=structs[i];if(s.k==='gas'&&!s.dead)gs=s;if(s.k==='hq'&&s.team===side)hq=s;}
   if(gs&&(FL.own[3]===side||FL.own[3]===-1)&&hyp(gs.x-e.x,gs.y-e.y)<hyp((hq?hq.x:e.x)-e.x,(hq?hq.y:e.y)-e.y))
@@ -4348,7 +5114,7 @@ function ai(e,dt){
  var sq=sqInfo(e);
  /* ── โครงสร้างเป้าหมาย ── */
  var stg=null;
- if(FL.on&&!e.retreat&&(role==='atk'||role==='free')){stg=nearStruct(e,1300);if(stg&&tgt&&hyp(tgt.x-e.x,tgt.y-e.y)<820)stg=null;}
+ if(FL.on&&!e.retreat&&(role==='atk'||role==='free')){stg=nearStruct(e,1300);if(stg&&tgt&&hyp(tgt.x-e.x,tgt.y-e.y)<820)stg=null;if(stg&&FR.on&&frBelow(e))stg=null;}
  /* ── ไม่มีเป้ารถ ── */
  if(!tgt&&!stg){
   var gx,gy,thr=.9;
@@ -4399,7 +5165,7 @@ function ai(e,dt){
  if(chg&&e.smkN>0&&e.smkCd<=0&&d<900&&Math.random()<dt*.12)deploySmoke(e,true);
  if(e.retreat){var rg2=retreatGoal(e,tgt);desired=rg2?Math.atan2(rg2.y-e.y,rg2.x-e.x):bodyAim+Math.PI;
   thr=rg2&&hyp(rg2.x-e.x,rg2.y-e.y)<50?0:.95;}
- else if(chg){desired=bodyAim+e.aiS*.28;thr=1;}                /* บุกทั้งแนว: พุ่งเข้าหา ยิงขณะวิ่ง */
+ else if(chg){if(FR.on&&frBelow(e)){var fgp=frGoalPt(e);desired=Math.atan2(fgp.y-e.y,fgp.x-e.x);}else desired=bodyAim+e.aiS*.28;thr=1;}                /* บุกทั้งแนว: พุ่งเข้าหา ยิงขณะวิ่ง */
  else if(cls==='light'||cls==='ifv'){
   var flank=bodyAim+side*1.18;
   if(d>FAR)desired=bodyAim;else if(d<(cls==='ifv'?520:400))desired=bodyAim+Math.PI*.75*e.aiS;
@@ -4440,9 +5206,9 @@ function updTurrets(dt){
  for(var i=0;i<structs.length;i++){var s=structs[i];
   if(s.k!=='turret'||s.dead)continue;
   if(s.cd>0)s.cd-=dt;
-  var best=null,bd=1250;
+  var best=null,bd=1250*frVisMul();
   for(var j=0;j<tanks.length;j++){var t=tanks[j];
-   if(t.dead||teamSide(t.team)===s.team)continue;
+   if(t.dead||t.craft||teamSide(t.team)===s.team)continue;
    var d=hyp(t.x-s.x,t.y-s.y);
    if(d<bd&&losVision(s,t,0)){bd=d;best=t;}}
   if(!best)continue;
@@ -4461,6 +5227,7 @@ function updTurrets(dt){
 
 /* ═══════ MOVE ═══════ */
 function moveTank(t,dt){
+ if(t.craft){if(t.rl>0)t.rl-=dt;return;}
  var s=t.st,isP=t.team===0;
  var spdM=(isP?runBuff.spd:1);
  if(t.mod.trk>0){t.thr=0;t.steer=0;}
@@ -4586,13 +5353,14 @@ function killTank(t){
  if(t.team===1){G.kills++;SV.stat.kills++;
   if(!FL.on||Math.random()<.4)addLog('☠️ ทำลาย'+(t.boss?'บอส':'ศัตรู')+'ได้!','g');}
  if(FL.on)tkLose(teamSide(t.team),tkCost(t));
- if(FL.on&&t.team!==0&&!(FL.col&&FL.col[teamSide(t.team)]))FL.spawnQ.push({team:t.team,t:0,st:t.st,skin:t.skin});
+ if(FL.on&&t.team!==0&&!(FL.col&&FL.col[teamSide(t.team)])&&!(FR.on&&(t.boss||teamSide(t.team)===FR.atk&&FR.tk<=0)))FL.spawnQ.push({team:t.team,t:0,st:t.st,skin:t.skin});
  if(FL.on&&t.team===0)playerDown();
  setTimeout(function(){parts.push({x:t.x,y:t.y,vx:0,vy:0,l:99,ml:99,c:'#26251f',r:20,wreck:1});},100);}
 function queueTime(team){
  var n=0;for(var i=0;i<FL.spawnQ.length;i++)if(teamSide(FL.spawnQ[i].team)===teamSide(team))n++;
- return (3+6*clamp(n/Math.max(2,G.teamSize*0.6),0,1)*(FL.rt!==undefined&&!FL.prep?(FL.to?.8:FL.atk===teamSide(team)?.55:1.35):1))+(FL.btT&&FL.btT[1-teamSide(team)]>0?6:0);}
+ return (3+6*clamp(n/Math.max(2,G.teamSize*0.6),0,1)*(FL.rt!==undefined&&!FL.prep?(FL.to?.8:FL.atk===teamSide(team)?.55:1.35):1))+(FL.btT&&FL.btT[1-teamSide(team)]>0?6:0)+(FR.on&&teamSide(team)===FR.def?6:0);}
 function playerDown(){
+ if(FR.on&&teamSide(0)===FR.atk&&FR.tk<=0){G.deaths++;FL.pRespawn=0;$('hResp').classList.add('on');$('respT').textContent='—';$('respQ').textContent='หมดกำลังเสริม — เกิดใหม่ไม่ได้ · รอดูผลการรบ';return;}
  G.deaths++;FL.pRespawn=FL.col&&FL.col[0]?20:queueTime(0);
  if(FL.col&&FL.col[0])addLog('💀 กองทัพแตก — เกิดใหม่ได้ที่ HQ ช้าลง (กองหนุนสุดท้าย)','r');
  $('hResp').classList.add('on');}
@@ -4600,8 +5368,9 @@ function respawnPlayer(){
  $('hResp').classList.remove('on');
  var sp=flSpawnPoint(0),ps=calc();
  var old=tanks.indexOf(P);
- var np=mkTank(sp.x,sp.y,ps,0,{a:0,skin:SV.build.skin});supSpawnMark(0,sp.x,sp.y);infFill(np);
+ var np=mkTank(sp.x,sp.y,ps,0,{a:FR.on?frFace(0):0,skin:SV.build.skin});supSpawnMark(0,sp.x,sp.y);infFill(np);
  if(old>=0)tanks[old]=np;else tanks.push(np);
+ if(FR.on&&sp.craft)frCraftNew(sp.y,[np],0,0,frShoreU(sp.y)-1500,false);
  P=np;G.lock=null;aSel=firstAmmo();
  cam.x=P.x-innerWidth/2;cam.y=P.y-innerHeight/2;
  updAmmoUI();addLog('🔄 เกิดใหม่ที่ Zone '+(sp.z+1),'b');}
@@ -4692,7 +5461,7 @@ var FSIZE={s8:{n:'8 v 8',size:8,cr:30000,box:'e'},
  s24:{n:'24 v 24 (เต็มรูปแบบ)',size:24,cr:80000,box:'l'},
  s32:{n:'32 v 32 (TOTAL WAR)',size:32,cr:120000,box:'l'}};
 function drawDuel(){refreshAll();
- var h='';for(var k in MAPS){if(k==='nord')continue;var m=MAPS[k];
+ var h='';for(var k in MAPS){if(k==='nord'||k==='coast')continue;var m=MAPS[k];
   h+='<div class="card'+(duelSel.map===k?' sel':'')+'" onclick="duelSel.map=\''+k+'\';SFX.ui(1);drawDuel()">'+
    '<div class="nm">'+m.n+'</div><div class="st">'+m.d+'</div></div>';}
  $('dMaps').innerHTML=h;h='';
@@ -4708,7 +5477,7 @@ function drawBattleSel(){refreshAll();
    '\';btSel.size='+m.size+';SFX.ui(1);drawBattleSel()"><div class="nm">'+m.n+'</div>'+
    '<div class="st">'+m.d+'<br><span class="tag">💰 '+fmt(m.cr)+'</span></div></div>';}
  $('btModes').innerHTML=h;h='';
- for(var k in MAPS){if(k==='nord')continue;var m=MAPS[k];
+ for(var k in MAPS){if(k==='nord'||k==='coast')continue;var m=MAPS[k];
   h+='<div class="card'+(btSel.map===k?' sel':'')+'" onclick="btSel.map=\''+k+'\';SFX.ui(1);drawBattleSel()">'+
    '<div class="nm">'+m.n+'</div><div class="st">'+m.d+'</div></div>';}
  $('btMaps').innerHTML=h;h='';
@@ -4717,7 +5486,7 @@ function drawBattleSel(){refreshAll();
    '<div class="nm">'+a[1]+'</div><div class="st">×'+(1+a[0]*.12).toFixed(2)+' รางวัล</div></div>';});
  $('btLvl').innerHTML=h;}
 function drawInf(){refreshAll();
- var h='';for(var k in MAPS){if(k==='nord')continue;var m=MAPS[k];
+ var h='';for(var k in MAPS){if(k==='nord'||k==='coast')continue;var m=MAPS[k];
   h+='<div class="card'+(duelSel.map===k?' sel':'')+'" onclick="duelSel.map=\''+k+'\';SFX.ui(1);drawInf()">'+
    '<div class="nm">'+m.n+'</div><div class="st">'+m.d+'</div></div>';}
  $('iMaps').innerHTML=h;
@@ -4789,14 +5558,14 @@ function commonStart(mode){
  requestAnimationFrame(loop);}
 function firstAmmo(){for(var k in SV.ammoMix)if(SV.ammoDev[k]&&P&&P.ammo[k]>0)return k;
  for(var k in SV.ammoDev)if(SV.ammoDev[k])return k;return 'ap';}
-function startDuel(){FL.on=false;G.map=duelSel.map;commonStart('duel');
+function startDuel(){FL.on=false;FR.on=false;G.map=duelSel.map;commonStart('duel');
  var f=FOES[duelSel.foe],seq=f.mix?['light','medium','heavy']:[f.cls,f.cls,f.cls];
  for(var i=0;i<f.cnt;i++){
   var ex=AX*.76+rnd(-180,180),ey=rnd(-AY*.35,AY*.35);
   var st=foeStat(f.lvl,seq[i],f.boss);
   tanks.push(mkTank(ex,ey,st,1,{a:Math.atan2(P.y-ey,P.x-ex),skin:st.skinKey,boss:f.boss}));}
  $('hInfo').textContent='ดวล — '+f.n;addLog('เข้าสู่การรบที่ '+MAPS[G.map].n,'b');}
-function startBattle(){FL.on=false;
+function startBattle(){FL.on=false;FR.on=false;
  var bm=BMODES[btSel.key];G.map=btSel.map;G.teamSize=bm.size;G.lvl=btSel.lvl;G.sub=btSel.key;
  commonStart(bm.mode);
  if(bm.mode==='cap')G.caps=[{x:0,y:0,r:230,n:'B (กลาง)',own:-1,p:0},
@@ -4808,10 +5577,11 @@ function startBattle(){FL.on=false;
  for(var i=0;i<bm.size;i++){var st=foeStat(G.lvl,pick(pool),false);
   tanks.push(mkTank(AX*.76+rnd(-180,260),rnd(-AY*.42,AY*.42),st,1,{a:Math.PI,skin:st.skinKey}));}
  $('hInfo').textContent=bm.n;addLog('เข้าสู่สนามรบ — '+bm.n,'b');}
-function startInf(){FL.on=false;G.map=duelSel.map;commonStart('inf');
+function startInf(){FL.on=false;FR.on=false;G.map=duelSel.map;commonStart('inf');
  G.wave=0;G.waveState='inter';G.inter=2.5;
  $('hInfo').textContent='Infinity — เตรียมพร้อม';addLog('โหมด Infinity เริ่ม!','b');}
 function startFrontline(){
+ FR.on=false;FLZ=7;ZL=2600;RS.arty.cd=75;
  G.map='nord';G.teamSize=flSel.size;G.lvl=flSel.lvl;G.sub='fl'+flSel.size;
  flInit();commonStart('fl');
  P.x=zoneCX(0)+280;P.y=rnd(-300,300);P.a=0;
@@ -4843,7 +5613,7 @@ function nextWave(){
  G.waveState='fight';SFX.wave();
  bigMsg(boss?'★ เวฟ '+G.wave+' — บอส ★':'เวฟ '+G.wave);
  addLog('เวฟ '+G.wave+' — ศัตรู '+cnt+' คัน',boss?'r':'b');}
-function quitBattle(){G.run=false;if(FL.sup){FL.sup.mark=null;supBarUI();}SPEC.on=false;document.body.classList.remove('spec','specused');flEvStop();FL.on=false;SFX.engineStop();SFX.music('menu');SFX.ui(false);
+function quitBattle(){G.run=false;frPerfRestore();FR.on=false;FR.crafts=[];FR.bOpen=false;document.body.classList.remove('pfr','pfrd');if(SFX.rainSet)SFX.rainSet(0);frBuildUI();if(FL.sup){FL.sup.mark=null;supBarUI();}SPEC.on=false;document.body.classList.remove('spec','specused');flEvStop();FL.on=false;SFX.engineStop();SFX.music('menu');SFX.ui(false);
  $('hud').classList.remove('on');$('mob').classList.remove('on');
  $('hScore').classList.remove('on');$('hResp').classList.remove('on');
  closeBigMap();closeModal();show('scMenu');}
@@ -4905,7 +5675,7 @@ function update(dt){
   if(G.lock&&!G.lock.dead)P.ta+=clamp(angD(P.ta,Math.atan2(G.lock.y-P.y,G.lock.x-P.x)),-tv*1.15,tv*1.15);
   else if(PLAT==='mb')mobAim(dt);
   else P.ta+=clamp(angD(P.ta,Math.atan2(mouse.y+cam.y-P.y,mouse.x+cam.x-P.x)),-tv,tv);
-  if(mouse.down&&PLAT==='pc'&&!(FL.sup&&FL.sup.mark))fire(P,wSel);
+  if(mouse.down&&PLAT==='pc'&&!(FL.sup&&FL.sup.mark)&&!(FR.on&&FR.bSel))fire(P,wSel);
   if(G.scanning){
    G.scan=clamp(G.scan+dt*P.st.scanSp*runBuff.scan*.5,0,1);
    for(var i=0;i<tanks.length;i++){var e=tanks[i];
@@ -4926,11 +5696,12 @@ function update(dt){
  if(FL.on){for(var s=0;s<2;s++)if(FL.intel[s]>0)FL.intel[s]-=dt;}
  scanTick-=dt;if(scanTick<=0){scanTick=.35;updScanList();}
  /* ── Strategic Brain ── */
- if(FL.on){brainT-=dt;if(brainT<=0){brainT=0.6;strategicBrain();}
+ if(FL.on&&FR.on){frSpawnQueue(dt);frCapture(dt);flArty(dt);updTurrets(dt);frHUD();flEvents(dt);supTick(dt);frTick(dt);infUpdate(dt);cineTick(dt/(CINE.slow||1));}
+ else if(FL.on){brainT-=dt;if(brainT<=0){brainT=0.6;strategicBrain();}
   flSpawnQueue(dt);flCapture(dt);flArty(dt);updTurrets(dt);flHUD();flEvents(dt);supTick(dt);flRolesTick(dt);infUpdate(dt);cineTick(dt/(CINE.slow||1));}
  /* ── รถทุกคัน ── */
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead)continue;
-  if(t.team!==0){updSpot(t,dt);cmdPre(t);ai(t,dt);if(FL.on)infVehAI(t,dt);cmdPost(t,dt);}
+  var lod=FR.on&&FR.pl>=1&&t!==P&&frFar(t.x,t.y,2500);if(t.team!==0&&!(lod&&(t.lodF=!t.lodF))){var adt=lod?dt*2:dt;updSpot(t,adt);cmdPre(t);ai(t,adt);if(FL.on)infVehAI(t,adt);cmdPost(t,adt);}
   var egd=t===P?(PLAT==='pc'?hyp(mouse.x+cam.x-P.x,mouse.y+cam.y-P.y):(P.asT&&!P.asT.dead?hyp(P.asT.x-P.x,P.asT.y-P.y):900)):(t.see&&t.seeT&&!t.seeT.dead?hyp(t.seeT.x-t.x,t.seeT.y-t.y):900);
   t.elev=lerp(t.elev||0,clamp((egd-520)/5000,-.07,.22),Math.min(1,dt*3));if(t.recoil>0)t.recoil=Math.max(0,t.recoil-dt*3.2);
   moveTank(t,dt);if(t.hp<=0)killTank(t);}
@@ -4946,7 +5717,7 @@ function update(dt){
  for(var i=arty.length-1;i>=0;i--){var a=arty[i];a.t-=dt;
   if(!a.wh&&a.t<1.0){a.wh=1;if(P&&hyp(a.x-P.x,a.y-P.y)<1600&&Math.random()<(a.sup?.8:.35))SFX.at(a.x,a.y).bombWhistle();}
   if(a.t<=0){
-   if(supPtOK(a.side,a.x,a.y))explodeAt(a.x,a.y,a.r,a.dmg,1.5);
+   if(supPtOK(a.side,a.x,a.y)){if(FR.on)FR.bo=a.byP?'P':(a.side===0||a.side===1?'S'+a.side:null);explodeAt(a.x,a.y,a.r,a.dmg,1.5);FR.bo=null;}
    arty.splice(i,1);}}
  /* ── ควัน / APS ── */
  for(var i=smokes.length-1;i>=0;i--){var s=smokes[i];s.life-=dt;
@@ -5008,9 +5779,11 @@ function update(dt){
       $('hSub').textContent='โจมตี HQ −'+Math.round(dm);
      shots.splice(i,1);hit=true;break;}}
    if(hit)break;
-   if(!s.drone&&!s.bomb&&blocked(s.x,s.y)){SFX.at(s.x,s.y).ric();burst(s.x,s.y,Math.round(8*GFX.parts),'#b9a98a');
+   var bo0=!s.drone&&!s.bomb?blocked(s.x,s.y,1):null;if(bo0&&bo0.fort&&bo0.hp){bo0.hp-=s.dmg*(s.ammo==='he'||s.kind===2?1.1:.5);if(bo0.hp<=0)frObRemove(bo0);}
+   if(bo0){SFX.at(s.x,s.y).ric();burst(s.x,s.y,Math.round(8*GFX.parts),'#b9a98a');
     if(s.kind===2)burst(s.x,s.y,Math.round(18*GFX.parts),'#ff8a4c');
     shots.splice(i,1);hit=true;break;}
+   if(FR.on&&!s.lipD&&s.kind!==2&&frLip(s)){SFX.at(s.x,s.y).ric();burst(s.x,s.y,Math.round(10*GFX.parts),'#9a8a70');shots.splice(i,1);hit=true;break;}
    for(var j=0;j<tanks.length;j++){var t=tanks[j];
     if(t.dead||t===s.own)continue;
     if(s.skip===t&&s.skipN>0)continue;
@@ -5068,7 +5841,7 @@ function update(dt){
   if(aliveE===0)endGame(true);else if(aliveF===0)endGame(false);
  }else if(G.mode==='fl'&&!G.over){
   var z=P?zoneOf(P.x):0;
-  $('hInfo').textContent='Zone '+(z+1)+' · แนวรบ '+(FL.front[0]+1)+'–'+(FL.front[1]+1)+
+  $('hInfo').textContent=(FR.on?'Sector '+FRC.LET[FR.atk===0?z:FLZ-1-z]+' · FRONTIER':'Zone '+(z+1)+' · แนวรบ '+(FL.front[0]+1)+'–'+(FL.front[1]+1))+
    (SPEC.on?' · น้ำเงิน ':' · เรา ')+aliveF+' vs '+aliveE;}
  if(P&&P.hp<=0&&!G.over&&(G.mode==='duel'||G.mode==='inf'))endGame(false);
  if(SPEC.on&&!G.over&&aliveF===0&&(G.mode==='duel'||G.mode==='inf'))endGame(false);
@@ -5177,6 +5950,10 @@ function endGame(victory){
    if(victory){cr=f.cr;box=f.box;SV.cr+=cr;SV.boxes[box]++;
     h='<h1 style="font-size:24px">🏆 ชนะ!</h1>';}
    else{cr=Math.round(f.cr*.22);SV.cr+=cr;h='<h1 style="font-size:24px">💀 ถูกทำลาย</h1>';}
+  }else if(G.mode==='fl'&&FR.on){var fs=FRS[FR.size]||FRS[32],mul=1+G.lvl*.14,uA=teamSide(0)===FR.atk;
+   if(victory){cr=Math.round(fs.cr*mul);box=fs.box;SV.cr+=cr;SV.boxes[box]++;h='<h1 style="font-size:24px">🏆 '+(uA?'ทำลายกองบัญชาการสำเร็จ!':'ยันแนวป้องกันสำเร็จ!')+'</h1>';}
+   else{cr=Math.round(fs.cr*mul*.3);SV.cr+=cr;h='<h1 style="font-size:24px">💀 '+(uA?'การยกพลล้มเหลว':'กองบัญชาการแตก')+'</h1>';}
+   h+='<p class="sub">FRONTIER · '+fs.n+' · '+(uA?'ฝ่ายบุก':'ฝ่ายป้องกัน')+'<br>ไปถึงเป้าหมาย '+(FR.next>4?'HQ':FRC.LET[FR.next])+' · กำลังเสริมฝ่ายบุกเหลือ '+fmt(FR.tk)+' (ใช้ไป '+fmt(FR.tkLost||0)+') · ตาย '+G.deaths+' ครั้ง</p>';h+=frStatsHTML();
   }else if(G.mode==='fl'){
    var fz=FSIZE['s'+flSel.size]||FSIZE.s12,mul=1+G.lvl*.14;
    if(victory){cr=Math.round(fz.cr*mul);box=fz.box;SV.cr+=cr;SV.boxes[box]++;
@@ -5204,14 +5981,15 @@ function endGame(victory){
    (box?'<br>กล่องสุ่ม: <b style="color:#f0b429">'+{c:'ธรรมดา',r:'หายาก',e:'Epic',l:'ตำนาน'}[box]+' ×1</b>':'')+
    '</div></div>';
   var again=G.mode==='duel'?'startDuel()':G.mode==='inf'?'startInf()':
-   G.mode==='fl'?'startFrontline()':'startBattle()';
-  var fnS=G.mode==='duel'?'startDuel':G.mode==='inf'?'startInf':G.mode==='fl'?'startFrontline':'startBattle';
+   G.mode==='fl'?(FR.on?'startFrontier()':'startFrontline()'):'startBattle()';
+  var fnS=G.mode==='duel'?'startDuel':G.mode==='inf'?'startInf':G.mode==='fl'?(FR.on?'startFrontier':'startFrontline'):'startBattle';
   h+='<div class="row" style="margin-top:12px">'+(SPEC.used?'<button class="btn blu" onclick="closeModal();specStart(\''+fnS+'\')">👁️ ดูอีกครั้ง</button>':'')+
    '<button class="btn pri" onclick="closeModal();'+again+
    '">'+(SPEC.used?'🎮 เล่นเอง':'🔁 เล่นอีกครั้ง')+'</button>'+
    (box?'<button class="btn blu" onclick="quitBattle();show(\'scBox\')">🎁 เปิดกล่อง</button>':'')+
+   (G.mode==='fl'&&FR.on?'<button class="btn blu" onclick="quitBattle();show(\'scFrontier\')">🏠 กลับล็อบบี้ FRONTIER</button>':'')+
    '<button class="btn" onclick="quitBattle()">← เมนูหลัก</button></div>';
-  FL.on=false;save();modal(h);},1200);}
+  FL.on=false;frPerfRestore();FR.on=false;document.body.classList.remove('pfr','pfrd');if(SFX.rainSet)SFX.rainSet(0);save();modal(h);},1200);}
 
 /* ═══════ RENDER ═══════ */
 function drawTank(t,time,lod){
@@ -5309,7 +6087,9 @@ var THEMES={
  dune:{base:'#4a3d28',blot:['#55462e','#403422','#5c4c32','#4e4029','#463924'],speck:['#6e5c3e','#352b1c','#7a6844','#5e4e34'],
   kind:'sand',rock:'#8a7250',ridge:'#7e6644',dust:'#b09468',tint:'rgba(255,190,120,.06)',amb:'sand',clouds:3,decor:'dry',craters:14,dusty:1},
  nord:{base:'#27331f',blot:['#2f3d25','#202b19','#36442a','#2b3420','#253222'],speck:['#455a30','#18210f','#56603a','#6a6a4a'],
-  kind:'grass',flowers:1,rock:'#5e6258',moss:'#4a6a30',dust:'#5e604a',tint:'rgba(170,200,220,.05)',amb:'pollen',clouds:6,decor:'grass',craters:40}};
+  kind:'grass',flowers:1,rock:'#5e6258',moss:'#4a6a30',dust:'#5e604a',tint:'rgba(170,200,220,.05)',amb:'pollen',clouds:6,decor:'grass',craters:40},
+ coast:{base:'#2a3620',blot:['#324026','#222d1a','#3a482b','#2e3722','#283523'],speck:['#4a5e32','#1a2311','#5a6a3c','#6e6c4c'],
+  kind:'grass',flowers:1,rock:'#625e52',moss:'#4e6a32',dust:'#6a6448',tint:'rgba(180,210,230,.05)',amb:'pollen',clouds:6,decor:'grass',craters:46}};
 var GX={T:512,MK:6,pat:null,patM:null,patR:null,th:null,cache:{},trees:{},decor:[],decals:[],scorch:[],scS:[],crS:[],
  lights:[],rings:[],clouds:[],amb:[],vig:null,vw:0,vh:0,wx:14,wy:5,lt:0,lcx:0,lcy:0,spr:{}};
 function gxCap(){return 350+900*GFX.parts;}
@@ -5377,7 +6157,7 @@ function bakeAsphalt(){var T=256,c=mkC(T,T),g=c.getContext('2d'),i;g.fillStyle='
  return c;}
 
 /* ─────────── สิ่งกีดขวาง ─────────── */
-function obKind(o,ob){
+function obKind(o,ob){if(o.kind)return o.kind;
  if(o.t==='c')return ob==='base'?'silo':'rock';
  if(ob==='city')return (o.w>=44&&o.h>=44)?'bld':'car';
  if(ob==='base')return 'cont';
@@ -5524,7 +6304,8 @@ function sprConc(o){var w=o.w,h=o.h,B=sprBox(w,h,16),g=B.g,R=new Path2D(),i,hori
 function bakeOb(o,ob,th){switch(obKind(o,ob)){
  case 'rock':return sprRock(o,th);case 'silo':return sprSilo(o);case 'bld':return sprBld(o);case 'car':return sprCar(o);
  case 'cont':return sprCont(o);case 'ridge':return sprRidge(o,th,th.ridge||th.rock);case 'slab':return sprRidge(o,th,th.ridge||th.rock);
- case 'wall':return sprWall(o,th);case 'barn':return sprBarn(o);case 'fence':return sprFence(o);default:return sprConc(o);}}
+ case 'wall':return sprWall(o,th);case 'barn':return sprBarn(o);case 'fence':return sprFence(o);
+ case 'hedge':return sprHedge(o);case 'teeth':return sprTeeth(o);case 'sandbag':return sprSandbag(o);case 'wreck':return sprWreck(o);case 'ruin':return sprRuin(o);case 'rblock':return sprRoadblock(o);default:return sprConc(o);}}
 
 /* ─────────── ต้นไม้ / ของตกแต่ง ─────────── */
 function sprDecor(type){var s=gr(9,18),B=sprBox(2*s,2*s,8),g=B.g,c=s,i,x,y,z,a;
@@ -5622,8 +6403,9 @@ function bakeGround(th){var S=GX.T*3,c=mkC(S,S),g=c.getContext('2d');
 function drawGround(w,h){var c=GX.gc,S=c.width,x0=-gmod(cam.x,S),y0=-gmod(cam.y,S);
  if(x0>-60)x0-=S;if(y0>-60)y0-=S;
  for(var x=x0;x<w+60;x+=S)for(var y=y0;y<h+60;y+=S)cx.drawImage(c,x,y);}
-function drawRoads(w,h){for(var i=0;i<roads.length;i++){var r=roads[i],hw=r.w/2,y=r.y-cam.y;
+function drawRoads(w,h){for(var i=0;i<roads.length;i++){var r=roads[i],hw=r.w/2,y=r.y-cam.y,clp=r.x0!==undefined;
  if(y+hw+20<-40||y-hw-20>h+40)continue;
+ if(clp){if(r.x1-cam.x<-40||r.x0-cam.x>w+40)continue;cx.save();cx.beginPath();cx.rect(r.x0-cam.x,y-hw-30,r.x1-r.x0,r.w+60);cx.clip();}
  cx.fillStyle='#45433a';cx.fillRect(-40,y-hw-9,w+80,r.w+18);
  cx.fillStyle='rgba(0,0,0,.25)';cx.fillRect(-40,y+hw+4,w+80,5);
  cx.save();cx.translate(-gmod(cam.x,256),-cam.y);cx.fillStyle=GX.patR;cx.fillRect(-256,r.y-hw,w+600,r.w);cx.restore();
@@ -5631,7 +6413,7 @@ function drawRoads(w,h){for(var i=0;i<roads.length;i++){var r=roads[i],hw=r.w/2,
  cx.strokeStyle='rgba(225,220,200,.55)';cx.lineWidth=2.5;cx.beginPath();
  cx.moveTo(-40,y-hw+7);cx.lineTo(w+40,y-hw+7);cx.moveTo(-40,y+hw-7);cx.lineTo(w+40,y+hw-7);cx.stroke();
  cx.strokeStyle='rgba(220,180,70,.75)';cx.lineWidth=3;cx.setLineDash([40,34]);cx.lineDashOffset=gmod(cam.x,74);
- cx.beginPath();cx.moveTo(-40,y);cx.lineTo(w+40,y);cx.stroke();cx.setLineDash([]);cx.lineDashOffset=0;}}
+ cx.beginPath();cx.moveTo(-40,y);cx.lineTo(w+40,y);cx.stroke();cx.setLineDash([]);cx.lineDashOffset=0;if(clp)cx.restore();}}
 function drawBounds(w,h){var x0=-AX-cam.x,x1=AX-cam.x,y0=-AY-cam.y,y1=AY-cam.y,L=Math.max(x0,-60),R=Math.min(x1,w+60);
  cx.fillStyle='rgba(6,8,5,.55)';
  if(x0>-60)cx.fillRect(-60,-60,x0+60,h+120);
@@ -5651,7 +6433,7 @@ function drawWrecks(w,h){var s=GX.scS[0];if(!s)return;
   cx.globalAlpha=1;cx.fillStyle='#16140f';cx.beginPath();cx.arc(x,y,13,0,6.2832);cx.fill();
   if(p.l>80){cx.globalCompositeOperation='lighter';cx.globalAlpha=clamp((p.l-80)/19,0,1)*(.45+Math.random()*.25);
    cx.drawImage(glowSpr('#ff6a20'),x-22,y-22,44,44);cx.globalCompositeOperation='source-over';cx.globalAlpha=1;}}}
-function drawClouds(w,h,dt){var PP=2800,s=cloudSpr();cx.globalAlpha=.2;
+function drawClouds(w,h,dt){var PP=2800,s=cloudSpr();cx.globalAlpha=FR.on&&FR.wxT?FR.wxT.cloud:.2;
  for(var i=0;i<GX.clouds.length;i++){var c=GX.clouds[i];c.x+=GX.wx*dt*1.4;c.y+=GX.wy*dt*1.4;
   var bx=gmod(c.x-cam.x,PP)-c.s,by=gmod(c.y-cam.y,PP)-c.s;
   for(var ox=-PP;ox<=PP;ox+=PP)for(var oy=-PP;oy<=PP;oy+=PP){var X=bx+ox,Y=by+oy;
@@ -5676,7 +6458,7 @@ function drawFx(w,h,dt){var i,p,x,y,f,r;
  cx.globalCompositeOperation='source-over';
  for(i=GX.rings.length-1;i>=0;i--){var g=GX.rings[i];if(g.l<=0)continue;
   f=1-g.l/g.ml;cx.globalAlpha=(1-f)*.55;cx.strokeStyle=g.c||'#ffe2b0';cx.lineWidth=(2+(1-f)*5)*(g.w||1);
-  cx.beginPath();cx.arc(g.x-cam.x,g.y-cam.y,g.R*(.2+f*.8),0,6.2832);cx.stroke();}
+  cx.beginPath();cx.arc(g.x-cam.x,g.y-cam.y,Math.max(1,g.R*(.2+clamp(f,0,1)*.8)),0,6.2832);cx.stroke();}
  cx.globalAlpha=1;}
 function drawAtmos(w,h,dt){var th=GX.th;if(!th)return;
  var a=th.amb,n=Math.round(25+70*GFX.parts);
@@ -5724,7 +6506,7 @@ function gxWreck(p,dt){var f=Math.max(.35,GFX.parts);
 function obH(k,o){switch(k){
  case 'rock':return o.r*gr(.55,.85);case 'silo':return o.r*gr(.9,1.2);case 'bld':return gr(26,50);
  case 'car':return 8;case 'cont':return gr(0,1)<.25?30:15;case 'ridge':return Math.min(o.w,o.h)*.5+gr(8,16);
- case 'slab':return Math.min(o.w,o.h)*.4+gr(4,10);case 'wall':return 9;case 'barn':return 22;case 'fence':return 8;default:return 18;}}
+ case 'slab':return Math.min(o.w,o.h)*.4+gr(4,10);case 'wall':return 9;case 'hedge':return 10;case 'teeth':return 9;case 'sandbag':return 7;case 'wreck':return 12;case 'ruin':return gr(14,30);case 'rblock':return 10;case 'barn':return 22;case 'fence':return 8;default:return 18;}}
 function addPoly(Q,pts,dx,dy){Q.moveTo(pts[0][0]+dx,pts[0][1]+dy);for(var i=1;i<pts.length;i++)Q.lineTo(pts[i][0]+dx,pts[i][1]+dy);Q.closePath();}
 /* เงาบนพื้น = รอยเท้าวัตถุลากไปตามทิศแสง (ยิ่งสูงยิ่งยาว) */
 function sweptShadow(g,add,H,HK,a){var Q=new Path2D();for(var k=0;k<=5;k++){var f=k/5;add(Q,f*H*.5,HK+f*H*.62);}
@@ -5745,7 +6527,7 @@ function polyWalls(g,pts,HK,col){var n=pts.length,ar=0,i;
  g.strokeStyle='rgba(0,0,0,.18)';g.lineWidth=1;for(var yy=y0+4;yy<y1;yy+=gr(3,6)){g.beginPath();g.moveTo(-50,yy);g.lineTo(2000,yy+gr(-2,2));g.stroke();}
  g.restore();}
 function wallDeco(k,g,w,h,HK,R){var i,j,y0=h,c=R.col||'#55594f';
- if(k==='bld'){g.fillStyle=gpick(['#5a564e','#4e4c46','#625a4e','#544e48']);g.fillRect(0,y0,w,HK);
+ if(k==='bld'||k==='ruin'){g.fillStyle=gpick(['#5a564e','#4e4c46','#625a4e','#544e48']);g.fillRect(0,y0,w,HK);
   var fl=Math.max(1,Math.floor(HK/11)),fh=(HK-4)/fl;
   for(j=0;j<fl;j++){var wy=y0+3+j*fh;for(i=4;i<w-6;i+=9){var br=gr(0,1);
    g.fillStyle=br<.15?'#0a0a09':br<.2?'rgba(255,196,120,.6)':'#1e2226';g.fillRect(i,wy,5,Math.max(2,Math.min(6,fh-3)));
@@ -5776,7 +6558,7 @@ function wallDeco(k,g,w,h,HK,R){var i,j,y0=h,c=R.col||'#55594f';
   for(i=0;i<3;i++)blob(g,gr(0,w),y0+gr(0,HK),gr(3,8),'#000000',.2);wallShade(g,0,y0,w,HK);}
  g.strokeStyle='rgba(0,0,0,.55)';g.lineWidth=1;if(k!=='fence')g.strokeRect(.5,y0,w-1,HK-.5);}
 function bakeOb25(o,ob,th){var k=obKind(o,ob);o.H=obH(k,o);
- if(k==='rock'||k==='silo'||k==='ridge'||k==='slab')return bakeOb(o,ob,th);
+ if(k==='rock'||k==='silo'||k==='ridge'||k==='slab'||k==='hedge'||k==='teeth'||k==='wreck'||k==='sandbag'||k==='rblock')return bakeOb(o,ob,th);
  GX.noSh=1;var R=bakeOb(o,ob,th);GX.noSh=0;
  var w=o.w,h=o.h,H=o.H,HK=H*VK,B=sprBox(w,h+HK,Math.ceil(Math.max(14,H*.6+10))),g=B.g;B.oy=HK;
  sweptShadow(g,function(Q,dx,dy){Q.rect(dx,dy,w,h);},H,HK,k==='fence'?.22:.45);
@@ -5805,7 +6587,7 @@ function sprTree25(R,v){var HT=R*1.15,pad=16,B=sprBox(2*R+HT*.5,2*R+HT,pad),g=B.
  return B;}
 /* โครงสร้าง Frontline: ผนัง + ยกหน้าบน */
 var STH={hq:34,turret:16,radio:22,gas:14};
-function drawStruct25(s,time){var x=s.x-cam.x,y=s.y-cam.y;
+function drawStruct25(s,time){if(s.k==='mg')return frDrawMG(s,time);var x=s.x-cam.x,y=s.y-cam.y;
  if(x<-300||x>innerWidth+300||y<-300||y>innerHeight+300)return;
  var H=(STH[s.k]||16)*(s.dead?.35:1),HK=H*VK;
  if(s.k==='turret'){var r=s.dead?24:32;
@@ -5856,7 +6638,7 @@ var TOD={day:{n:'☀️ กลางวัน',d:'แสงเต็ม มอ�
  dusk:{n:'🌇 เย็น',d:'ฟ้าส้ม เงายาว',dark:.36,col:'46,20,8',tint:'rgba(255,120,40,.12)'},
  night:{n:'🌙 กลางคืน',d:'มืด แสงจากไฟ/พลุ/ระเบิด',dark:.9,col:'5,12,34',tint:'rgba(40,70,150,.14)'},
  storm:{n:'⛈️ พายุ',d:'ฝน ฟ้าผ่า ทัศนวิสัยต่ำ',dark:.56,col:'8,12,18',tint:'rgba(90,110,130,.14)'}};
-function curTod(){return FL.on&&FL.tod?TOD[FL.tod]:TOD.day;}
+function curTod(){if(FR.on&&FR.wxT)return FR.wxT;return FL.on&&FL.tod?TOD[FL.tod]:TOD.day;}
 function holeSpr(){if(GX.spr.hole)return GX.spr.hole;var c=mkC(128,128),g=c.getContext('2d'),q=g.createRadialGradient(64,64,0,64,64,64);
  q.addColorStop(0,'rgba(0,0,0,1)');q.addColorStop(.45,'rgba(0,0,0,.72)');q.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=q;g.fillRect(0,0,128,128);return GX.spr.hole=c;}
 /* แผนที่แสง: ทาความมืดทั้งจอ แล้ว "เจาะรู" ตรงแหล่งแสง (ครึ่งความละเอียด = ถูก) */
@@ -5875,13 +6657,14 @@ function drawLightMap(w,h){var T=curTod();if(!T.dark)return;
  if(!lo)for(i=0;i<shots.length;i++){var s=shots[i];if(s.kind!==1)hole(s.x,s.y-SHZ,s.kind===2?80:46,.7);}
  for(i=0;i<structs.length;i++){var st=structs[i];if(!st.dead&&st.k!=='turret')hole(st.x,st.y,260,.55);}
  if(FL.ev)for(i=0;i<FL.ev.flares.length;i++){var f=FL.ev.flares[i];hole(f.x,f.y,720,clamp(f.t/3,0,1)*(.85+Math.random()*.15));}
+ if(FR.on&&T.dark>.55)frSearchHoles(hole);
  if(P&&!P.dead)hole(P.x,P.y,300,.45);
  g.globalAlpha=1;g.globalCompositeOperation='source-over';cx.drawImage(GX.lm,0,0,w,h);}
 function redVig(w,h){var k='rv'+w+'x'+h;if(GX.spr[k])return GX.spr[k];var c=mkC(w/2,h/2),g=c.getContext('2d'),r=Math.hypot(w,h)/4,
  q=g.createRadialGradient(w/4,h/4,r*.45,w/4,h/4,r);q.addColorStop(0,'rgba(160,0,0,0)');q.addColorStop(1,'rgba(170,10,0,.85)');g.fillStyle=q;g.fillRect(0,0,w/2,h/2);return GX.spr[k]=c;}
 /* ฝน + ฟ้าผ่า + แฟลช + ใกล้ตายเป็นสีแดง (พิกัดจอ) */
 function drawWeatherFx(w,h,dt){var i;
- if(FL.on&&FL.tod==='storm'){var n=Math.round(60+150*GFX.parts);GX.rain=GX.rain||[];
+ if(FL.on&&!FR.on&&FL.tod==='storm'){var n=Math.round(60+150*GFX.parts);GX.rain=GX.rain||[];
   while(GX.rain.length<n)GX.rain.push({x:rnd(0,w),y:rnd(0,h),v:rnd(900,1300),l:rnd(14,26)});
   cx.strokeStyle='rgba(180,200,230,.35)';cx.lineWidth=1;cx.beginPath();
   for(i=0;i<GX.rain.length&&i<n;i++){var r=GX.rain[i];r.y+=r.v*dt;r.x+=r.v*.18*dt;if(r.y>h+20){r.y=-20;r.x=rnd(-60,w);}
@@ -5894,13 +6677,14 @@ function explodeAt(x,y,r,dmg,s,silent){
  if(!silent)SFX.at(x,y).boom(clamp(s||1.4,.6,2.2),P?hyp(x-P.x,y-P.y):0);
  burst(x,y,Math.round(30*(s||1.4)*GFX.parts),'#ff9040');burst(x,y,Math.round(14*GFX.parts),'#7a7268');
  if(P&&hyp(x-P.x,y-P.y)<650)addShake(clamp(12*(s||1.4)*(1-hyp(x-P.x,y-P.y)/650),2,16),.4);
- for(var j=0;j<tanks.length;j++){var t=tanks[j];if(t.dead||t.dropT>0)continue;var d=hyp(t.x-x,t.y-y);if(d>=r)continue;
+ for(var j=0;j<tanks.length;j++){var t=tanks[j];if(t.dead||t.dropT>0||t.craft)continue;var d=hyp(t.x-x,t.y-y);if(d>=r)continue;
   var f=1-d/r,arm=1-Math.min(.55,(t.st.ar.hs||40)/420);t.hp-=dmg*f*arm;t.hitFlash=.2;
   if(t.mods){var md=Math.max(70,dmg*.2);dmgMod(t,pick(['trkL','trkR','opt','eng','rad']),md*f);if(dmg>=500&&f>.5)dmgMod(t,pick(['trkL','trkR','eng','gun']),md*.7*f);if(f>.5&&Math.random()<.5+Math.min(.3,dmg/2500)){dmgCrew(t,t.crew[ri(0,t.crew.length-1)],rnd(15,45)*f*(dmg>=500?1.5:1));}
    if(Math.random()<.1*f)ignite(t,'ระเบิด');applyFx(t);if(crewOut(t))crewKO(t);}
   if(t===P&&f>.3)pop(P.x,P.y-20,'โดนระเบิด!','#ff7050',13);
   if(t.hp<=0)killTank(t);}
- if(inf.length)infBlast(x,y,r,dmg);}
+ if(inf.length)infBlast(x,y,r,dmg);
+ if(FR.on)frBlastFort(x,y,r,dmg);}
 /* ── ผู้กำกับสนามรบ ── */
 function flEvInit(){FL.ev={t:rnd(30,45),air:[],bombs:[],flares:[],amsl:[],aflr:[],charge:[0,0],chT:[rnd(110,170),rnd(120,180)],uid:0};supInit();
  FL.tod=flSel.tod==='rand'?pick(['day','dusk','night','storm','day','dusk','night']):(flSel.tod||'day');
@@ -5935,7 +6719,7 @@ function flEvent(){var E=FL.ev,own=[0,0];FL.own.forEach(function(o){if(o>=0)own[
  else if(k==='flares'){for(var i=0;i<5;i++)E.flares.push({x:tg.x+rnd(-900,900),y:clamp(tg.y+rnd(-1000,1000),-AY*.85,AY*.85),h:rnd(320,420),t:rnd(18,24)});
   SFX.flare();evSay(side,'🎆 ยิงพลุส่องสว่างเหนือ '+zt,'🎆 ศัตรูยิงพลุส่องสว่าง!');}
  else if(k==='boss'){var team=side===0?2:1,sp=flSpawnPoint(team),st=foeStat(G.lvl+2,'mbt',true);
-  tanks.push(mkTank(sp.x,sp.y,st,team,{a:team===1?Math.PI:0,skin:side===0?'gold':st.skinKey,boss:true}));
+  var bt=mkTank(sp.x,sp.y,st,team,{a:FR.on?frFace(side):team===1?Math.PI:0,skin:side===0?'gold':st.skinKey,boss:true});tanks.push(bt);if(FR.on&&sp.craft)frCraftNew(sp.y,[bt],0,team,frShoreU(sp.y)-1450,false);
   evSay(side,'★ รถถังยักษ์ฝ่ายเรามาถึงแนวหน้า!','⚠️ รถถังยักษ์ศัตรูเข้าสนาม!');}
  else{var fx2=side===0?(-AX+ZL*(FL.front[0]+1)):(-AX+ZL*FL.front[1]);
   for(var yy2=-AY*.82;yy2<=AY*.82;yy2+=240)smokes.push({x:fx2+rnd(-60,60),y:yy2,r:170,life:22,ml:22,grow:0,seed:rnd(0,99)});
@@ -5953,7 +6737,7 @@ function flEvents(dt){var E=FL.ev;if(!E)return;var i,j;
   while(a.drops.length&&(a.vy>0?a.y>=a.drops[0].y:a.y<=a.drops[0].y)){var dp=a.drops.shift();
    E.bombs.push({x:dp.x,y:dp.y,t:a.k==='bomber'?1.3:.9,big:a.k==='bomber',side:a.side});
    if(P&&hyp(dp.x-P.x,dp.y-P.y)<700&&Math.random()<.5)SFX.at(dp.x,dp.y).bombWhistle();}
-  if(Math.abs(a.y)>AY+800){if(a.snd)SFX.loopStop(a.snd);E.air.splice(i,1);}}
+  if(Math.abs(a.y)>AY+800||Math.abs(a.x)>AX+2600){if(a.snd)SFX.loopStop(a.snd);E.air.splice(i,1);}}
  airMslTick(dt);
  for(i=E.bombs.length-1;i>=0;i--){var b=E.bombs[i];b.t-=dt;if(b.t<=0){if(supPtOK(b.side,b.x,b.y))explodeAt(b.x,b.y,b.big?170:185,b.big?640:820,b.big?1.5:1.9);E.bombs.splice(i,1);}}
  for(i=E.flares.length-1;i>=0;i--){var f=E.flares[i];f.t-=dt;f.h=Math.max(0,f.h-dt*16);
@@ -6342,7 +7126,7 @@ var FLR={prep:30,swap:120,warn:10,limit:10*60,grace:12,lossGrace:10,oob:5,siege:
  tkBase:240,tkPer:22,drain:.45,capSpd:7/4.5,btWin:90,btDur:60,breachT:6,breachS:1.2};
 function flRolesInit(){FL.rt=0;FL.prep=true;FL.to=false;tkInit();FL.phaseT=FLR.prep;FL.atk=Math.random()<.5?0:1;FL.warned=false;FL.swapN=0;
  FL.sgA={};addLog('⏳ เตรียมพร้อม 30 วิ — ยังเข้าโซนที่ยังไม่ได้ยึดไม่ได้','b');}
-function flRole(side){if(!FL.on||FL.rt===undefined)return 'free';if(FL.prep)return 'prep';if(FL.to)return 'atk';
+function flRole(side){if(!FL.on||FL.rt===undefined)return 'free';if(FR.on)return FL.prep?'prep':(side===FR.atk?'atk':'def');if(FL.prep)return 'prep';if(FL.to)return 'atk';
  if(FL.atk===side)return FL.phaseT<FLR.warn&&!FL.capNow?'ret':'atk';return 'def';}
 function zoneOwnOK(side,x){return FL.own[zoneOf(x)]===side;}
 /* ฝ่ายป้องกันอยู่ได้: โซนตัวเอง + โซนกลางที่ติดเขตตัวเอง (เข้าไปชิงคืนได้) */
@@ -6411,9 +7195,9 @@ function drawZoneRules(w,h){if(!FL.on||FL.rt===undefined||!P||SPEC.on||CINE.k)re
   if(tx>-ZL/2&&tx<w+ZL/2){cx.strokeStyle='rgba(255,180,60,'+(.35+Math.sin(G.t*4)*.2)+')';cx.lineWidth=3;cx.strokeRect(tx-ZL/2+8,-30,ZL-16,h+60);}
   var ex=clamp(tx,40,w-40);cx.fillStyle='#ffb347';cx.font='700 13px Kanit, Tahoma';cx.textAlign='center';
   cx.fillText((tx<40?'◀ ':tx>w-40?'':'')+'⚔️ บุก Zone '+(tz+1)+(tx>w-40?' ▶':''),ex,ty-70);cx.textAlign='left';}}
-function drawPrepCount(w,h){if(!FL.prep||FL.rt===undefined||FL.phaseT>10)return;var sec=Math.max(1,Math.ceil(FL.phaseT)),f=FL.phaseT-Math.floor(FL.phaseT),mb=PLAT==='mb';
+function drawPrepCount(w,h){if(!FL.prep||FL.rt===undefined||FL.phaseT>10||CINE.k)return;var sec=Math.max(1,Math.ceil(FL.phaseT)),f=FL.phaseT-Math.floor(FL.phaseT),mb=PLAT==='mb';
  cx.save();cx.textAlign='center';cx.lineWidth=6;cx.strokeStyle='rgba(0,0,0,.72)';
- cx.font='700 '+(mb?13:17)+'px Kanit, Tahoma';cx.fillStyle='#ffcf7a';cx.strokeText('TOTAL OFFENSIVE ใน',w/2,h*.26);cx.fillText('TOTAL OFFENSIVE ใน',w/2,h*.26);
+ cx.font='700 '+(mb?13:17)+'px Kanit, Tahoma';cx.fillStyle='#ffcf7a';var lbP=FR.on?(teamSide(0)===FR.atk?'ประตูเรือเปิดใน':'ศัตรูขึ้นฝั่งใน'):'TOTAL OFFENSIVE ใน';cx.strokeText(lbP,w/2,h*.26);cx.fillText(lbP,w/2,h*.26);
  cx.font='800 '+(mb?50:78)+'px Kanit, Tahoma';cx.globalAlpha=.4+.6*f;cx.fillStyle=sec<=3?'#ff7a3c':'#f0c43a';
  cx.strokeText(sec,w/2,h*.26+(mb?52:80));cx.fillText(sec,w/2,h*.26+(mb?52:80));cx.restore();}
 function drawOobWarn(w,h){if(!FL.on||!P||P.dead||!(P.oob>0))return;var left=(P.oobMax||FLR.oob)-P.oob;
@@ -6438,9 +7222,9 @@ function specSetup(){var h=P;h.team=2;h.isP=false;h.hero=true;SPEC.hero=h;SPEC.f
  specUI();specHUD();}
 /* ── สถิติ ── */
 function specShot(t){if(SPEC.st)SPEC.st.sh[teamSide(t.team)]++;}
-function specHit(s,t,r){if(!SPEC.st||!s.own)return;var d=r.dmg||0;if(d<=0)return;var sd=teamSide(s.own.team);
+function specHit(s,t,r){if(FR.on&&FR.recs)frStHit(s,t,r);if(!SPEC.st||!s.own)return;var d=r.dmg||0;if(d<=0)return;var sd=teamSide(s.own.team);
  if(s.kind===0&&!s.hc){s.hc=1;SPEC.st.hit[sd]++;}SPEC.st.dmg[sd]+=d;s.own.dmgD=(s.own.dmgD||0)+d;t.lastBy=s.own;t.lastByT=G.t;specMvp(s.own);}
-function specKill(t){if(!SPEC.st)return;var b=t.lastBy&&G.t-(t.lastByT||0)<20?t.lastBy:null;
+function specKill(t){if(FR.on&&FR.recs)frStKill(t);if(!SPEC.st)return;var b=t.lastBy&&G.t-(t.lastByT||0)<20?t.lastBy:null;
  SPEC.st.k[1-teamSide(t.team)]++;if(b){b.kills=(b.kills||0)+1;specMvp(b);}
  if(SPEC.on&&b&&b.st&&(!FL.on||Math.random()<.5)){var bs=teamSide(b.team);addLog((bs===0?'🟦 ':'🟥 ')+tkName(b)+' ทำลาย '+tkName(t),bs===0?'b':'r');}}
 function specMvp(o){var sc=(o.kills||0)*1000+(o.dmgD||0);
@@ -6587,7 +7371,7 @@ function supRequest(side,k,x,y){var S=FL.sup;if(!supReady(side,k))return false;
   var bx=side===0?-AX-400:AX+400;SFX.at(bx,y).cannon(1.7,2400);}
  else if(k==='ac130'&&E){var ac=acSpawn(side,x,y);ac.mid=id;E.air.push(ac);S.act.push({k:'ac130',side:side,x:x,y:y,id:id});}
  else if(k==='cas'&&E){var a=casSpawn(side,x,y);a.mid=id;E.air.push(a);S.act.push({k:'cas',side:side,x:x,y:y,id:id});}
- var zt='Zone '+(zoneOf(x)+1);
+ var zt=FR.on?'เขต '+FRC.LET[FR.atk===0?zoneOf(x):FLZ-1-zoneOf(x)]:'Zone '+(zoneOf(x)+1);
  if(side===0)addLog(k==='cas'?'✈️ CAS รับทราบ — เครื่องบินโจมตีกำลังเข้าเป้า '+zt:'💥 ปืนใหญ่รับทราบ — ยิงแล้ว กระสุนกำลังเดินทาง → '+zt,'g');
  else addLog(k==='cas'?'⚠️ เครื่องบินโจมตีศัตรูเข้าโจมตี '+zt+'!':'⚠️ ปืนใหญ่ศัตรูกำลังยิงเข้า '+zt+'! กระจายกำลัง!','r');
  SFX.radio(side===0?'air':'bad');return true;}
@@ -6599,7 +7383,7 @@ function supTick(dt){var S=FL.sup;if(!S)return;var i,k,s;
  for(i=S.act.length-1;i>=0;i--){var a=S.act[i];
   if(a.k==='arty'){a.t-=dt;if(a.t>0)continue;a.iv-=dt;if(a.iv>0)continue;a.iv=rnd(.45,.8);
    var ang=rnd(0,6.2832),rr=Math.sqrt(Math.random())*RS.arty.r*artyScatter(a.side,a.x);
-   arty.push({x:a.x+Math.cos(ang)*rr,y:a.y+Math.sin(ang)*rr*.85,t:1.25,r:170,dmg:720,side:a.side,sup:1});
+   arty.push({x:a.x+Math.cos(ang)*rr,y:a.y+Math.sin(ang)*rr*.85,t:1.25,r:170,dmg:720,side:a.side,sup:1,byP:a.byP});
    if(--a.n<=0)S.act.splice(i,1);}
   else if(a.k==='cas'||a.k==='ac130'){var alive=false,E=FL.ev;if(E)for(var j=0;j<E.air.length;j++)if(E.air[j].mid===a.id){alive=true;break;}if(!alive)S.act.splice(i,1);}}
  /* จรวดนำวิถีจาก CAS */
@@ -6642,7 +7426,7 @@ function radioPick(k){var S=FL.sup;closeModal();if(!supReady(0,k)){toast('ยั
 function supSetMark(x,y){var S=FL.sup;if(!S||!S.mark)return;var m=S.mark,c=supCheck(0,x,y,RS[m.k].r*.6);
  m.x=x;m.y=y;m.ok=c.ok;m.why=c.why;SFX.ui(c.ok);if(!c.ok)toast('⛔ '+c.why+' — เลือกตำแหน่งใหม่');supBarUI();}
 function supConfirm(){var S=FL.sup;if(!S||!S.mark)return;var m=S.mark;if(!m.ok){toast('⛔ '+(m.why||'ยังไม่ได้เลือกเป้า'));return;}
- if(supRequest(0,m.k,m.x,m.y)){S.mark=null;supBarUI();closeBigMap();}else{toast('⛔ ขอการสนับสนุนไม่สำเร็จ (คูลดาวน์/เป้าไม่ถูกต้อง)');m.ok=false;supBarUI();}}
+ if(supRequest(0,m.k,m.x,m.y)){if(m.k==='arty'){var la=S.act[S.act.length-1];if(la)la.byP=1;}S.mark=null;supBarUI();closeBigMap();}else{toast('⛔ ขอการสนับสนุนไม่สำเร็จ (คูลดาวน์/เป้าไม่ถูกต้อง)');m.ok=false;supBarUI();}}
 function supCancel(){if(FL.sup){FL.sup.mark=null;supBarUI();}}
 function supBarUI(){var m=FL.sup&&FL.sup.mark,b=$('supBar'),bm=$('bmSup');if(!b)return;b.classList.toggle('on',!!m);
  var txt=m?('🎯 <b>'+RS[m.k].n+'</b> — '+(m.x===null?(isPhone()?'แตะ':'คลิก')+'บนสนามรบ/แผนที่เพื่อมาร์คเป้า':m.ok?'<span style="color:#8fd44a">✅ เป้าถูกต้อง Zone '+(zoneOf(m.x)+1)+'</span>':'<span style="color:#ff7a5a">⛔ '+m.why+'</span>')):'';
@@ -6759,9 +7543,10 @@ var inf=[],INF={uid:0,init:0,spT:20,fx:[],gren:[],grid:null,sndT:0},PAXCAP={V1:4
 var INFC={rifle:{n:'ทหารปืนเล็ก',hp:100,rng:560,spd:58},at:{n:'ทหารต่อต้านรถถัง',hp:100,rng:640,spd:52,rk:3}};
 function infReset(){inf=[];INF={uid:0,init:0,spT:20,fx:[],gren:[],grid:null,sndT:0};}
 function paxCap(t){if(!t||!t.st||t.st.cls!=='ifv')return 0;return PAXCAP[t.b&&t.b.ch]||6;}
-function infQuota(){return clamp(Math.round((G.teamSize||12)*1.4),8,40);}
+function infQuota(){if(FR.on)return FR.infQ;return clamp(Math.round((G.teamSize||12)*1.4),8,40);}
 function infCount(side){var n=0,i;for(i=0;i<inf.length;i++)if(!inf[i].dead&&teamSide(inf[i].team)===side)n++;
- for(i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&t.pax&&teamSide(t.team)===side)n+=t.pax.length;}return n;}
+ for(i=0;i<tanks.length;i++){var t=tanks[i];if(!t.dead&&t.pax&&teamSide(t.team)===side)n+=t.pax.length;}
+ if(FR.on)for(i=0;i<FR.crafts.length;i++)if(teamSide(FR.crafts[i].team)===side)n+=FR.crafts[i].pax.length;return n;}
 function mkSoldier(team,cls){var c=INFC[cls];
  return{inf:1,id:++INF.uid,team:team===0?2:team,cls:cls,x:0,y:0,a:0,hp:c.hp,mhp:c.hp,dead:false,gone:false,deadT:0,
   st:{name:c.n,cls:'inf'},b:{atgm:'aNone'},seed:ri(0,9999),veh:null,vehL:null,lead:null,tgt:null,thinkT:rnd(0,.3),cd:rnd(.5,1.5),burst:0,bT:0,
@@ -6793,7 +7578,7 @@ function paxCmd(){if(!P||P.dead||!FL.on)return;var cap=paxCap(P);if(!cap){toast(
 function infGrid(){var G2={},i,s,k;for(i=0;i<inf.length;i++){s=inf[i];if(s.dead)continue;k=(Math.floor(s.x/80))+','+(Math.floor(s.y/80));(G2[k]||(G2[k]=[])).push(s);}INF.grid=G2;}
 function infNear(x,y,r,fn){var G2=INF.grid;if(!G2)return;var x0=Math.floor((x-r)/80),x1=Math.floor((x+r)/80),y0=Math.floor((y-r)/80),y1=Math.floor((y+r)/80);
  for(var gx=x0;gx<=x1;gx++)for(var gy=y0;gy<=y1;gy++){var c=G2[gx+','+gy];if(c)for(var i=0;i<c.length;i++)fn(c[i]);}}
-function infKill(s,by){if(s.dead)return;if(FL.on)tkLose(teamSide(s.team),1);s.dead=true;s.hp=0;s.deadT=0;s.tgt=null;s.aimT=0;s.burst=0;
+function infKill(s,by){if(s.dead)return;if(FR.on&&FR.recs)frStInf(s,by);if(FL.on)tkLose(teamSide(s.team),1);s.dead=true;s.hp=0;s.deadT=0;s.tgt=null;s.aimT=0;s.burst=0;
  if(by&&by.st){by.ik=(by.ik||0)+1;}if(SPEC.st){SPEC.st.ik=SPEC.st.ik||[0,0];SPEC.st.ik[1-teamSide(s.team)]++;}}
 function infHurt(s,d,by){if(s.dead)return;s.hp-=d;s.flinch=.25;if(s.hp<=0)infKill(s,by);}
 /* กระสุนผ่านตัวทหาร: เช็กเส้นทางของเฟรมที่แล้ว */
@@ -6814,7 +7599,7 @@ function infNearSupply(s,sd){for(var i=0;i<structs.length;i++){var st=structs[i]
  var v=s.vehL;return !!(v&&!v.dead&&hyp(v.x-s.x,v.y-s.y)<90);}
 /* ── การตัดสินใจ ── */
 function infFindTarget(s,sd){var best=null,bs=1e9,i,o,d,C=INFC[s.cls],cand=[];
- if(s.cls==='at'&&s.rk>0){for(i=0;i<tanks.length;i++){o=tanks[i];if(o.dead||teamSide(o.team)===sd)continue;d=hyp(o.x-s.x,o.y-s.y);if(d>C.rng+200)continue;
+ if(s.cls==='at'&&s.rk>0){for(i=0;i<tanks.length;i++){o=tanks[i];if(o.dead||o.craft||teamSide(o.team)===sd)continue;d=hyp(o.x-s.x,o.y-s.y);if(d>C.rng+200)continue;
    var asp=Math.abs(angD(o.a,Math.atan2(s.y-o.y,s.x-o.x)));cand.push([d-asp*120+(o.st.cls==='light'?150:0),o]);}
   cand.sort(function(a,b){return a[0]-b[0];});for(i=0;i<cand.length&&i<2;i++)if(losClear(s,cand[i][1]))return cand[i][1];}
  cand=[];for(i=0;i<inf.length;i++){o=inf[i];if(o.dead||teamSide(o.team)===sd)continue;d=hyp(o.x-s.x,o.y-s.y);if(d<C.rng)cand.push([d,o]);}
@@ -6825,6 +7610,7 @@ function infGoal(s,sd,role){var dir=sd===0?1:-1,sp=((s.seed%9)-4),ly=((s.seed%13
  if(s.tgt&&!s.tgt.dead){var d=hyp(s.tgt.x-s.x,s.tgt.y-s.y),want=s.tgt.inf?380:500;
   if(d>want)return{x:s.x+(s.tgt.x-s.x)/d*80,y:s.y+(s.tgt.y-s.y)/d*80};return{x:s.x,y:s.y};}
  var v=s.vehL;if(v&&!v.dead&&hyp(v.x-s.x,v.y-s.y)<1500&&v!==P)return{x:v.x+dir*(80+(s.seed%4)*35),y:v.y+sp*22};
+ if(FR.on){var fg=frGoalPt(s);return{x:fg.x+sp*12,y:fg.y+(((s.seed>>2)%7)-3)*16};}
  if(role==='atk'){var tz=clamp(zoneOf(ownEdgeX(sd)+dir*5),0,FLZ-1);return{x:zoneCX(tz)-dir*ZL*.12+sp*30,y:ly*AY*.75};}
  var xb=role==='prep'?ownEdgeX(sd):holdEdgeX(sd);return{x:xb-dir*(170+(s.seed%5)*70),y:ly*AY*.75};}
 function infThink(s,sd,role){
@@ -6854,11 +7640,11 @@ function infUpdate(dt){if(!FL.on)return;var i,s;
  if(!INF.init){INF.init=1;for(i=0;i<tanks.length;i++)if(tanks[i].st.cls==='ifv')infFill(tanks[i]);
   for(var sd=0;sd<2;sd++){var sp=flSpawnPoint(sd===0?2:1),n=Math.min(6,infQuota()-infCount(sd));if(n>0)infFoot(sd===0?2:1,n,sp.x,sp.y);}}
  infGrid();infShotPass();
- INF.spT-=dt;if(INF.spT<=0){INF.spT=16;for(var sd2=0;sd2<2;sd2++){var room=infQuota()-infCount(sd2);if(room>=3&&!(FL.col&&FL.col[sd2])){var p2=flSpawnPoint(sd2===0?2:1);infFoot(sd2===0?2:1,Math.min(4,room),p2.x,p2.y);supSpawnMark(sd2,p2.x,p2.y);}}}
+ INF.spT-=dt;if(!FR.on&&INF.spT<=0){INF.spT=16;for(var sd2=0;sd2<2;sd2++){var room=infQuota()-infCount(sd2);if(room>=3&&!(FL.col&&FL.col[sd2])){var p2=flSpawnPoint(sd2===0?2:1);infFoot(sd2===0?2:1,Math.min(4,room),p2.x,p2.y);supSpawnMark(sd2,p2.x,p2.y);}}}
  for(i=INF.fx.length-1;i>=0;i--){INF.fx[i].t-=dt;if(INF.fx[i].t<=0)INF.fx.splice(i,1);}
  for(i=INF.gren.length-1;i>=0;i--){var gq=INF.gren[i];gq.t+=dt;if(gq.t>=gq.T){explodeAt(gq.tx,gq.ty,70,120,.7);INF.gren.splice(i,1);}}
  for(i=inf.length-1;i>=0;i--){s=inf[i];if(s.dead){s.deadT+=dt;if(s.deadT>9)inf.splice(i,1);continue;}infStep(s,dt);}}
-function infStep(s,dt){var sd=teamSide(s.team),role=flRole(sd),C=INFC[s.cls],i,t;
+function infStep(s,dt){if(FR.on&&FR.pl>=1&&frFar(s.x,s.y,1900)){s.lodF=!s.lodF;if(s.lodF)return;dt*=2;}var sd=teamSide(s.team),role=flRole(sd),C=INFC[s.cls],i,t;
  s.flash=Math.max(0,s.flash-dt);s.cd-=dt;if(s.flinch>0)s.flinch-=dt;
  s.thinkT-=dt;if(s.thinkT<=0){s.thinkT=rnd(.3,.42);infThink(s,sd,role);}
  var tg=s.tgt&&!s.tgt.dead&&!s.tgt.veh?s.tgt:null,busy=false;
@@ -6871,7 +7657,7 @@ function infStep(s,dt){var sd=teamSide(s.team),role=flRole(sd),C=INFC[s.cls],i,t
  else{s.aimT=0;s.burst=0;}
  /* การเคลื่อนที่ */
  var dx=s.gx-s.x,dy=s.gy-s.y,dd=hyp(dx,dy);s.mv=0;
- if(!busy&&dd>14){s.kneel=Math.max(0,s.kneel-dt*3);var sp=C.spd*(s.flinch>0?.5:1)*(s.hp<40?.8:1)*dt,ang=Math.atan2(dy,dx),nx=s.x+Math.cos(ang)*sp,ny=s.y+Math.sin(ang)*sp;
+ if(!busy&&dd>14){s.kneel=Math.max(0,s.kneel-dt*3);var sp=C.spd*(s.flinch>0?.5:1)*(s.hp<40?.8:1)*(FR.on&&FR.wires.length&&frInWire(s)?.35:1)*dt,ang=Math.atan2(dy,dx),nx=s.x+Math.cos(ang)*sp,ny=s.y+Math.sin(ang)*sp;
   if(blocked(nx,ny)){for(var k=1;k<=2;k++){var a2=ang+(s.seed%2?1:-1)*k*.9;nx=s.x+Math.cos(a2)*sp;ny=s.y+Math.sin(a2)*sp;if(!blocked(nx,ny)){ang=a2;break;}}}
   if(!blocked(nx,ny)){s.x=nx;s.y=ny;s.mv=1;s.walk+=dt*11;if(!tg)s.a+=clamp(angD(s.a,ang),-6*dt,6*dt);}}
  /* หลบรถ / ถูกทับ */
@@ -6881,7 +7667,7 @@ function infStep(s,dt){var sd=teamSide(s.team),role=flRole(sd),C=INFC[s.cls],i,t
  s.y=clamp(s.y,-AY+24,AY-24);s.x=clamp(s.x,-AX+24,AX-24);
  /* กติกาเขต (เหมือนรถถัง) */
  if(role==='prep'&&!zoneOwnOK(sd,s.x)){var xb=ownEdgeX(sd);s.x=sd===0?Math.min(s.x,xb-20):Math.max(s.x,xb+20);}
- if(role==='def'&&!zoneHoldOK(sd,s.x)){s.oob+=dt;s.gx=holdEdgeX(sd)+(sd===0?-200:200);if(s.oob>(FLR.grace+4))infKill(s,null);}else s.oob=0;}
+ if(role==='def'&&!zoneHoldOK(sd,s.x)){s.oob+=dt;s.gx=holdEdgeX(sd)+(sd===0?-200:200);if(s.oob>((FR.on?50:FLR.grace)+4))infKill(s,null);}else s.oob=0;}
 /* ── รถกับทหาร: IFV ส่งลง/รับขึ้น · รถถังยิงทหาร ── */
 function infVehAI(e,dt){if(!FL.on)return;var cap=paxCap(e);
  if(cap){e.paxCD=(e.paxCD||0)-dt;
@@ -6965,7 +7751,7 @@ function cineSkip(){if(CINE.k!=='intro')return;CINE.t=Math.max(CINE.t,CINE.T-.5)
 function cineEnd(victory,hq){if(CINE.end)return true;if(!FL.on)return false;
  CINE.end={v:victory,hq:hq,t:0,bT:0,n:0};CINE.k='end';CINE.t=0;CINE.T=5.4;CINE.lock=true;document.body.classList.add('cine');
  CINE.cam=hq?{x:hq.x,y:hq.y}:{x:(FL.front[0]+FL.front[1]+1)*.5*ZL-AX,y:0};
- var us=victory;cineCard(SPEC.on?(us?'น้ำเงินชนะ':'แดงชนะ'):(us?'ชัยชนะ':'พ่ายแพ้'),hq?(hq.team===1?'ฐานทัพศัตรูถูกทำลาย':'ฐานทัพเราถูกทำลาย'):'หมดเวลา — ตัดสินจากพื้นที่ที่ครอง',us?'#ffd77a':'#ff6a4a',5,true);
+ var us=victory;cineCard(SPEC.on?(us?'น้ำเงินชนะ':'แดงชนะ'):(us?'ชัยชนะ':'พ่ายแพ้'),FR.on?frEndSub(hq):hq?(hq.team===1?'ฐานทัพศัตรูถูกทำลาย':'ฐานทัพเราถูกทำลาย'):'หมดเวลา — ตัดสินจากพื้นที่ที่ครอง',us?'#ffd77a':'#ff6a4a',5,true);
  SFX.braam(1.2);return true;}
 /* อัปเดต (dt = เวลาจริง ไม่ถูกสโลว์) */
 function cineTick(rdt){var i,c;
@@ -7132,7 +7918,7 @@ if(bmc)bmc.addEventListener('pointerdown',function(e){if(G.cmdPick==='attack'&&G
    · 10:00 ยังไม่จบ → HQ ฝ่ายแต้มน้อยระเบิด
    ═══════════════════════════════════════════════════════════ */
 function tkInit(){var n=Math.round(FLR.tkBase+(G.teamSize||12)*FLR.tkPer);FL.tk=[n,n];FL.tk0=n;FL.col=[false,false];FL.btT=[0,0];FL.capH=[[],[]];}
-function tkLose(side,n){if(!FL.tk||FL.prep||G.over||FL.col[0]||FL.col[1])return;FL.tk[side]=Math.max(0,FL.tk[side]-n);if(FL.tk[side]<=0&&!FL.col[side])tkCollapse(side);}
+function tkLose(side,n){if(FR.on){frTkLose(side);return;}if(!FL.tk||FL.prep||G.over||FL.col[0]||FL.col[1])return;FL.tk[side]=Math.max(0,FL.tk[side]-n);if(FL.tk[side]<=0&&!FL.col[side])tkCollapse(side);}
 function tkCost(t){return t.boss?6:(t.st.cls==='light'||t.st.cls==='ifv')?2:3;}
 function tkCollapse(s){var w=1-s,i;FL.col[s]=true;FL.to=false;FL.atk=w;FL.phaseT=999;FL.otOn=0;FL.ot=0;FL.warned=true;
  for(i=0;i<structs.length;i++){var st=structs[i];if(st.k==='turret'&&st.team===s&&!st.dead){st.hp=0;st.dead=true;fxBlast(st.x,st.y,1.2);}}
@@ -7208,7 +7994,7 @@ function skUse(t){var s=t.st;
  if(t===P&&!SPEC.on){var pk={LEO:'Leopard: ปืนและกระสุนดีที่สุด (ไม่มีสกิลกด)',K2:'K2: บรรจุอัตโนมัติ 3 วิ (ไม่มีสกิลกด)',T90:'T-90M: ERA 34 ก้อน (ไม่มีสกิลกด)',T14:'T-14: APS ทำงานเองอัตโนมัติ'}[t.b.ch];toast(pk||'รถคันนี้ไม่มีสกิลพิเศษ');}}
 function rwsAmmo(t){if(!t||t.dead||t.st.skill!=='rws')return;t.rwsHE=!t.rwsHE;skMsg(t,t.rwsHE?'💥 30mm: กระสุน HE':'🔩 30mm: กระสุน AP','b');if(t===P)SFX.ui(true);}
 /* ── โดรนพลีชีพ (KF51) ── */
-function skFoes(t){var f=enemyOf(t.team),out=[];for(var i=0;i<tanks.length;i++){var o=tanks[i];if(!o.dead&&f.indexOf(o.team)>=0&&!(o.cloakT>0)&&!(o.dropT>0)&&!(o.adpT>0))out.push(o);}return out;}
+function skFoes(t){var f=enemyOf(t.team),out=[];for(var i=0;i<tanks.length;i++){var o=tanks[i];if(!o.dead&&f.indexOf(o.team)>=0&&!(o.cloakT>0)&&!(o.dropT>0)&&!(o.adpT>0)&&!o.craft)out.push(o);}return out;}
 function droneSeek(s){if(s.lock&&!s.lock.dead&&!(s.lock.cloakT>0))return;var f=skFoes(s.own),best=null,bd=s.seek;
  for(var i=0;i<f.length;i++){var o=f[i],d=hyp(o.x-s.x,o.y-s.y);if(d<bd){bd=d;best=o;}}s.lock=best;if(best)triggerLWS(best,s.x,s.y,1);}
 function drawDrone(s,sx,sy){var alt=s.alt||0;
@@ -7452,9 +8238,9 @@ function render(){
  var sx=G.shake?rnd(-G.shake,G.shake):0,sy=G.shake?rnd(-G.shake,G.shake):0;
  cx.save();cx.translate(sx,sy);
  var now=performance.now(),gdt=GX.lt?clamp((now-GX.lt)/1000,0,.1):0;GX.lt=now;
- drawGround(w,h);drawRoads(w,h);drawDecals(w,h);
+ drawGround(w,h);if(FR.on)frDrawTerrain(w,h,time);drawRoads(w,h);drawDecals(w,h);
  /* โซน Frontline */
- if(FL.on){
+ if(FL.on&&!FR.on){
   for(var z=0;z<FLZ;z++){
    var x0=(-AX+z*ZL)-cam.x;
    if(x0>w||x0+ZL<0)continue;
@@ -7471,7 +8257,7 @@ function render(){
     cx.fillRect(x0+14,32,pr*1.2,5);
     cx.strokeStyle='#37432d';cx.strokeRect(x0+14,32,120,5);}}
  }
- drawBounds(w,h);if(FL.on)drawZoneRules(w,h);
+ drawBounds(w,h);if(FR.on){frDrawFleet(w,h,time);frDrawObj(w,h,time);frDrawRules(w,h);}else if(FL.on)drawZoneRules(w,h);
  /* จุดยึด (cap mode) */
  for(var i=0;i<G.caps.length;i++){var c=G.caps[i],cxp=c.x-cam.x,cyp=c.y-cam.y;
   if(cxp<-c.r-60||cxp>w+c.r+60)continue;
@@ -7489,7 +8275,8 @@ function render(){
  drawWrecks(w,h);drawDecor(w,h);
  /* โลก 2.5D: สิ่งกีดขวาง ต้นไม้ โครงสร้าง รถ — เรียงตามความลึก */
  if(FL.on)drawAirShadows(w,h);
- drawWorld(w,h,time);if(FL.on)drawInfFx(w,h);if(SPEC.on)drawSpecMark(w,h);drawSupRing();
+ if(FR.on){frDrawCraft(w,h,time);frDrawFort(w,h);}
+ drawWorld(w,h,time);if(FR.on){frDrawAtmo(w,h,time);frDrawGhost(w,h);}if(FL.on)drawInfFx(w,h);if(SPEC.on)drawSpecMark(w,h);drawSupRing();
  for(var i=0;i<trails.length;i++){var t2=trails[i];
   cx.globalAlpha=t2.l/t2.ml*.7;cx.fillStyle=t2.c;
   cx.fillRect(t2.x-cam.x-1.5,t2.y-cam.y-1.5-SHZ,3.2,3.2);}
@@ -7502,7 +8289,7 @@ function render(){
   cx.fillStyle=col.base;cx.strokeStyle='#141810';cx.lineWidth=1.6;
   pathPts(cx,turPts(M.sty,TR));cx.fill();cx.stroke();
   cx.restore();}
- if(FL.on){drawAir(w,h);drawEv2(w,h);drawSupMarks(w,h);drawCapBars(w,h);}
+ if(FL.on){drawAir(w,h);drawEv2(w,h);drawSupMarks(w,h);if(!FR.on)drawCapBars(w,h);}
  drawCmd(w,h);
  drawClouds(w,h,gdt);
  /* กระสุน */
@@ -7541,7 +8328,7 @@ function render(){
   for(var k=0;k<5;k++){var an=k*1.2566+i+time*.05*(k%2?1:-1),rr=r*(k?.72:1);
    cx.globalAlpha=al*(k?.75:.9);cx.drawImage(sp2,sxp+(k?Math.cos(an)*r*.42:0)-rr,syp+(k?Math.sin(an)*r*.42:0)-rr,rr*2,rr*2);}
   cx.globalAlpha=1;}
- drawLightMap(w,h);drawPops(gdt);
+ drawLightMap(w,h);if(FR.on){frDrawBeams(w,h);frDrawEdge(w,h);}drawPops(gdt);
  /* เส้นเล็ง */
  if(P&&!P.dead){
   var maxD=2600,ex=P.x+Math.cos(P.ta)*maxD,ey=P.y+Math.sin(P.ta)*maxD;
@@ -7571,7 +8358,7 @@ function render(){
  if(G.scanning&&P){cx.strokeStyle='#4fa0e0';cx.globalAlpha=clamp(1-G.scan,.2,.9);cx.lineWidth=2;
   cx.beginPath();cx.arc(P.x-cam.x,P.y-cam.y,220+G.scan*1700,0,6.2832);cx.stroke();cx.globalAlpha=1;}
  cx.restore();
- drawAtmos(w,h,gdt);drawWeatherFx(w,h,gdt);drawOobWarn(w,h);if(FL.on)drawPrepCount(w,h);
+ drawAtmos(w,h,gdt);if(FR.on)frWxFx(w,h,gdt);drawWeatherFx(w,h,gdt);drawOobWarn(w,h);if(FL.on)drawPrepCount(w,h);
  if(G.fireGlow>0){cx.fillStyle='rgba(255,220,150,'+(G.fireGlow*0.5)+')';cx.fillRect(0,0,w,h);}
  if(G.alert>0&&G.lwsDir!==null){
   var a=clamp(G.alert,0,1);
@@ -7600,6 +8387,7 @@ function renderMini(){
    mx.fillRect(x0,H/2-AY*sc,zw,AY*2*sc);}
   mx.strokeStyle='#6a6252';mx.lineWidth=1.5;
   mx.beginPath();mx.moveTo(W/2-AX*sc,H/2);mx.lineTo(W/2+AX*sc,H/2);mx.stroke();
+  if(FR.on)frMapOv(mx,W,H,sc,mp,false);
  }else{mx.fillStyle='#2b3226';
   for(var i=0;i<obst.length;i+=2){var q=mp(obst[i]);
    var sz=obst[i].t==='c'?Math.max(1,obst[i].r*sc):Math.max(1,obst[i].w*sc);
@@ -7642,13 +8430,14 @@ function drawBigMap(){
   bmx.strokeStyle='#37432d';bmx.lineWidth=1;
   bmx.strokeRect(x0,H/2-AY*sc,zw,AY*2*sc);
   bmx.fillStyle='#9aa889';bmx.font='bold 12px Tahoma';bmx.textAlign='center';
-  bmx.fillText('ZONE '+(z+1),x0+zw/2,H/2-AY*sc+16);
+  bmx.fillText(FR.on?'SECTOR '+FRC.LET[FR.atk===0?z:FLZ-1-z]:'ZONE '+(z+1),x0+zw/2,H/2-AY*sc+16);
   if(o===-1&&Math.abs(FL.prog[z])>1){
    bmx.fillStyle=FL.prog[z]>0?'#8fd44a':'#e05a3c';
    bmx.fillText(Math.round(Math.abs(FL.prog[z]))+'%',x0+zw/2,H/2-AY*sc+32);}
   bmx.textAlign='left';}
  bmx.strokeStyle='#6a6252';bmx.lineWidth=3;
  bmx.beginPath();bmx.moveTo(W/2-AX*sc,H/2);bmx.lineTo(W/2+AX*sc,H/2);bmx.stroke();
+ if(FR.on)frMapOv(bmx,W,H,sc,mp,true);
  for(var i=0;i<obst.length;i+=3){var q=mp(obst[i]);
   bmx.fillStyle='#2b3226';bmx.fillRect(q[0]-1,q[1]-1,2.4,2.4);}
  for(var i=0;i<bushes.length;i+=2){var q=mp(bushes[i]);
@@ -7660,7 +8449,7 @@ function drawBigMap(){
    s.k==='turret'?(s.team===0?'#5f8f30':'#a04030'):'#c8b878';
   var sz=s.k==='hq'?11:6;bmx.fillRect(q[0]-sz/2,q[1]-sz/2,sz,sz);
   bmx.fillStyle='#e8e6dd';bmx.font='9px Tahoma';bmx.textAlign='center';
-  bmx.fillText(s.k==='hq'?'HQ':s.k==='turret'?'🏰':s.k==='radio'?'📻':'⛽',q[0],q[1]-8);
+  bmx.fillText(s.k==='hq'?'HQ':s.k==='turret'?'🏰':s.k==='mg'?'🔫':s.k==='radio'?'📻':'⛽',q[0],q[1]-8);
   bmx.textAlign='left';}
  for(var i=0;i<tanks.length;i++){var t=tanks[i];if(t.dead)continue;
   var q=mp(t);
@@ -7670,13 +8459,13 @@ function drawBigMap(){
   if(t.marked){bmx.strokeStyle='#ff3030';bmx.lineWidth=1;
    bmx.strokeRect(q[0]-5,q[1]-5,10,10);}}
  if(FL.on)drawSupBig(mp,sc);
- $('bmInfo').innerHTML=FL.on?
+ $('bmInfo').innerHTML=FR.on?('🎟️ กำลังเสริมฝ่ายบุก <b>'+fmt(FR.tk)+'</b> · เป้าหมาย <b>'+(FR.next>4?'HQ':FRC.LET[FR.next])+'</b> · HQ <b>'+Math.round(FR.hq.hp/FR.hq.mhp*100)+'%</b>'+(FR.hq.inv?' 🔒':'')+' · ⏱️ '+mmss(FL.prep?FR.prepT:FR.time)):FL.on?
   ('HQ เรา <b style="color:#8fd44a">'+fmt(FL.hq[0])+'</b> · ศัตรู <b style="color:#e05a3c">'+fmt(FL.hq[1])+
    '</b> · แนวรบ Zone '+(FL.front[0]+1)+'–'+(FL.front[1]+1)+
    (FL.intel[0]>0?' · 📻 ข่าวกรองเหลือ '+Math.ceil(FL.intel[0])+' วิ':'')):'';}
 function loop(now){if(!G.run)return;
  if(isPhone()&&innerHeight>innerWidth){G.last=now;requestAnimationFrame(loop);return;}  /* แนวตั้ง = หยุดชั่วคราว */
- var dt=Math.min((now-G.last)/1000,.05);G.last=now;
+ var dt=Math.min((now-G.last)/1000,.05);G.last=now;if(FR.on&&!CINE.k)FR.ft=(FR.ft||16)*.95+dt*50;
  for(var si=0,sn=SPEC.on&&!CINE.k?SPEC.spd:1;si<sn;si++){var sdt=dt*(CINE.slow||1);G.t+=sdt;update(sdt);if(!G.run)break;}
  render();
  if($('bigmap').classList.contains('on')&&Math.random()<.25)drawBigMap();
@@ -7741,6 +8530,7 @@ addEventListener('keydown',function(e){
   SV.keys[awaitKey]=k;awaitKey=null;save();SFX.ui(true);drawKeys();return;}
  keys[k]=true;
  if(!G.run)return;
+ if(FR.on&&!SPEC.on){if(FR.bOpen&&frBuildKey(k)){e.preventDefault();return;}if(k===(SV.keys.build||'b')){frBuildToggle();return;}if(k===(SV.keys.arty||'z')){frArty();return;}}
  if(FL.on&&FL.sup&&FL.sup.mark&&!SPEC.on){if(k==='escape'||k===SV.keys.quit){e.preventDefault();if($('bigmap').classList.contains('on'))closeBigMap();supCancel();return;}if(k==='enter'){supConfirm();return;}}
  if(SPEC.on){if(k===SV.keys.map){if($('bigmap').classList.contains('on'))closeBigMap();else openBigMap();}
   if(k===SV.keys.quit){if($('bigmap').classList.contains('on'))closeBigMap();else quitBattle();}return;}
@@ -7762,7 +8552,7 @@ addEventListener('keydown',function(e){
 addEventListener('keyup',function(e){var k=(e.key||'').toLowerCase();keys[k]=false;
  if(k===SV.keys.scan)G.scanning=false;});
 cv.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;});
-cv.addEventListener('mousedown',function(){SFX.init();SFX.resume();mouse.down=true;});
+cv.addEventListener('mousedown',function(e){SFX.init();SFX.resume();if(FR.on&&FR.bOpen&&FR.bSel&&G.run&&frCanPlayerBuild()){if(e.button===2){FR.bSel=null;frBuildUI();return;}var p=frAimPt();frPlaceAt(FR.bSel,p.x,p.y);return;}mouse.down=true;});
 addEventListener('mouseup',function(){mouse.down=false;});
 cv.addEventListener('contextmenu',function(e){e.preventDefault();});
 var joyL={x:0,y:0,a:0,m:0},joyR={x:0,y:0,a:0,m:0};
