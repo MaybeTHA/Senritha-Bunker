@@ -38,6 +38,7 @@ p.sub{text-align:center;color:#8d977c;font-size:clamp(11px,2.3vw,13px);margin-bo
 .btn.blu{background:linear-gradient(180deg,#2f5f8f,#183048);border-color:#5aa0d0}
 .btn.grn{background:linear-gradient(180deg,#2f7a44,#154023);border-color:#5ad080}
 .btn.sm{padding:6px 9px;font-size:clamp(10.5px,2.2vw,12.5px)}
+#coCode::placeholder{letter-spacing:1px;font-size:15px;font-weight:400;color:#6f7a60}
 .row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:5px 0}
 .bar{height:8px;background:#12160f;border-radius:5px;overflow:hidden;border:1px solid #303927;flex:1;min-width:50px}
 .bar>i{display:block;height:100%;background:linear-gradient(90deg,#7ea63f,#d8e04a);transition:width .2s}
@@ -523,10 +524,12 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
   <h2>🤝 เล่นกับเพื่อน <span style="font-size:13px;color:#93a181">ทีมเดียวกัน · สูงสุด 4 คน</span></h2>
   <div class="card" style="cursor:default;text-align:left">
    <div class="st">ชื่อผู้เล่น</div><input id="coName" maxlength="14" placeholder="ชื่อของคุณ" style="width:100%;padding:8px;border-radius:8px;border:1px solid #3a4430;background:#141810;color:#e8e2d0">
-   <div class="grid g2" style="margin-top:8px"><button class="btn pri" onclick="netHost()">👑 สร้างห้อง</button>
-    <div style="display:flex;gap:6px"><input id="coCode" maxlength="5" placeholder="รหัสห้อง" style="flex:1;min-width:0;padding:8px;border-radius:8px;border:1px solid #3a4430;background:#141810;color:#ffd27a;text-transform:uppercase;letter-spacing:2px"><button class="btn grn" onclick="netJoin()">เข้าร่วม</button></div></div>
+   <button class="btn pri" style="margin-top:8px" onclick="netHost()">👑 สร้างห้อง</button>
+   <div class="st" style="margin-top:10px">หรือเข้าห้องเพื่อน</div>
+   <div style="display:flex;gap:6px;align-items:stretch"><input id="coCode" maxlength="5" placeholder="รหัส 5 ตัว" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="coCodeIn(this)" style="flex:1 1 auto;width:0;min-width:0;padding:10px;border-radius:8px;border:1px solid #3a4430;background:#141810;color:#ffd27a;text-transform:uppercase;letter-spacing:5px;font-size:20px;font-weight:700;text-align:center"><button class="btn grn" style="width:auto;flex:0 0 auto;padding:10px 20px" onclick="netJoin()">เข้าร่วม</button></div>
    <div id="coStat" class="hint" style="margin-top:6px">สร้างห้องแล้วส่งรหัสให้เพื่อน หรือกรอกรหัสห้องของเพื่อน</div></div>
-  <div class="card" style="cursor:default;text-align:left"><div class="st">ผู้เล่นในห้อง <b id="coCodeShow" style="color:#ffd27a;letter-spacing:2px"></b></div><div id="coList"></div></div>
+  <div class="card" style="cursor:default;text-align:left"><div class="st">ผู้เล่นในห้อง <b id="coCodeShow" style="color:#ffd27a;letter-spacing:3px;font-size:18px"></b></div>
+   <div id="coShare" class="grid g2" style="display:none;margin:4px 0 6px"><button class="btn sm" onclick="coCopy()">📋 คัดลอกรหัส</button><button class="btn sm" onclick="coShareLink()">📤 ส่งลิงก์ให้เพื่อน</button></div><div id="coList"></div></div>
   <div id="coHostBox" class="card" style="cursor:default;display:none;text-align:left"><div class="st">👑 โฮสต์: เลือกโหมดแล้วกดเริ่มตามปกติ — เพื่อนเข้าแมตช์พร้อมกันอัตโนมัติ</div>
    <div class="grid g2" style="margin-top:6px"><button class="btn grn" onclick="show('scFrontier')">🌊 FRONTIER</button><button class="btn grn" onclick="show('scFront')">🌲 FRONTLINE</button>
    <button class="btn blu" onclick="show('scBattle')">⚔️ ยึดจุด / เดธแมตช์</button><button class="btn dan" onclick="show('scDuel')">🎯 ดวล (ศัตรูเพิ่มตามจำนวนคน)</button><button class="btn blu" onclick="show('scInf')">♾️ Infinity (เวฟ)</button></div></div>
@@ -1810,7 +1813,7 @@ function setPlat(p){SFX.ui(true);PLAT=p;SV.plat=p;updOrient();
  ['pfPC','pfMB','s_pc','s_mb'].forEach(function(i){if($(i))$(i).classList.remove('sel');});
  if($(p==='pc'?'pfPC':'pfMB'))$(p==='pc'?'pfPC':'pfMB').classList.add('sel');
  if($(p==='pc'?'s_pc':'s_mb'))$(p==='pc'?'s_pc':'s_mb').classList.add('sel');save();}
-function bootDone(){SFX.init();goFull();updOrient();show('scMenu');SFX.music('menu');}
+function bootDone(){SFX.init();goFull();updOrient();show('scMenu');SFX.music('menu');if(NET.urlRoom)coOpen();}
 var cv=$('cv'),cx=cv.getContext('2d'),mc=$('mini'),mx=mc.getContext('2d');
 var pv=$('prev'),px=pv?pv.getContext('2d'):null;
 var bmc=$('bmc'),bmx=bmc?bmc.getContext('2d'):null;
@@ -4693,9 +4696,10 @@ function netBcast(m){NET.conns.forEach(function(c){netSend(c,m);});}
 function netStatus(t,c){var e=$('coStat');if(e){e.textContent=t;e.style.color=c==='r'?'#ff8a6a':c==='g'?'#9fe06a':'#e8e2d0';}}
 function netName(){var v=($('coName')&&$('coName').value||'').trim().slice(0,14);if(v){NET.name=v;try{localStorage.setItem('sf_coname',v);}catch(e){}}return NET.name||'ผู้เล่น';}
 /* ── โฮสต์ ── */
-function netHost(){netName();netStatus('กำลังสร้างห้อง...');netLoadLib(function(){var tries=0;(function mk(){NET.code=netCode();var pr=netPeer(NETC.pre+NET.code);
- pr.on('open',function(){NET.peer=pr;NET.mode='host';NET.lobby=[{id:'host',name:NET.name,host:1}];netStatus('✅ ห้องพร้อม — ให้เพื่อนกรอกรหัส '+NET.code,'g');netLobbyUI();});
- pr.on('error',function(e){if(e&&e.type==='unavailable-id'&&tries++<5){pr.destroy();mk();return;}netStatus('❌ เชื่อมต่อไม่ได้: '+(e&&e.type||e),'r');});
+function netHost(){if(NET.mode==='host'&&NET.peer){netStatus('✅ ห้องพร้อม — รหัส '+NET.code,'g');return;}if(NET.peer)netLeave();netName();netStatus('กำลังสร้างห้อง...');netLoadLib(function(){var tries=0;(function mk(){NET.code=netCode();var pr=netPeer(NETC.pre+NET.code);
+ pr.on('open',function(){if(NET.peer===pr)return;NET.peer=pr;NET.mode='host';NET.lobby=[{id:'host',name:NET.name,host:1}];netStatus('✅ ห้องพร้อม — ส่งรหัส '+NET.code+' ให้เพื่อน (เปิดหน้านี้ค้างไว้)','g');netLobbyUI();netWake();});
+ netKeep(pr);
+ pr.on('error',function(e){if(e&&e.type==='unavailable-id'&&tries++<5&&NET.peer!==pr){pr.destroy();mk();return;}if(NET.peer===pr&&e&&(e.type==='network'||e.type==='server-error'||e.type==='socket-error'||e.type==='socket-closed'))return;netStatus('❌ เชื่อมต่อไม่ได้: '+(e&&e.type||e),'r');});
  pr.on('connection',function(c){c.on('open',function(){if(NET.conns.length>=NETC.max-1){netSend(c,{t:'full'});setTimeout(function(){c.close();},400);return;}NET.conns.push(c);});
   c.on('data',function(d){netRecv(c,d,netHostMsg);});c.on('close',function(){netDrop(c);});c.on('error',function(){netDrop(c);});});})();});}
 function netHostMsg(c,m){if(!m||!m.t)return;
@@ -4708,19 +4712,39 @@ function netHostMsg(c,m){if(!m||!m.t)return;
 function netDrop(c){var i=NET.conns.indexOf(c);if(i<0)return;NET.conns.splice(i,1);if(c.hum){addLog('📴 '+c.hum.name+' ออกจากเกม','r');humRemove(c.hum);NET.lobby=NET.lobby.filter(function(p){return p.id!==c.hum.id;});}netLobbyBcast();if(NET.mode==='off')NET.mode='host';}
 function netLobbyBcast(){netBcast({t:'lobby',p:NET.lobby});netLobbyUI();}
 /* ── เพื่อน ── */
-function netJoin(){netName();var code=(($('coCode')&&$('coCode').value)||'').trim().toUpperCase();if(code.length<4){netStatus('กรอกรหัสห้อง 5 ตัว','r');return;}
- netStatus('กำลังเชื่อมต่อห้อง '+code+'...');netLoadLib(function(){var pr=netPeer();NET.peer=pr;
-  pr.on('open',function(){var c=pr.connect(NETC.pre+code,{reliable:true,serialization:'raw'});NET.conn=c;
-   c.on('open',function(){var st=null;try{st=calc();}catch(e){}netSend(c,{t:'hello',v:NETV,name:NET.name,build:SV.build,st:st});netStatus('✅ เชื่อมต่อแล้ว — รอโฮสต์เริ่มเกม','g');});
-   c.on('data',function(d){netRecv(c,d,function(cc,m){netCliMsg(m);});});c.on('close',function(){netCliLost();});c.on('error',function(){netCliLost();});});
-  pr.on('error',function(e){netStatus('❌ '+(e&&e.type==='peer-unavailable'?'ไม่พบห้องนี้':'เชื่อมต่อไม่ได้: '+(e&&e.type||e)),'r');});});}
+function netJoin(){if(NET.mode==='host'){netStatus('คุณเป็นโฮสต์อยู่ — กด 🚪 ออกจากห้องก่อน','r');return;}netName();var code=(($('coCode')&&$('coCode').value)||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length!==5){netStatus('กรอกรหัสห้องให้ครบ 5 ตัว (ตัวอังกฤษ/ตัวเลข)','r');return;}
+ if(NET.peer){try{if(NET.conn)NET.conn.close();NET.peer.destroy();}catch(e){}NET.conn=null;NET.peer=null;}
+ netStatus('กำลังเชื่อมต่อห้อง '+code+'...');netLoadLib(function(){var pr=netPeer(),tries=0,tm=0;NET.peer=pr;netKeep(pr);
+  function go(){if(NET.peer!==pr)return;var c=pr.connect(NETC.pre+code,{reliable:true,serialization:'raw'});NET.conn=c;clearTimeout(tm);
+   tm=setTimeout(function(){if(NET.conn===c&&!c.open){netStatus('❌ ต่อไม่ติด — เครือข่ายนี้อาจบล็อก ลองสลับ WiFi/เน็ตมือถือ แล้วกดเข้าร่วมใหม่','r');try{c.close();}catch(e){}NET.conn=null;}},20000);
+   c.on('open',function(){clearTimeout(tm);var st=null;try{st=calc();}catch(e){}netSend(c,{t:'hello',v:NETV,name:NET.name,build:SV.build,st:st});netStatus('✅ เชื่อมต่อแล้ว — รอโฮสต์เริ่มเกม','g');netWake();});
+   c.on('data',function(d){netRecv(c,d,function(cc,m){netCliMsg(m);});});c.on('close',function(){if(NET.conn===c)netCliLost();});c.on('error',function(){});}
+  pr.on('open',function(){if(!NET.conn)go();});
+  pr.on('error',function(e){if(NET.peer!==pr)return;var ty=e&&e.type;
+   if(ty==='peer-unavailable'){clearTimeout(tm);NET.conn=null;if(tries++<1){netStatus('ยังไม่พบห้อง '+code+' — กำลังลองอีกครั้ง...');setTimeout(go,1500);return;}
+    netStatus('❌ ไม่พบห้อง '+code+' — เช็ครหัสอีกครั้ง และให้โฮสต์เปิดหน้าเกมค้างไว้ (ไม่สลับแอป/ไม่ปิดจอ)','r');return;}
+   if(ty==='network'||ty==='socket-error'||ty==='socket-closed'||ty==='server-error'){if(NET.mode==='client')return;}
+   netStatus('❌ เชื่อมต่อไม่ได้: '+(ty||e),'r');});});}
 function netCliLost(){if(NET.mode!=='client'&&!NET.conn)return;var was=NET.mode==='client';NET.conn=null;if(was){NET.mode='off';G.run=false;toast('📴 หลุดจากห้อง');show('scCoop');}netStatus('📴 การเชื่อมต่อหลุด','r');}
-function netLeave(){try{if(NET.conn)NET.conn.close();NET.conns.forEach(function(c){c.close();});if(NET.peer)NET.peer.destroy();}catch(e){}NET.conn=null;NET.conns=[];NET.peer=null;HUMS.length=0;NET.mode='off';NET.started=false;NET.lobby=[];netStatus('ออกจากห้องแล้ว');netLobbyUI();}
+function netLeave(){try{if(NET.conn)NET.conn.close();NET.conns.forEach(function(c){c.close();});if(NET.peer)NET.peer.destroy();}catch(e){}NET.conn=null;NET.conns=[];NET.peer=null;HUMS.length=0;NET.mode='off';NET.started=false;NET.lobby=[];netWakeOff();netStatus('ออกจากห้องแล้ว');netLobbyUI();}
 /* ── ล็อบบี้ UI ── */
 function netLobbyUI(){var e=$('coList');if(!e)return;var L=NET.mode==='host'?NET.lobby:(NET.cliLobby||[]),h='';
  L.forEach(function(p){h+='<div class="card" style="cursor:default;padding:6px 10px;margin:3px 0">'+(p.host?'👑 ':'🪖 ')+esc(p.name)+(p.host?' <span style="color:#93a181">(โฮสต์)</span>':'')+'</div>';});e.innerHTML=h||'<div class="hint">ยังไม่มีผู้เล่น</div>';
- var hb=$('coHostBox');if(hb)hb.style.display=NET.mode==='host'?'block':'none';var cd=$('coCodeShow');if(cd)cd.textContent=NET.mode==='host'?NET.code:'';}
-function coOpen(){var e=$('coName');if(e&&!e.value){try{e.value=localStorage.getItem('sf_coname')||'';}catch(x){}}show('scCoop');netLobbyUI();}
+ var hb=$('coHostBox');if(hb)hb.style.display=NET.mode==='host'?'block':'none';var cd=$('coCodeShow');if(cd)cd.textContent=NET.mode==='host'?NET.code:'';var sh=$('coShare');if(sh)sh.style.display=NET.mode==='host'?'':'none';}
+function coOpen(){var e=$('coName');if(e&&!e.value){try{e.value=localStorage.getItem('sf_coname')||'';}catch(x){}}show('scCoop');netLobbyUI();
+ if(NET.urlRoom&&NET.mode==='off'){var k=$('coCode');if(k)k.value=NET.urlRoom;NET.urlRoom='';netStatus('ได้รับลิงก์ห้องแล้ว — ใส่ชื่อแล้วกด เข้าร่วม','g');}}
+try{var _rm=/[?&]room=([A-Za-z0-9]{5})/.exec(location.search);NET.urlRoom=_rm?_rm[1].toUpperCase():'';}catch(e){NET.urlRoom='';}
+function coCodeIn(el){var raw=el.value,v=raw.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5);if(v!==raw)el.value=v;if(raw&&/[^\x00-\x7f]/.test(raw))netStatus('รหัสห้องใช้ตัวอังกฤษ/ตัวเลข — สลับแป้นเป็นภาษาอังกฤษ','r');}
+function coLink(){return /^https?:/.test(location.protocol)?location.origin+location.pathname+'?room='+NET.code:'';}
+function coClip(t,ok){function fb(){try{window.prompt('คัดลอกข้อความนี้',t);}catch(e){}}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast(ok);},fb);return;}}catch(e){}fb();}
+function coCopy(){if(NET.mode!=='host')return;coClip(NET.code,'📋 คัดลอกรหัส '+NET.code+' แล้ว');}
+function coShareLink(){if(NET.mode!=='host')return;var u=coLink(),t='มาเล่น Steelforge Requiem ด้วยกัน — รหัสห้อง '+NET.code;
+ if(navigator.share){navigator.share(u?{title:'Steelforge Requiem',text:t,url:u}:{title:'Steelforge Requiem',text:t}).catch(function(){});return;}coClip(u?t+'\n'+u:t,'📋 คัดลอกลิงก์แล้ว');}
+/* มือถือ: สลับแอป/จอดับ → ซ็อกเก็ตเซิร์ฟเวอร์หลุด → ต่อใหม่ด้วย id เดิม (ห้องไม่หาย) · ขอไม่ให้จอดับระหว่างอยู่ในห้อง */
+function netKeep(pr){pr.on('disconnected',function(){if(NET.peer!==pr||pr._rcT)return;pr._rcN=(pr._rcN||0)+1;pr._rcT=setTimeout(function(){pr._rcT=0;if(NET.peer!==pr||pr.destroyed||!pr.disconnected)return;try{pr.reconnect();}catch(e){}},pr._rcN<6?1500:5000);});pr.on('open',function(){pr._rcN=0;});}
+function netWake(){try{if(navigator.wakeLock&&!NET.wl&&!document.hidden)navigator.wakeLock.request('screen').then(function(l){NET.wl=l;l.addEventListener('release',function(){if(NET.wl===l)NET.wl=null;});}).catch(function(){});}catch(e){}}
+function netWakeOff(){try{if(NET.wl)NET.wl.release();}catch(e){}NET.wl=null;}
+document.addEventListener('visibilitychange',function(){if(document.hidden||!NET.peer)return;var pr=NET.peer;if(pr&&pr.disconnected&&!pr.destroyed){try{pr.reconnect();}catch(e){}}netWake();});
 
 /* ── เริ่มแมตช์พร้อมกัน: สุ่มแบบมี seed เดียวกัน + ส่งแผนที่จริงไปทับ ── */
 function netRec(){return NET.mode==='host'&&NET.started&&NET.conns.length>0;}
