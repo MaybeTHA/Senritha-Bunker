@@ -528,7 +528,8 @@ body.mbl.specused:not(.spec) #specBack{display:flex;align-items:center}
    <div id="coStat" class="hint" style="margin-top:6px">สร้างห้องแล้วส่งรหัสให้เพื่อน หรือกรอกรหัสห้องของเพื่อน</div></div>
   <div class="card" style="cursor:default;text-align:left"><div class="st">ผู้เล่นในห้อง <b id="coCodeShow" style="color:#ffd27a;letter-spacing:2px"></b></div><div id="coList"></div></div>
   <div id="coHostBox" class="card" style="cursor:default;display:none;text-align:left"><div class="st">👑 โฮสต์: เลือกโหมดแล้วกดเริ่มตามปกติ — เพื่อนเข้าแมตช์พร้อมกันอัตโนมัติ</div>
-   <div class="grid g2" style="margin-top:6px"><button class="btn grn" onclick="show('scFrontier')">🌊 FRONTIER</button><button class="btn grn" onclick="show('scFront')">🌲 FRONTLINE</button></div></div>
+   <div class="grid g2" style="margin-top:6px"><button class="btn grn" onclick="show('scFrontier')">🌊 FRONTIER</button><button class="btn grn" onclick="show('scFront')">🌲 FRONTLINE</button>
+   <button class="btn blu" onclick="show('scBattle')">⚔️ ยึดจุด / เดธแมตช์</button><button class="btn dan" onclick="show('scDuel')">🎯 ดวล (ศัตรูเพิ่มตามจำนวนคน)</button><button class="btn blu" onclick="show('scInf')">♾️ Infinity (เวฟ)</button></div></div>
   <div class="grid g2" style="margin-top:8px"><button class="btn" onclick="netLeave()">🚪 ออกจากห้อง</button><button class="btn" onclick="show('scMenu')">⬅ กลับเมนู</button></div>
   <p class="hint">ต้องต่ออินเทอร์เน็ต · บางเครือข่าย (เช่น เน็ตมือถือบางค่าย) อาจต่อไม่ติดถ้าไม่ได้ตั้งค่า TURN</p>
 </div></div></div>
@@ -4662,8 +4663,14 @@ function humDown(h){if(RC===h){playerDown();return;}humIn(h);playerDown();humOut
 /* โฮสต์: รันผู้เล่นระยะไกลทุกเฟรม (ควบคุม + นับถอยหลังเกิดใหม่) */
 function humTick(dt){if(NET.mode!=='host'||!HUMS.length)return;
  for(var i=0;i<HUMS.length;i++){var h=HUMS[i];if(!h.remote)continue;humIn(h);try{
-  if(!P){if(FL.on&&!G.over)respawnPlayer();}
+  if(!P&&!G.over){if(FL.on)respawnPlayer();else if(!h.spawned)humSpawnArena(h);}
   else{humActs(h);plCtl(dt);if(P.dead&&FL.on&&FL.pRespawn>0){FL.pRespawn-=dt;if(FL.pRespawn<=0)respawnPlayer();}}}finally{humOut(h);}}}
+/* โหมดสนามเล็ก (Battle/ดวล/Infinity): เพื่อนเกิดข้างโฮสต์ครั้งเดียว ตายแล้วรอจบรอบ */
+function humSpawnArena(h){var hp=h._sv[0],i=HUMS.indexOf(h)+1,bx=hp?hp.x:-AX*.76,by=hp?hp.y:0,x=bx+50,y=clamp(by+((i%2)?1:-1)*120*Math.ceil(i/2),-AY+120,AY-120);
+ var ps=h.st?JSON.parse(JSON.stringify(h.st)):calc(),np=mkTank(x,y,ps,0,{a:hp?hp.a:0,skin:(h.build&&h.build.skin)||'std'});np.hum=h;tanks.push(np);P=np;G.lock=null;aSel=firstAmmo();h.spawned=1;}
+function humAnyAlive(){if(NET.mode!=='host')return false;for(var i=0;i<HUMS.length;i++){var t=HUMS[i].tank;if(t&&!t.dead)return true;}return false;}
+/* กล้อง: ถ้ารถตัวเองพัง ให้ตามเพื่อนที่ยังรอด */
+function netCamT(){if(P&&!P.dead)return P;if(NET.mode==='host'){for(var i=0;i<HUMS.length;i++){var t=HUMS[i].tank;if(t&&!t.dead)return t;}}else if(NET.mode==='client'){for(var j=0;j<tanks.length;j++){var o=tanks[j];if(o.hname&&!o.dead)return o;}}return P;}
 function humAdd(o){var h=humNew(o);HUMS.push(h);if(NET.mode==='off')NET.mode='host';return h;}
 function humRemove(h){var i=HUMS.indexOf(h);if(i>=0)HUMS.splice(i,1);if(h.tank&&!h.tank.dead){h.tank.hum=null;h.tank.team=2;}if(!HUMS.length&&NET.mode==='host')NET.mode='off';}
 
@@ -4725,15 +4732,19 @@ function netDump(){return{o:obst.map(netObD),b:bushes.map(function(b){return[Mat
 function netStartWrap(kind,fn){if(!(NET.mode==='host'&&NET.conns.length)){fn();return;}
  var seed=(Math.random()*4294967295)>>>0;netSeedRnd(seed);try{fn();}finally{netSeedOff();}
  NET.started=true;NET.kind=kind;NET.seed=seed;NET.evq=[];NET.tick=0;NET.sendT=0;tanks.forEach(netNid);
- NET.cfg={kind:kind,seed:seed,sel:JSON.parse(JSON.stringify(kind==='fr'?frSel:flSel)),build:SV.build};var dump=netDump();
+ if(kind==='du')netDuelExtra();if(kind==='bt'){var cut=HUMS.length;tanks=tanks.filter(function(t){if(cut>0&&t.team===2){cut--;return false;}return true;});}
+ NET.cfg={kind:kind,seed:seed,sel:JSON.parse(JSON.stringify(netSelOf(kind))),build:SV.build};var dump=netDump();
  NET.conns.forEach(function(c){netSendStart(c,dump);});}
+function netSelOf(k){return k==='fr'?frSel:k==='fl'?flSel:k==='bt'?btSel:duelSel;}
+/* ดวลกับเพื่อน: ศัตรูเพิ่ม 1 ชุดต่อเพื่อน 1 คน */
+function netDuelExtra(){var f=FOES[duelSel.foe];if(!f)return;for(var n=0;n<HUMS.length;n++)for(var i=0;i<f.cnt;i++){var cls=f.mix?['light','medium','heavy'][i%3]:f.cls,st=foeStat(f.lvl,cls,f.boss),ex=AX*.76+rnd(-220,220),ey=rnd(-AY*.4,AY*.4);tanks.push(mkTank(ex,ey,st,1,{a:Math.PI,skin:st.skinKey,boss:f.boss}));}}
 function netSendStart(c,dump){c.sent={};c.ssent={};structs.forEach(function(s){c.ssent[s.sid]=1;});netSend(c,{t:'start',cfg:NET.cfg,dump:dump||netDump(),id:c.hum&&c.hum.id});}
 function netJoinLate(c){netSendStart(c,null);}
 /* ── สถานะโหมด/ผู้เล่น ── */
 function netModeState(){var F={gt:Math.round(G.t*100)/100,ov:G.over?1:0};
  if(FL.on){F.own=FL.own;F.prep=FL.prep?1:0;F.pt=Math.round((FL.phaseT||0)*10)/10;F.prog=FL.prog;F.front=FL.front;F.rt=FL.rt;F.to=FL.to?1:0;F.tk=FL.tk;F.atk=FL.atk;F.intel=FL.intel;F.col=FL.col;}
  if(FR.on){F.fr=[FR.next,Math.round(FR.prog*10)/10,FR.cst,Math.round(FR.tk),Math.round(FR.time),FR.hq?Math.round(FR.hq.hp):0,FR.hq&&FR.hq.inv?1:0,FR.wx?FR.wx.cur:'',FR.wx&&FR.wx.nxt||'',FR.wx?Math.round(FR.wx.t*100)/100:0,Math.round((FR.prepT||0)*10)/10];F.fob=FR.fob;F.tk0=FR.tk0;}
- if(FL.sup)F.sup=FL.sup.cd;return F;}
+ if(FL.sup)F.sup=FL.sup.cd;var hi=$('hInfo');if(hi)F.hi=hi.textContent;if(G.caps&&G.caps.length)F.caps=G.caps.map(function(c){return[c.own,Math.round(c.p)];});if(G.mode==='inf')F.wv=[G.wave,G.waveState];return F;}
 var NETME_SKIP={st:1,b:1,seeT:1,hunt:1,goal:1,cov:1,hum:1,craft:1,pax:1,crew:1,mods:1,ammo:1,dmk:1,rec:1,dmgBy:1,lastBy:1,nav:1,mNear:1,srch:1,asT:1};
 function netMe(h,full){var t=h.tank,m={bu:h.ctx.bUsed,id:t?t.nid:0,dd:!t||t.dead?1:0,rs:Math.round((h.ctx.pRespawn||0)*10)/10,de:h.deaths,w:h.ctx.wSel,am:h.ctx.aSel,lk:h.ctx.lock&&h.ctx.lock.nid||0};
  if(t&&full){m.p=netPrim(t,NETME_SKIP);m.ammo=t.ammo;m.mods=t.mods?JSON.parse(JSON.stringify(t.mods)):null;m.crew=t.crew?t.crew.map(function(c){return netPrim(c);}):null;m.pax=t.pax?t.pax.length:0;}
@@ -4788,8 +4799,8 @@ function netCliMsg(m){if(!m||!m.t)return;
  if(m.t==='start'){netCliStart(m);return;}
  if(m.t==='pong'){var rt=performance.now()-m.ts;NET.rtt=NET.rtt?NET.rtt*.8+rt*.2:rt;return;}
  if(m.t==='s'&&NET.mode==='client'){netCliSnap(m);return;}}
-function netCliStart(m){var cfg=m.cfg,sb=SV.build;NET.myId=m.id||NET.myId;SV.build=cfg.build||sb;var sel=cfg.kind==='fr'?frSel:flSel;for(var k in cfg.sel)sel[k]=cfg.sel[k];
- NET.mode='cstart';netSeedRnd(cfg.seed);try{(cfg.kind==='fr'?_startFrontier:_startFrontline)();}catch(e){console.error(e);}finally{netSeedOff();SV.build=sb;}
+function netCliStart(m){var cfg=m.cfg,sb=SV.build;NET.myId=m.id||NET.myId;SV.build=cfg.build||sb;var sel=netSelOf(cfg.kind);for(var k in cfg.sel)sel[k]=cfg.sel[k];
+ NET.mode='cstart';netSeedRnd(cfg.seed);try{({fr:_startFrontier,fl:_startFrontline,bt:_startBattle,du:_startDuel,in:_startInf}[cfg.kind]||_startFrontline)();}catch(e){console.error(e);}finally{netSeedOff();SV.build=sb;}
  netApplyDump(m.dump);netCliEnter();}
 function netApplyDump(d){var ob=MAPS[G.map].ob;
  obst=d.o.map(function(r){var o={};for(var k in r)o[k]=r[k];o.nid=r.n;o.spr=bakeOb25(o,ob,GX.th);return o;});gridBuild();
@@ -4819,13 +4830,14 @@ function netCliSnap(m){var i,r,t,id;
  if(m.F)netCliMode(m.F);
  if(m.me)netCliMe(m.me);
  (m.E||[]).forEach(netCliEv);(m.O||[]).forEach(netCliOut);}
-function netCliMode(F){if(FL.on){if(F.own)FL.own=F.own;FL.prep=!!F.prep;if(F.pt!==undefined)FL.phaseT=F.pt;if(F.prog)FL.prog=F.prog;if(F.front)FL.front=F.front;if(F.rt!==undefined)FL.rt=F.rt;FL.to=!!F.to;if(F.tk)FL.tk=F.tk;if(F.atk!==undefined)FL.atk=F.atk;if(F.intel)FL.intel=F.intel;if(F.col)FL.col=F.col;}
+function netCliMode(F){if(F.hi!==undefined){var hi=$('hInfo');if(hi)hi.textContent=F.hi;}if(F.caps&&G.caps)F.caps.forEach(function(c,i){if(G.caps[i]){G.caps[i].own=c[0];G.caps[i].p=c[1];}});if(F.wv){G.wave=F.wv[0];G.waveState=F.wv[1];}
+ if(FL.on){if(F.own)FL.own=F.own;FL.prep=!!F.prep;if(F.pt!==undefined)FL.phaseT=F.pt;if(F.prog)FL.prog=F.prog;if(F.front)FL.front=F.front;if(F.rt!==undefined)FL.rt=F.rt;FL.to=!!F.to;if(F.tk)FL.tk=F.tk;if(F.atk!==undefined)FL.atk=F.atk;if(F.intel)FL.intel=F.intel;if(F.col)FL.col=F.col;}
  if(FR.on&&F.fr){var a=F.fr;if(a[10]!==undefined)FR.prepT=a[10];FR.next=a[0];FR.prog=a[1];FR.cst=a[2];FR.tk=a[3];FR.time=a[4];if(FR.hq){FR.hq.hp=a[5];FR.hq.inv=!!a[6];}if(FR.wx&&a[7]){var ch=FR.wx.cur!==a[7]||(FR.wx.nxt||'')!==a[8];FR.wx.cur=a[7];FR.wx.nxt=a[8]||null;FR.wx.t=a[9];frWxBlend();if(ch){FL.tod=frWxTodKey(FR.wx.cur);frWxVig();}}FR.fob=F.fob||null;if(F.tk0)FR.tk0=F.tk0;}
  if(F.sup&&FL.sup)FL.sup.cd=F.sup;}
 var NETME_KEEP={x:1,y:1,a:1,ta:1,nid:1,seed:1,dead:1,gone:1,team:1,hp:1,mhp:1,spd:1};
 function netCliMe(me){var t=NET.T[me.id];if(me.bu&&FR.on)FR.bUsed=me.bu;P=me.dd?null:(t||null);NET.meId=me.id;wSel=me.w|0;if(me.am)aSel=me.am;G.lock=me.lk?NET.T[me.lk]||null:null;
  if(t&&me.p){for(var k in me.p)if(!NETME_KEEP[k])t[k]=me.p[k];if(me.ammo)t.ammo=me.ammo;if(me.mods)t.mods=me.mods;if(me.crew&&t.crew)me.crew.forEach(function(c,i){if(t.crew[i])for(var k2 in c)t.crew[i][k2]=c[k2];});t.pax=new Array(me.pax||0);}
- var hr=$('hResp');if(me.dd){hr.classList.add('on');$('respT').textContent=me.rs>0?Math.ceil(me.rs):'—';$('respQ').textContent='🤝 รอเกิดใหม่ (โฮสต์เป็นผู้กำหนด)';}else hr.classList.remove('on');}
+ var hr=$('hResp');if(me.dd){hr.classList.add('on');$('respT').textContent=me.rs>0?Math.ceil(me.rs):'—';$('respQ').textContent=FL.on?'🤝 รอเกิดใหม่ (โฮสต์เป็นผู้กำหนด)':'💀 รถพัง — ดูเพื่อนเล่นจนจบรอบ';}else hr.classList.remove('on');}
 function netCliEv(e){try{switch(e[0]){
  case 'f':shots.push({x:e[1],y:e[2],vx:e[3],vy:e[4],kind:e[5],r:e[6],col:e[7],life:e[8],a:e[9],cli:1});GX.lights.push({x:e[1],y:e[2],r:40,l:.06,ml:.06,c:'#ffc878'});break;
  case 'ar':arty.push({x:e[1],y:e[2],t:e[3],r:e[4],cli:1});break;
@@ -4842,6 +4854,7 @@ function netCliEv(e){try{switch(e[0]){
  case 'c':cineCard(e[1],e[2],e[3]||undefined,e[4]||undefined,!!e[5]);break;
  case 'l':addLog(e[1],e[2]);break;
  case 'm':bigMsg(e[1]);break;
+ case 'wr':SV.cr+=e[1];save();addLog('🔧 เวฟ '+e[2]+' ผ่าน — ซ่อมรถ 45% · +'+fmt(e[1])+' เครดิต','g');break;
  case 'end':if(!G.over){NET.mode='cend';endGame(!!e[1]);NET.mode='cwait';}break;}}catch(x){}}
 function netCliOut(o){if(o[0]==='log')addLog(o[1],o[2]);else if(o[0]==='toast')toast(o[1]);else if(o[0]==='big')bigMsg(o[1]);else if(o[0]==='pop'&&P)pop(P.x,P.y-24,o[1],o[2]||'#fff',13);else if(o[0]==='dead')addLog('💀 หมดกำลังเสริม — เกิดใหม่ไม่ได้','r');}
 function cliKillFx(t,big){if(t.dead&&t._kfx)return;t.dead=true;t._kfx=1;var ang=rnd(0,6.28),pw=big?rnd(4.5,7.5):rnd(2.2,4.2);
@@ -4904,8 +4917,9 @@ function drawCoopNames(w,h){cx.save();cx.font='700 12px Kanit, Tahoma';cx.textAl
  cx.restore();}
 function netHostQuit(){if(NET.mode==='host'&&NET.conns.length){netBcast({t:'quit'});NET.started=false;}}
 
-var _startFrontier=startFrontier,_startFrontline=startFrontline;
+var _startFrontier=startFrontier,_startFrontline=startFrontline,_startBattle=startBattle,_startDuel=startDuel,_startInf=startInf;
 window.startFrontier=function(){netStartWrap('fr',_startFrontier);};window.startFrontline=function(){netStartWrap('fl',_startFrontline);};
+window.startBattle=function(){netStartWrap('bt',_startBattle);};window.startDuel=function(){netStartWrap('du',_startDuel);};window.startInf=function(){netStartWrap('in',_startInf);};
 netHooks();
 /* ═══════ FRONTLINE STATE ═══════ */
 var FL={on:false,own:[],prog:[],capT:[],hq:[6000,6000],front:[1,5],
@@ -6219,7 +6233,7 @@ function nearEngines(){var L=[],px=P&&!P.dead?P.x:cam.x+innerWidth/2,py=P&&!P.de
   L.push({x:t.x,y:t.y,d:d,sp:Math.abs(t.spd)/Math.max(t.st.sp,.1)*.8+Math.abs(t.thr||0)*.3,k:1.25-Math.min((t.st.W||30)/80,.6)});}
  L.sort(function(a,b){return a.d-b.d;});return L.slice(0,3);}
 function commonStart(mode){
- SFX.init();SFX.resume();if(typeof HUMS!=='undefined')HUMS.forEach(function(h){h.tank=null;h.acts=[];h.out=[];h.ctx={wSel:0,aSel:'ap',lock:null,scanning:false,scan:0,pRespawn:0,bUsed:{}};h.deaths=0;h.kills=0;});
+ SFX.init();SFX.resume();if(typeof HUMS!=='undefined')HUMS.forEach(function(h){h.tank=null;h.acts=[];h.out=[];h.ctx={wSel:0,aSel:'ap',lock:null,scanning:false,scan:0,pRespawn:0,bUsed:{}};h.spawned=0;h.deaths=0;h.kills=0;});
  var s=document.querySelectorAll('.screen');
  for(var i=0;i<s.length;i++)s[i].classList.remove('on');
  $('hud').classList.add('on');
@@ -6287,7 +6301,7 @@ function startFrontline(){
 function nextWave(){
  G.wave++;var C=P;if(SPEC.on){C=SPEC.hero&&!SPEC.hero.dead?SPEC.hero:null;for(var ci=0;!C&&ci<tanks.length;ci++)if(!tanks[ci].dead&&teamSide(tanks[ci].team)===0)C=tanks[ci];C=C||P;}
  if(!SPEC.on&&G.wave>SV.stat.best){SV.stat.best=G.wave;save();}
- var lvl=G.wave,boss=(G.wave%5===0),cnt=boss?1:Math.min(1+Math.floor(G.wave/2),5);
+ var lvl=G.wave,boss=(G.wave%5===0),cnt=boss?1:Math.min(1+Math.floor(G.wave/2),5);if(NET.mode==='host'&&HUMS.length)cnt=boss?1+HUMS.length:Math.min(cnt+Math.ceil(cnt*.6*HUMS.length),12);
  for(var i=0;i<cnt;i++){
   var ang=rnd(0,6.28),dist=AX*rnd(.55,.78);
   var ex=clamp(C.x+Math.cos(ang)*dist,-AX*.9,AX*.9),ey=clamp(C.y+Math.sin(ang)*dist,-AY*.9,AY*.9);
@@ -6367,7 +6381,7 @@ function camHud(dt){
  /* ── กล้อง ── */
  if(cineCam(dt/(CINE.slow||1))){}
  else if(SPEC.on)specCam(dt);
- else if(P){var tx=P.x-innerWidth/2,ty=P.y-innerHeight/2;
+ else if(netCamT()){var CT=netCamT(),tx=CT.x-innerWidth/2,ty=CT.y-innerHeight/2;
   cam.x=lerp(cam.x,tx,1-Math.pow(.0015,dt));cam.y=lerp(cam.y,ty,1-Math.pow(.0015,dt));}
  if(G.shakeT>0){G.shakeT-=dt;G.shake*=.9;}else G.shake=0;
  if(G.fireGlow>0)G.fireGlow-=dt;
@@ -6567,7 +6581,7 @@ function update(dt){
   var z=P?zoneOf(P.x):0;
   $('hInfo').textContent=(FR.on?'Sector '+FRC.LET[FR.atk===0?z:FLZ-1-z]+' · FRONTIER':'Zone '+(z+1)+' · แนวรบ '+(FL.front[0]+1)+'–'+(FL.front[1]+1))+
    (SPEC.on?' · น้ำเงิน ':' · เรา ')+aliveF+' vs '+aliveE;}
- if(P&&P.hp<=0&&!G.over&&(G.mode==='duel'||G.mode==='inf'))endGame(false);
+ if(P&&P.hp<=0&&!G.over&&(G.mode==='duel'||G.mode==='inf')&&!humAnyAlive())endGame(false);
  if(SPEC.on&&!G.over&&aliveF===0&&(G.mode==='duel'||G.mode==='inf'))endGame(false);
  if(SPEC.used&&!SPEC.on)SPEC.played+=dt;
  if(SPEC.on)specFrame(dt);
@@ -6591,7 +6605,7 @@ function waveReward(){
   '<p class="sub">ได้ '+fmt(cr)+' เครดิต · เลือกบัฟ 1 อย่าง</p><div class="grid" style="gap:7px">';
  chosen.forEach(function(b){h+='<div class="card" onclick="takeBuff(\''+b.k+'\')">'+
   '<div class="nm">'+b.ico+' '+b.n+'</div><div class="st">'+b.d+'</div></div>';});
- modal(h+'</div>');SFX.rare();G.run=false;}
+ modal(h+'</div>');SFX.rare();if(NET.mode==='host'&&NET.conns.length){HUMS.forEach(function(hh){var t=hh.tank;if(t&&!t.dead)t.hp=Math.min(t.mhp,t.hp+t.mhp*.45);});NET.evq.push(['wr',cr,G.wave]);}else G.run=false;}
 function takeBuff(k){
  closeModal();SFX.ui(true);
  var b=BUFFS.filter(function(x){return x.k===k;})[0];
@@ -6628,8 +6642,8 @@ function takeBuff(k){
    al.hp=al.mhp;tanks.push(al);}
   addLog('🤝 พันธมิตรมาถึงแล้ว!','b');}
  addLog('บัฟ: '+b.n,'g');updAmmoUI();
- G.waveState='inter';G.inter=3;G.run=true;G.last=performance.now();
- requestAnimationFrame(loop);}
+ G.waveState='inter';G.inter=3;var wasRun=G.run;G.run=true;G.last=performance.now();
+ if(!wasRun)requestAnimationFrame(loop);}
 
 /* ═══════ END ═══════ */
 function endGame(victory){
