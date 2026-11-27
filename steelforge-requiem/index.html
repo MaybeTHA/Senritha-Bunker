@@ -4695,6 +4695,7 @@ function netHostMsg(c,m){if(!m||!m.t)return;
  if(m.t==='hello'){if(m.v!==NETV){netSend(c,{t:'bad',why:'เวอร์ชันเกมไม่ตรงกัน'});return;}var h=humAdd({name:(m.name||'เพื่อน').slice(0,14),build:m.build||null,st:m.st||null});h.conn=c;c.hum=h;c.sent={};c.ssent={};
   NET.lobby.push({id:h.id,name:h.name});netSend(c,{t:'welcome',id:h.id,code:NET.code});netLobbyBcast();if(NET.started&&G.run)netJoinLate(c);return;}
  var h=c.hum;if(!h)return;
+ if(m.t==='png'){netSend(c,{t:'pong',ts:m.ts});return;}
  if(m.t==='cmd'){if(m.c)h.cmd=m.c;if(m.a&&m.a.length)h.acts=h.acts.concat(m.a.slice(0,12));return;}
  if(m.t==='bld'){h.build=m.build;h.st=m.st;return;}}
 function netDrop(c){var i=NET.conns.indexOf(c);if(i<0)return;NET.conns.splice(i,1);if(c.hum){addLog('📴 '+c.hum.name+' ออกจากเกม','r');humRemove(c.hum);NET.lobby=NET.lobby.filter(function(p){return p.id!==c.hum.id;});}netLobbyBcast();if(NET.mode==='off')NET.mode='host';}
@@ -4785,6 +4786,7 @@ function netCliMsg(m){if(!m||!m.t)return;
  if(m.t==='bad'){netStatus('❌ '+m.why,'r');return;}
  if(m.t==='quit'){if(NET.mode==='client'){NET.mode='cwait';G.run=false;show('scCoop');toast('โฮสต์ออกจากแมตช์');}return;}
  if(m.t==='start'){netCliStart(m);return;}
+ if(m.t==='pong'){var rt=performance.now()-m.ts;NET.rtt=NET.rtt?NET.rtt*.8+rt*.2:rt;return;}
  if(m.t==='s'&&NET.mode==='client'){netCliSnap(m);return;}}
 function netCliStart(m){var cfg=m.cfg,sb=SV.build;NET.myId=m.id||NET.myId;SV.build=cfg.build||sb;var sel=cfg.kind==='fr'?frSel:flSel;for(var k in cfg.sel)sel[k]=cfg.sel[k];
  NET.mode='cstart';netSeedRnd(cfg.seed);try{(cfg.kind==='fr'?_startFrontier:_startFrontline)();}catch(e){console.error(e);}finally{netSeedOff();SV.build=sb;}
@@ -4803,7 +4805,7 @@ function netCliSnap(m){var i,r,t,id;
  var seenC={};(m.C||[]).forEach(function(r){var c=NET.C[r[0]];if(!c){c=NET.C[r[0]]={nid:r[0],pax:[]};FR.crafts.push(c);}c._tx=r[1];c._ty=r[2];if(c.x===undefined){c.x=r[1];c.y=r[2];}c.a=r[3];c.L=r[4];c.W=r[5];c.st=r[6];c.ramp=r[7];c.seed=r[8];c.pax.length=r[9];c.team=r[10];seenC[r[0]]=1;});
  for(id in NET.C)if(!seenC[id]){i=FR.crafts.indexOf(NET.C[id]);if(i>=0)FR.crafts.splice(i,1);delete NET.C[id];}
  var seen={};(m.T||[]).forEach(function(r){var t=NET.T[r[0]];if(!t){var sp=NET.TS[r[0]];if(!sp)return;t=mkTank(r[1],r[2],sp.st,sp.team,{a:r[3],skin:sp.skin});t.nid=r[0];t.hname=sp.hum||'';NET.T[r[0]]=t;tanks.push(t);t.x=r[1];t.y=r[2];t.ta=r[4];}
-  t._tx=r[1];t._ty=r[2];t._a=r[3];t._t=r[4];t.hp=r[5];t.mhp=r[8];var f=r[6];t.craft=f&1?(NET.C[r[9]]||{}):null;t.fire=f&2?1:0;if(f&8)t.hitFlash=.15;t.spd=r[7]/100;t.elev=r[10]||0;
+  t._tx=r[1];t._ty=r[2];t._a=r[3];t._t=r[4];t.hp=r[5];t.mhp=r[8];var f=r[6];t.craft=f&1?(NET.C[r[9]]||{}):null;t.fire=f&2?1:0;if(f&8)t.hitFlash=.15;t._spd=r[7]/100;if(r[0]!==NET.meId||t.craft||t.dead)t.spd=t._spd;t.elev=r[10]||0;
   if(f&4&&!t.dead){t.dead=true;}seen[r[0]]=1;});
  if(m.full)for(id in NET.T)if(!seen[id]){t=NET.T[id];t.gone=true;i=tanks.indexOf(t);if(i>=0)tanks.splice(i,1);delete NET.T[id];}
  var seenI={};(m.I||[]).forEach(function(r){var q=NET.I[r[0]];if(!q){q=NET.I[r[0]]={nid:r[0],x:r[1],y:r[2],a:r[3],cls:r[4]?'at':'rifle',team:r[5],hp:r[6],mhp:Math.max(r[6],(INFC[r[4]?'at':'rifle']||{}).hp||100),dead:false,deadT:0,mv:0,walk:0,kneel:0,flash:0,rk:1,aimT:0,seed:r[0]};inf.push(q);}
@@ -4850,12 +4852,14 @@ function cliKillFx(t,big){if(t.dead&&t._kfx)return;t.dead=true;t._kfx=1;var ang=
 /* ── เพื่อน: อัปเดตต่อเฟรม (ไม่จำลองเกม — วาดตามโฮสต์ + เอฟเฟกต์ในเครื่อง) ── */
 function netCliInput(dt){var c=NET.conn;if(!c)return;var th=0,sr=0;
  if(PLAT==='mb'){th=-joyL.y;sr=joyL.x;}else{if(kdown('fwd'))th+=1;if(kdown('back'))th-=1;if(kdown('left'))sr-=1;if(kdown('right'))sr+=1;}
+ var brk=PLAT==='pc'&&kdown('brake');NET.inp={th:clamp(th,-1,1),sr:clamp(sr,-1,1),brk:brk};
+ NET.pingT=(NET.pingT||0)-dt;if(NET.pingT<=0){NET.pingT=2;netSend(c,{t:'png',ts:Math.round(performance.now())});}
  var ax,ay,fire=false;
  if(P&&!P.dead){if(PLAT==='mb'){mobAim(dt);ax=P.x+Math.cos(P.ta)*520;ay=P.y+Math.sin(P.ta)*520;fire=!!G.mobFire;}
   else{ax=mouse.x+cam.x;ay=mouse.y+cam.y;fire=!!mouse.down||!!G.mobFire;var tv=P.st.tvel*dt;P.ta+=clamp(angD(P.ta,Math.atan2(ay-P.y,ax-P.x)),-tv,tv);}}
  else{ax=cam.x+innerWidth/2;ay=cam.y+innerHeight/2;}
  NET.cmdT-=dt;if(NET.cmdT>0&&!NET.acts.length)return;NET.cmdT=1/20;
- netSend(c,{t:'cmd',c:{th:clamp(th,-1,1),sr:clamp(sr,-1,1),ax:Math.round(ax),ay:Math.round(ay),fire:fire},a:NET.acts.length?NET.acts.splice(0):undefined});}
+ netSend(c,{t:'cmd',c:{th:clamp(th,-1,1),sr:clamp(sr,-1,1),brk:brk?1:0,ax:Math.round(ax),ay:Math.round(ay),fire:fire},a:NET.acts.length?NET.acts.splice(0):undefined});}
 function netCliKey(k){var K=SV.keys,a=null;
  if(k===K.w1)a={a:'w',i:0};else if(k===K.w2)a={a:'w',i:1};else if(k===K.w3)a={a:'w',i:2};else if(k===K.ammo)a={a:'ammo'};else if(k===K.smoke)a={a:'smoke'};
  else if(k===K.use)a={a:'use'};else if(k===K.lock)a={a:'lock'};else if(k===(K.pax||'g'))a={a:'pax'};else if(k===(K.skill||'v'))a={a:'skill'};else if(k===(K.rwsAm||'t'))a={a:'rws'};else if(k===K.ext)a={a:'ext'};
@@ -4864,7 +4868,7 @@ function netCliKey(k){var K=SV.keys,a=null;
  if(a){NET.acts.push(a);return true;}return false;}
 function cliUpdate(dt){var k=Math.min(1,dt*12),i,t;
  netCliInput(dt);
- for(i=0;i<tanks.length;i++){t=tanks[i];if(t._tx===undefined)continue;var ox=t.x,oy=t.y;t.x+=(t._tx-t.x)*k;t.y+=(t._ty-t.y)*k;t.a+=angD(t.a,t._a)*k;if(t!==P||PLAT==='mb')t.ta+=angD(t.ta,t._t)*k;
+ for(i=0;i<tanks.length;i++){t=tanks[i];if(t._tx===undefined)continue;var ox=t.x,oy=t.y;if(t===P&&!t.dead&&!t.craft&&NET.inp)cliPredict(t,dt);else{t.x+=(t._tx-t.x)*k;t.y+=(t._ty-t.y)*k;t.a+=angD(t.a,t._a)*k;}if(t!==P||PLAT==='mb')t.ta+=angD(t.ta,t._t)*k;
   t.trkOff=(t.trkOff||0)+t.spd*60*dt*.9;if(t.hitFlash>0)t.hitFlash-=dt;if(t.recoil>0)t.recoil=Math.max(0,t.recoil-dt*3.2);
   if(!t.dead&&!t.craft&&Math.abs(t.spd)>.35&&Math.random()<.3&&GFX.trail){if(gfOnTop(t.x,t.y)){marks.push({x:t.x,y:t.y,a:t.a,l:8,ml:8,w:mdl(t.b).W});if(marks.length>260)marks.shift();}else (GX.trkQ||(GX.trkQ=[])).push({x:t.x,y:t.y,a:t.a,w:mdl(t.b).W});}
   if(!t.dead&&!t.craft&&Math.abs(t.spd)>.8&&Math.random()<.18&&GX.th){var sd=Math.random()<.5?-1:1,ca=Math.cos(t.a),sa=Math.sin(t.a);pAdd({t:'s',x:t.x-ca*30-sa*sd*16,y:t.y-sa*30+ca*sd*16,vx:rnd(-.2,.2),vy:rnd(-.2,.2),l:rnd(.8,1.4),ml:1.4,c:GX.th.dust,r:rnd(5,9),g:1.6,a:.4,v:Math.floor(rnd(0,3))});}}
@@ -4882,6 +4886,13 @@ function cliUpdate(dt){var k=Math.min(1,dt*12),i,t;
  if(FR.on)frHUD();else if(FL.on)flHUD();
  cineTick(dt);
  camHud(dt);}
+/* ทำนายรถตัวเอง: ขยับทันทีตามปุ่มด้วยสูตรเดียวกับโฮสต์ แล้วดึงเข้าหาตำแหน่งโฮสต์ (ชดเชยความหน่วงของเน็ต) ทีละน้อย */
+function cliPredict(t,dt){var s=t.st,I=NET.inp,th=I.th,sr=I.sr;if(t.noMove||(t.mod&&t.mod.trk>0)){th=0;sr=0;}
+ var tspd=(I.brk?0:th)*s.sp*(t.bstT>0?1.55:1),rate=(Math.abs(tspd)<Math.abs(t.spd)||I.brk||(tspd*t.spd<0))?(s.acc*2.1):s.acc;rate*=(t.bstT>0?1.6:1);
+ t.spd=toward(t.spd,tspd,rate*dt);if(FL.on&&Math.abs(t.y)<80)t.spd*=1.0009;var mv=Math.abs(t.spd)/Math.max(s.sp,.05);
+ t.a+=sr*s.turn*60*dt*(0.42+mv*0.72);t.x+=Math.cos(t.a)*t.spd*60*dt;t.y+=Math.sin(t.a)*t.spd*60*dt;pushOut(t,s.cls==='light'||s.isIFV?26:s.cls==='medium'?30:34);
+ var L=clamp(((NET.rtt||120)/2+60)/1000,.04,.5),hs=t._spd||0,hx=t._tx+Math.cos(t._a)*hs*60*L,hy=t._ty+Math.sin(t._a)*hs*60*L,ex=hx-t.x,ey=hy-t.y,ed=Math.hypot(ex,ey);
+ if(ed>260){t.x=hx;t.y=hy;t.a=t._a;t.spd=hs;}else{var g=Math.min(1,dt*(ed>80?4:2));t.x+=ex*g;t.y+=ey*g;t.a+=angD(t.a,t._a)*Math.min(1,dt*2.5);t.spd+=(hs-t.spd)*Math.min(1,dt*1.5);}}
 /* โฮสต์ออกจากแมตช์ → บอกเพื่อน */
 /* ป้ายชื่อเพื่อนเหนือรถ + ลูกศรชี้เพื่อนที่อยู่นอกจอ */
 function drawCoopNames(w,h){cx.save();cx.font='700 12px Kanit, Tahoma';cx.textAlign='center';cx.lineWidth=3;
@@ -5904,7 +5915,7 @@ function moveTank(t,dt){
  var s=t.st,isP=t.team===0;
  var spdM=(isP?runBuff.spd:1);
  if(t.mod.trk>0){t.thr=0;t.steer=0;}
- var brake=isP&&kdown('brake')&&PLAT==='pc';
+ var brake=isP&&(RC&&RC.tank===t?!!RC.cmd.brk:(t===P&&!RC&&kdown('brake')&&PLAT==='pc'));
  if(t.dropT>0||t.towHold>0){t.thr=0;t.steer=0;}
  var tspd=(brake?0:t.thr)*s.sp*spdM*(t.bstT>0?1.55:1);
  var rate=(Math.abs(tspd)<Math.abs(t.spd)||brake||(tspd*t.spd<0))?(s.acc*2.1):s.acc;
